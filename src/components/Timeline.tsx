@@ -1,4 +1,4 @@
-import { Trash2, CheckCircle, XCircle, MinusCircle, Tag, Share2 } from 'lucide-react';
+import { Trash2, CheckCircle, XCircle, MinusCircle, Tag, Share2, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 import { MatchEventWithDetails, Match } from '../types/database';
 import TimelineShareModal from './TimelineShareModal';
@@ -9,9 +9,11 @@ interface TimelineProps {
   onDeleteEvent?: (eventId: string) => void;
   teamAName?: string;
   teamBName?: string;
+  veoUrl?: string;
+  buildVeoLink?: (videoTimestamp: number) => string;
 }
 
-export default function Timeline({ events, match, onDeleteEvent, teamAName = 'Éq. A', teamBName = 'Éq. B' }: TimelineProps) {
+export default function Timeline({ events, match, onDeleteEvent, teamAName = 'Éq. A', teamBName = 'Éq. B', veoUrl, buildVeoLink }: TimelineProps) {
   const [shareEvent, setShareEvent] = useState<MatchEventWithDetails | null>(null);
 
   const formatTime = (seconds: number): string => {
@@ -33,7 +35,14 @@ export default function Timeline({ events, match, onDeleteEvent, teamAName = 'É
 
   return (
     <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6 text-white">
-      <h3 className="text-lg font-semibold text-white mb-4">Timeline des événements</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-white">Timeline des événements</h3>
+        {veoUrl && (
+          <span className="flex items-center gap-1 text-xs text-yellow-400 bg-yellow-900/30 border border-yellow-800/40 px-2 py-1 rounded-full">
+            ⚡ VEO sync
+          </span>
+        )}
+      </div>
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {events.length === 0 ? (
           <p className="text-gray-600 text-center py-8">Aucun événement enregistré</p>
@@ -67,6 +76,17 @@ export default function Timeline({ events, match, onDeleteEvent, teamAName = 'É
                     {event.event_type?.has_outcome && getOutcomeIcon(event.outcome)}
                   </div>
                   <div className="flex items-center gap-1 ml-2">
+                    {veoUrl && buildVeoLink && event.video_timestamp != null && (
+                      <a
+                        href={buildVeoLink(event.video_timestamp)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 text-yellow-600 hover:text-yellow-400 transition-colors flex-shrink-0"
+                        title="Voir sur VEO"
+                      >
+                        <ExternalLink size={15} />
+                      </a>
+                    )}
                     {match && (
                       <button
                         onClick={() => setShareEvent(event)}

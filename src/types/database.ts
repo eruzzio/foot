@@ -63,6 +63,7 @@ export interface MatchEvent {
   keywords: string[];
   parent_event_id: string | null;
   location_id: string | null;
+  video_timestamp: number | null;
   created_at: string;
 }
 

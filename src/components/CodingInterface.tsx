@@ -46,6 +46,11 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [matchDate, setMatchDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [pendingEventId, setPendingEventId] = useState<string | null>(null);
+  const [kickoffRealTime, setKickoffRealTime] = useState<Date | null>(null);
+  const [veoUrl, setVeoUrl] = useState<string>('');
+  const [veoOffsetSeconds, setVeoOffsetSeconds] = useState<number | null>(null);
+  const [showVeoSync, setShowVeoSync] = useState(false);
+  const [veoKickoffInput, setVeoKickoffInput] = useState<string>('');
 
   useEffect(() => {
     initializeData();
@@ -405,6 +410,51 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     }
   };
 
+  const handleKickoff = (realTime: Date) => {
+    setKickoffRealTime(realTime);
+    if (matchId) {
+      supabase.from('matches').update({ kickoff_real_time: realTime.toISOString() }).eq('id', matchId);
+    }
+  };
+
+  // Calcule le décalage VEO : on saisit le timecode VEO du coup d'envoi (ex: "2:34")
+  // VEO offset = secondes VEO au coup d'envoi
+  const handleVeoSync = async () => {
+    if (!veoUrl || !kickoffRealTime || !veoKickoffInput) return;
+
+    const parts = veoKickoffInput.split(':').map(Number);
+    const veoKickoffSeconds = parts.length === 2 ? parts[0] * 60 + parts[1] : parts[0];
+    setVeoOffsetSeconds(veoKickoffSeconds);
+
+    if (matchId) {
+      await supabase.from('matches').update({
+        video_url: veoUrl,
+        video_provider: 'veo',
+      }).eq('id', matchId);
+
+      // Mettre à jour le video_timestamp de chaque événement
+      const { data: eventsData } = await supabase
+        .from('match_events')
+        .select('id, timestamp')
+        .eq('match_id', matchId);
+
+      if (eventsData) {
+        for (const ev of eventsData) {
+          const videoTs = veoKickoffSeconds + ev.timestamp;
+          await supabase.from('match_events').update({ video_timestamp: videoTs }).eq('id', ev.id);
+        }
+      }
+      await loadEvents();
+    }
+    setShowVeoSync(false);
+  };
+
+  const buildVeoLink = (videoTimestamp: number): string => {
+    if (!veoUrl) return '';
+    const base = veoUrl.split('?')[0];
+    return `${base}?t=${videoTimestamp}`;
+  };
+
   const handleScoreChange = async (team: 'A' | 'B', increment: number) => {
     if (!matchId) return;
 
@@ -487,6 +537,17 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 duration={currentTime}
               />
               <button
+                onClick={() => setShowVeoSync(true)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+                  veoOffsetSeconds !== null
+                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
+                    : 'bg-dark-tertiary hover:bg-gray-700 text-yellow-400 border border-yellow-800/50'
+                }`}
+                title="Synchroniser avec VEO"
+              >
+                {veoOffsetSeconds !== null ? 'VEO synchronisé' : 'Lier VEO'}
+              </button>
+              <button
                 onClick={() => setIsMatchSheetOpen(true)}
                 className="px-4 py-2 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
               >
@@ -551,6 +612,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
               teamALogoUrl={teamALogoUrl}
               halftimes={halftimes}
               onHalftime={handleHalftime}
+              kickoffRealTime={kickoffRealTime}
+              onKickoff={handleKickoff}
               onOpenFormation={(team) => {
                 setFormationTeam(team);
                 setShowFormationManager(true);
@@ -580,7 +643,14 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           </div>
 
           <div className="lg:col-span-1">
-            <Timeline events={events} onDeleteEvent={handleDeleteEvent} teamAName={teamAName} teamBName={teamBName} />
+            <Timeline
+              events={events}
+              onDeleteEvent={handleDeleteEvent}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              veoUrl={veoUrl}
+              buildVeoLink={buildVeoLink}
+            />
           </div>
         </div>
       </div>
@@ -611,6 +681,77 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           }}
         />
       )}
+      {showVeoSync && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-secondary border border-yellow-800/50 rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+              Synchronisation VEO
+            </h2>
+            <p className="text-sm text-gray-400 mb-5">
+              Après le match, collez le lien VEO et indiquez à quelle minute la vidéo VEO montre le coup d'envoi.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">Lien de partage VEO</label>
+                <input
+                  type="text"
+                  value={veoUrl}
+                  onChange={e => setVeoUrl(e.target.value)}
+                  placeholder="https://app.veo.co/matches/..."
+                  className="w-full bg-dark-tertiary border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-600"
+                />
+              </div>
+
+              {kickoffRealTime ? (
+                <div className="bg-dark-tertiary rounded-lg p-3">
+                  <p className="text-xs text-gray-400 mb-1">Coup d&apos;envoi enregistré dans ORION</p>
+                  <p className="text-sm font-mono text-yellow-400">
+                    {kickoffRealTime.toLocaleTimeString('fr-FR')}
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-3">
+                  <p className="text-xs text-red-400">! Pas de coup d&apos;envoi enregistré. Pendant le prochain match, appuyez sur &quot;Coup d&apos;envoi&quot; au moment exact du début.</p>
+                </div>
+              )}
+
+              <div>
+                <label className="text-xs text-gray-400 mb-1 block">
+                  À quel timecode VEO voit-on le coup d&apos;envoi ? (ex: 2:34)
+                </label>
+                <input
+                  type="text"
+                  value={veoKickoffInput}
+                  onChange={e => setVeoKickoffInput(e.target.value)}
+                  placeholder="2:34"
+                  className="w-full bg-dark-tertiary border border-gray-700 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-yellow-600 font-mono"
+                />
+                <p className="text-xs text-gray-600 mt-1">
+                  Ouvrez VEO, trouvez le coup d&apos;envoi, notez le timecode affiché
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowVeoSync(false)}
+                className="flex-1 py-2 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleVeoSync}
+                disabled={!veoUrl || !veoKickoffInput}
+                className="flex-1 py-2 bg-yellow-600 hover:bg-yellow-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg text-sm font-semibold transition-colors"
+              >
+                Synchroniser
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

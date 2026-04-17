@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Upload, Users, Timer } from 'lucide-react';
+import { Play, Pause, RotateCcw, Upload, Users, Timer, Zap } from 'lucide-react';
 
 interface MatchTimerProps {
   onTimeUpdate: (seconds: number) => void;
@@ -19,6 +19,8 @@ interface MatchTimerProps {
   teamALogoUrl?: string;
   halftimes: number[];
   onHalftime: () => void;
+  kickoffRealTime?: Date | null;
+  onKickoff?: (realTime: Date) => void;
 }
 
 export default function MatchTimer({
@@ -39,6 +41,8 @@ export default function MatchTimer({
   teamALogoUrl = '',
   halftimes,
   onHalftime,
+  kickoffRealTime,
+  onKickoff,
 }: MatchTimerProps) {
   const [logoA, setLogoA] = useState<string | null>(teamALogoUrl || null);
   const [logoB, setLogoB] = useState<string | null>(null);
@@ -193,6 +197,25 @@ export default function MatchTimer({
               <Timer size={13} />
               <span>MT {formatTime(halftimes[0])} / {formatTime(halftimes[1])}</span>
             </div>
+          )}
+
+          {/* Bouton Coup d'envoi VEO */}
+          {onKickoff && (
+            kickoffRealTime ? (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-900/30 text-yellow-400 border border-yellow-800/40" title={`Coup d'envoi enregistré à ${kickoffRealTime.toLocaleTimeString()}`}>
+                <Zap size={13} />
+                <span>{kickoffRealTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+              </div>
+            ) : (
+              <button
+                onClick={() => onKickoff(new Date())}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-600 hover:bg-yellow-500 text-white transition-colors"
+                title="Appuyer au moment exact du coup d'envoi pour synchroniser avec VEO"
+              >
+                <Zap size={13} />
+                Coup d'envoi
+              </button>
+            )
           )}
 
           <div className="text-xs text-gray-500">
