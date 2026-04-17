@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ExternalLink, Copy, CheckCircle, Video, Clock, ChevronRight, Filter } from 'lucide-react';
 import { Match, MatchEventWithDetails } from '../types/database';
-import { generateVEOTimestampLink } from '../utils/veoParser';
+import { buildVeoTimestampUrl } from '../utils/veoParser';
 
 interface VideoAnalysisTabProps {
   match: Match & { events: MatchEventWithDetails[] };
@@ -24,14 +24,9 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
 
   const buildVeoLink = (event: MatchEventWithDetails): string => {
     if (!match.video_url) return '';
-    if (event.video_timestamp != null) {
-      const base = match.video_url.split('?')[0];
-      return `${base}?t=${event.video_timestamp}`;
-    }
-    if (match.video_share_id) {
-      return generateVEOTimestampLink(match.video_share_id, event.timestamp).url;
-    }
-    return '';
+    // Utiliser le video_timestamp synchronisé si disponible, sinon le timestamp ORION
+    const ts = event.video_timestamp != null ? event.video_timestamp : event.timestamp;
+    return buildVeoTimestampUrl(match.video_url, ts);
   };
 
   const handleCopy = async (url: string, id: string) => {

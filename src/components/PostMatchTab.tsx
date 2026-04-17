@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { AlertCircle, CheckCircle, Loader, Copy, Link as LinkIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
-import { parseVEOUrl, generateVEOTimestampLink } from '../utils/veoParser';
-import VEOVideoPlayer from './VEOVideoPlayer';
+import { parseVEOUrl, buildVeoTimestampUrl } from '../utils/veoParser';
 
 interface PostMatchTabProps {
   match: Match & { events?: MatchEventWithDetails[] };
@@ -206,11 +205,18 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
             </div>
 
             <div className="bg-gray-900 border border-gray-800 rounded-lg p-6">
-              <h4 className="text-white font-medium mb-4">Lecteur vidéo</h4>
-              <VEOVideoPlayer
-                shareId={match.video_share_id}
-                timestamp={selectedEventTimestamp || undefined}
-              />
+              <h4 className="text-white font-medium mb-4">Accès à la vidéo</h4>
+              <a
+                href={match.video_url || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-3 w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-semibold transition-colors"
+              >
+                Ouvrir le match sur VEO
+              </a>
+              <p className="text-xs text-gray-500 mt-3 text-center">
+                La vidéo s&apos;ouvrira dans VEO. Utilisez l&apos;onglet &quot;Analyse Vidéo&quot; pour naviguer directement vers chaque action.
+              </p>
             </div>
 
             {match.events && match.events.length > 0 && (
@@ -221,9 +227,9 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
                 </h4>
                 <div className="space-y-2 max-h-96 overflow-y-auto">
                   {match.events.map((event) => {
-                    const veoLink = generateVEOTimestampLink(
-                      match.video_share_id || '',
-                      event.timestamp
+                    const veoLink = buildVeoTimestampUrl(
+                      match.video_url || '',
+                      event.video_timestamp != null ? event.video_timestamp : event.timestamp
                     );
                     const mins = Math.floor(event.timestamp / 60);
                     const secs = event.timestamp % 60;
@@ -254,7 +260,7 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
                             Voir
                           </button>
                           <button
-                            onClick={() => handleCopyLink(veoLink.url, event.id)}
+                            onClick={() => handleCopyLink(veoLink, event.id)}
                             className={`px-3 py-2 rounded-lg transition-all font-medium text-sm flex items-center gap-2 whitespace-nowrap ${
                               copiedLinkId === event.id
                                 ? 'bg-green-100 text-green-700'
