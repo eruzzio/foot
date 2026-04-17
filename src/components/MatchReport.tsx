@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, BarChart3, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, BarChart3, Users, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
 import Timeline from './Timeline';
 import ExportButton from './ExportButton';
 import PostMatchTab from './PostMatchTab';
+import VideoAnalysisTab from './VideoAnalysisTab';
 
 interface MatchReportProps {
   matchId: string;
@@ -21,7 +22,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [loading, setLoading] = useState(true);
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState<'overview' | 'postmatch'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video'>('overview');
 
   useEffect(() => {
     loadMatchData();
@@ -211,6 +212,23 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-primary" />
             )}
           </button>
+          <button
+            onClick={() => setActiveTab('video')}
+            className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
+              activeTab === 'video'
+                ? 'text-yellow-400'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            <Video size={15} />
+            Analyse Vid&eacute;o
+            {match.video_url && (
+              <span className="w-2 h-2 rounded-full bg-yellow-500" />
+            )}
+            {activeTab === 'video' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400" />
+            )}
+          </button>
         </div>
 
         {activeTab === 'overview' && (
@@ -284,6 +302,14 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
           <PostMatchTab
             match={{ ...match, events: match.events }}
             onMatchUpdate={handleMatchUpdate}
+          />
+        )}
+
+        {activeTab === 'video' && (
+          <VideoAnalysisTab
+            match={{ ...match, events: match.events }}
+            teamAName={match.team_a_name}
+            teamBName={match.team_b_name}
           />
         )}
       </div>
