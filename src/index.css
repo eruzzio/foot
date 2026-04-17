@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@layer base {
+  body {
+    @apply bg-orion-dark text-gray-100;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  /* Orion Dark Backgrounds */
+  .bg-dark {
+    background-color: #0c0e14;
+  }
+  .bg-orion-dark {
+    background-color: #0c0e14;
+  }
+  .bg-dark-secondary {
+    background-color: #141720;
+  }
+  .bg-dark-tertiary {
+    background-color: #1c2030;
+  }
+  .bg-dark-card {
+    background-color: #161a27;
+  }
+
+  /* Orion Blue Accent */
+  .text-orion-blue {
+    color: #2f8de4;
+  }
+  .text-orion-blue-light {
+    color: #5aaff7;
+  }
+  .bg-orion-blue {
+    background-color: #2f8de4;
+  }
+  .border-orion-blue {
+    border-color: #2f8de4;
+  }
+  .hover-orion-blue:hover {
+    background-color: #4a9fe8;
+  }
+
+  /* Legacy orange kept for backwards compat */
+  .text-orange-primary {
+    color: #2f8de4;
+  }
+  .bg-orange-primary {
+    background-color: #2f8de4;
+  }
+  .border-orange-primary {
+    border-color: #2f8de4;
+  }
+  .hover-orange:hover {
+    background-color: #4a9fe8;
+  }
+
+  /* Orion glow effects */
+  .orion-glow {
+    box-shadow: 0 0 30px rgba(47, 141, 228, 0.25), 0 0 60px rgba(47, 141, 228, 0.1);
+  }
+  .orion-glow-sm {
+    box-shadow: 0 0 15px rgba(47, 141, 228, 0.2);
+  }
+  .orion-text-glow {
+    text-shadow: 0 0 20px rgba(47, 141, 228, 0.5);
+  }
+
+  /* Orion gradient */
+  .orion-gradient {
+    background: linear-gradient(135deg, #0c0e14 0%, #0f1626 50%, #0c0e14 100%);
+  }
+  .orion-card-gradient {
+    background: linear-gradient(135deg, #161a27 0%, #1a2035 100%);
+  }
+  .orion-blue-gradient {
+    background: linear-gradient(135deg, #1a3a6e 0%, #2f8de4 100%);
+  }
+
+  /* Subtle star/grid pattern */
+  .orion-bg-pattern {
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(47, 141, 228, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(47, 141, 228, 0.04) 0%, transparent 50%);
+  }
+}
