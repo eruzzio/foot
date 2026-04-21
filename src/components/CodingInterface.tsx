@@ -11,6 +11,8 @@ import LocationSelector from './LocationSelector';
 import { ArrowLeft } from 'lucide-react';
 import ExportButton from './ExportButton';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
+import FieldPositionSelector from './FieldPositionSelector';
+import GoalZoneSelector from './GoalZoneSelector';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
@@ -51,6 +53,10 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [veoOffsetSeconds, setVeoOffsetSeconds] = useState<number | null>(null);
   const [showVeoSync, setShowVeoSync] = useState(false);
   const [veoKickoffInput, setVeoKickoffInput] = useState<string>('');
+  const [showFieldSelector, setShowFieldSelector] = useState(false);
+  const [showGoalSelector, setShowGoalSelector] = useState(false);
+  const [fieldSelectorEventId, setFieldSelectorEventId] = useState<string | null>(null);
+  const [fieldSelectorEventName, setFieldSelectorEventName] = useState<string>('');
 
   useEffect(() => {
     initializeData();
@@ -353,6 +359,11 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         if (zoneButtons.length > 0) {
           setPendingEventId(data[0].id);
           setShowLocationSelector(true);
+        } else {
+          // Pas de boutons zones : ouvrir le sélecteur terrain directement
+          setFieldSelectorEventId(data[0].id);
+          setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
+          setShowFieldSelector(true);
         }
       }
     }
@@ -369,6 +380,58 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       setPendingEventId(null);
       setShowLocationSelector(false);
     }
+  };
+
+  const handleFieldPositionSelected = async (x: number, y: number) => {
+    if (fieldSelectorEventId) {
+      await supabase
+        .from('match_events')
+        .update({ field_x: x, field_y: y })
+        .eq('id', fieldSelectorEventId);
+
+      setEvents(prev =>
+        prev.map(e => e.id === fieldSelectorEventId ? { ...e, field_x: x, field_y: y } : e)
+      );
+
+      // Si c'est un tir, proposer aussi la zone du but
+      const event = events.find(e => e.id === fieldSelectorEventId);
+      const eventName = event?.event_type?.name || event?.label || fieldSelectorEventName;
+      const isShotEvent = ['tir', 'frappe', 'shot', 'but', 'penalty', 'coup franc'].some(
+        kw => eventName.toLowerCase().includes(kw)
+      );
+
+      setShowFieldSelector(false);
+
+      if (isShotEvent) {
+        setShowGoalSelector(true);
+      } else {
+        setFieldSelectorEventId(null);
+        setFieldSelectorEventName('');
+      }
+    }
+  };
+
+  const handleGoalPositionSelected = async (x: number, y: number) => {
+    if (fieldSelectorEventId) {
+      await supabase
+        .from('match_events')
+        .update({ goal_x: x, goal_y: y })
+        .eq('id', fieldSelectorEventId);
+
+      setEvents(prev =>
+        prev.map(e => e.id === fieldSelectorEventId ? { ...e, goal_x: x, goal_y: y } : e)
+      );
+    }
+    setShowGoalSelector(false);
+    setFieldSelectorEventId(null);
+    setFieldSelectorEventName('');
+  };
+
+  const handleSkipFieldSelector = () => {
+    setShowFieldSelector(false);
+    setShowGoalSelector(false);
+    setFieldSelectorEventId(null);
+    setFieldSelectorEventName('');
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -681,6 +744,21 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           }}
         />
       )}
+      {showFieldSelector && (
+        <FieldPositionSelector
+          onPositionSelected={handleFieldPositionSelected}
+          onSkip={handleSkipFieldSelector}
+          eventName={fieldSelectorEventName}
+        />
+      )}
+
+      {showGoalSelector && (
+        <GoalZoneSelector
+          onPositionSelected={handleGoalPositionSelected}
+          onSkip={handleSkipFieldSelector}
+        />
+      )}
+
       {showVeoSync && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
           <div className="bg-dark-secondary border border-yellow-800/50 rounded-xl p-6 w-full max-w-md shadow-2xl">

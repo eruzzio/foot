@@ -64,6 +64,10 @@ export interface MatchEvent {
   parent_event_id: string | null;
   location_id: string | null;
   video_timestamp: number | null;
+  field_x: number | null;
+  field_y: number | null;
+  goal_x: number | null;
+  goal_y: number | null;
   created_at: string;
 }
 
