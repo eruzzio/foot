@@ -7,6 +7,7 @@ import Timeline from './Timeline';
 import ExportButton from './ExportButton';
 import PostMatchTab from './PostMatchTab';
 import VideoAnalysisTab from './VideoAnalysisTab';
+import Heatmap from './Heatmap';
 
 interface MatchReportProps {
   matchId: string;
@@ -285,6 +286,12 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             <div className="space-y-6">
               <Statistics
                 events={match.events}
+                teamAName={match.team_a_name}
+                teamBName={match.team_b_name}
+              />
+              <Heatmap
+                events={match.events}
+                matchId={match.id}
                 teamAName={match.team_a_name}
                 teamBName={match.team_b_name}
               />
