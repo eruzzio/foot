@@ -15,14 +15,7 @@ function App() {
   const [homeKey, setHomeKey] = useState(0);
 
   useEffect(() => {
-    // Auto-login anonyme pour bypasser l'auth
-    const autoLogin = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        await supabase.auth.signInAnonymously();
-      }
-    };
-    autoLogin();
+    // Pas d'auth nécessaire - mode test
   }, []);
 
   const handleBackToHome = () => {

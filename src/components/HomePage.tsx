@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Users, Video, LayoutGrid, ChevronRight, Star, TrendingUp } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import OrionLogo from './OrionLogo';
 
@@ -21,7 +22,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   };
 
   const ensureDefaultPanel = async () => {
-    const { data: userData } = await supabase.auth.getUser();
+    const userData = { user: await getCurrentUser() };
     if (userData.user) {
       await createDefaultFootballPanel(userData.user.id);
     }

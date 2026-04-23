@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';
 import TeamSettings from './TeamSettings';
@@ -170,7 +171,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const loadTeams = async () => {
     setLoadingTeams(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) return;
 
       const { data, error } = await supabase
@@ -196,7 +197,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const loadTeamDetail = async (teamId: string) => {
     setLoadingDetail(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) return;
 
       const [playersRes, formationRes] = await Promise.all([
@@ -226,7 +227,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
   const createDefaultFormation = async (teamId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) return;
 
       const { data: newFormation, error: formationError } = await supabase
@@ -272,7 +273,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   };
 
   const handleSavePlayer = async (playerData: Omit<Player, 'id' | 'user_id'>) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
     if (!user) throw new Error('User not authenticated');
 
     if (editingPlayer) {

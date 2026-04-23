@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Upload } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 
 interface Team {
   id: string;
@@ -42,7 +43,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
   const loadTeamData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) return;
 
       if (!propTeamId) {
@@ -113,7 +114,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
     setUploading(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) throw new Error('User not authenticated');
 
       let finalLogoUrl = formData.logo_url;

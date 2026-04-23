@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { EventType, MatchEvent, MatchEventWithDetails, PanelButtonWithEventType, Panel } from '../types/database';
 import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
@@ -63,7 +64,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   }, []);
 
   const initializeData = async () => {
-    const { data: userData } = await supabase.auth.getUser();
+    const userData = { user: await getCurrentUser() };
     if (userData.user) {
       await createDefaultFootballPanel(userData.user.id);
     }
@@ -125,7 +126,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   };
 
   const loadAllPanels = async () => {
-    const { data: userData } = await supabase.auth.getUser();
+    const userData = { user: await getCurrentUser() };
 
     if (userData.user) {
       const { data: panels } = await supabase
@@ -148,7 +149,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   };
 
   const loadEventTypes = async (panelId?: string | null) => {
-    const { data: userData } = await supabase.auth.getUser();
+    const userData = { user: await getCurrentUser() };
 
     if (userData.user) {
       let targetPanelId = panelId;

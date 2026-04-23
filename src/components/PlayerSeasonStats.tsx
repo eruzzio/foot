@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
+import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { TrendingUp, Target, Activity, Award, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface PlayerStat {
@@ -39,7 +40,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
       if (!user) return;
 
       const { data: players } = await supabase
