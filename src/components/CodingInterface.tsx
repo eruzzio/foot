@@ -355,16 +355,10 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         setLastEventId(data[0].id);
         setLastEventButtonId(parentButtonId ?? null);
 
-        const zoneButtons = panelButtons.filter((btn) => btn.is_zone);
-        if (zoneButtons.length > 0) {
-          setPendingEventId(data[0].id);
-          setShowLocationSelector(true);
-        } else {
-          // Pas de boutons zones : ouvrir le sélecteur terrain directement
-          setFieldSelectorEventId(data[0].id);
-          setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
-          setShowFieldSelector(true);
-        }
+        // Ouvrir le sélecteur de position terrain
+        setFieldSelectorEventId(data[0].id);
+        setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
+        setShowFieldSelector(true);
       }
     }
   };
