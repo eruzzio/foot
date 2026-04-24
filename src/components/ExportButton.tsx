@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Download, FileSpreadsheet, FileText, LayoutTemplate } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, LayoutTemplate, Code, Monitor, Film } from 'lucide-react';
 import { MatchEventWithDetails } from '../types/database';
 import { exportToCSV, exportToExcel } from '../utils/exportData';
 import { exportToPdf } from '../utils/exportPdf';
+import { exportToSportsCodeXML, exportToDartfishCSV, exportToLongoMatchCSV } from '../utils/exportPro';
 
 interface ExportButtonProps {
   events: MatchEventWithDetails[];
@@ -22,7 +23,7 @@ interface ExportButtonProps {
 export default function ExportButton({ events, teamAName, teamBName, matchDate, scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl, disabled }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleExport = (format: 'csv' | 'excel' | 'pdf') => {
+  const handleExport = (format: 'csv' | 'excel' | 'pdf' | 'sportscode' | 'dartfish' | 'longomatch') => {
     const exportData = {
       events,
       matchInfo: {
@@ -43,8 +44,14 @@ export default function ExportButton({ events, teamAName, teamBName, matchDate, 
       exportToCSV(exportData);
     } else if (format === 'excel') {
       exportToExcel(exportData);
-    } else {
+    } else if (format === 'pdf') {
       exportToPdf(exportData);
+    } else if (format === 'sportscode') {
+      exportToSportsCodeXML(exportData);
+    } else if (format === 'dartfish') {
+      exportToDartfishCSV(exportData);
+    } else if (format === 'longomatch') {
+      exportToLongoMatchCSV(exportData);
     }
 
     setIsOpen(false);
@@ -100,6 +107,39 @@ export default function ExportButton({ events, teamAName, teamBName, matchDate, 
               <div>
                 <div className="font-medium text-gray-800">CSV (.csv)</div>
                 <div className="text-xs text-gray-500">Données brutes</div>
+              </div>
+            </button>
+            <div className="border-t border-gray-200 px-4 py-1.5">
+              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Logiciels pro</span>
+            </div>
+            <button
+              onClick={() => handleExport('sportscode')}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+            >
+              <Code size={18} className="text-purple-600" />
+              <div>
+                <div className="font-medium text-gray-800">Hudl SportsCode</div>
+                <div className="text-xs text-gray-500">XML compatible Hudl / Nacsport</div>
+              </div>
+            </button>
+            <button
+              onClick={() => handleExport('dartfish')}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+            >
+              <Monitor size={18} className="text-cyan-600" />
+              <div>
+                <div className="font-medium text-gray-800">Dartfish</div>
+                <div className="text-xs text-gray-500">CSV compatible Dartfish</div>
+              </div>
+            </button>
+            <button
+              onClick={() => handleExport('longomatch')}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+            >
+              <Film size={18} className="text-amber-600" />
+              <div>
+                <div className="font-medium text-gray-800">LongoMatch</div>
+                <div className="text-xs text-gray-500">CSV compatible LongoMatch</div>
               </div>
             </button>
           </div>
