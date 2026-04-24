@@ -55,9 +55,7 @@ export default function FieldPositionSelector({ onPositionSelected, onSkip, even
 
         <div className="p-4">
           <div
-            ref={containerRef}
-            onClick={handleClick}
-            className="relative rounded-lg border-2 border-gray-600/40 overflow-hidden cursor-crosshair"
+            className="relative rounded-lg border-2 border-gray-600/40 overflow-hidden"
             style={{
               paddingBottom: '60%',
               backgroundImage: `url('${getFootballFieldSVG()}')`,
@@ -66,7 +64,11 @@ export default function FieldPositionSelector({ onPositionSelected, onSkip, even
               backgroundRepeat: 'no-repeat',
             }}
           >
-            <div className="absolute inset-0 hover:bg-white/5 transition-colors" />
+            <div
+              ref={containerRef}
+              onClick={handleClick}
+              className="absolute inset-0 cursor-crosshair hover:bg-white/5 transition-colors"
+            />
           </div>
           <p className="text-center text-[11px] text-gray-600 mt-2">
             Appuyez sur le terrain pour localiser cette action
