@@ -50,6 +50,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   const [buttonTeamAssociation, setButtonTeamAssociation] = useState<'A' | 'B' | null>(null);
   const [editingButtonId, setEditingButtonId] = useState<string | null>(null);
   const [isZone, setIsZone] = useState(false);
+  const [locationMode, setLocationMode] = useState<'none' | 'field' | 'field_and_goal'>('none');
 
   useEffect(() => {
     loadData();
@@ -199,6 +200,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     setButtonTeamAssociation(null);
     setEditingButtonId(null);
     setIsZone(false);
+    setLocationMode('none');
   };
 
   const startAddSubButton = (parentBtn: PanelButtonWithEventType) => {
@@ -223,6 +225,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     setParentButtonId(button.parent_button_id);
     setButtonTeamAssociation(button.team_association);
     setIsZone(button.is_zone ?? false);
+    setLocationMode(button.location_mode ?? 'none');
     setShowCreateForm(true);
     setActiveTab('list');
   };
@@ -244,6 +247,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         group_name: parentButtonId ? null : (buttonGroup.trim() || null),
         team_association: buttonTeamAssociation,
         is_zone: isZone,
+        location_mode: locationMode,
       }).eq('id', editingButtonId);
 
       if (!error) {
@@ -270,6 +274,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
           : rootButtonsOnPage.length,
         team_association: buttonTeamAssociation,
         is_zone: isZone,
+        location_mode: locationMode,
       });
 
       if (!error) {
@@ -815,29 +820,42 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
                     {!parentButtonId && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Mode Zone</label>
-                        <button
-                          onClick={() => setIsZone(!isZone)}
-                          className={`w-full p-3 rounded-lg border-2 transition-all text-left flex items-start gap-3 ${
-                            isZone
-                              ? 'border-orange-500 bg-orange-900/20'
-                              : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
-                          }`}
-                        >
-                          <div className={`p-1.5 rounded flex-shrink-0 ${isZone ? 'bg-orange-500/30' : 'bg-gray-700/30'}`}>
-                            <MapPin size={16} className={isZone ? 'text-orange-400' : 'text-gray-400'} />
-                          </div>
-                          <div>
-                            <div className="text-sm font-bold text-white mb-0.5">
-                              {isZone ? 'Zone activée' : 'Zone désactivée'}
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {isZone
-                                ? 'Ce bouton affichera les zones à cliquer après un événement'
-                                : 'Configure ce bouton comme une zone de localisation'}
-                            </div>
-                          </div>
-                        </button>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Localisation</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <button
+                            onClick={() => { setLocationMode('none'); setIsZone(false); }}
+                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                              locationMode === 'none'
+                                ? 'border-gray-400 bg-gray-800/40'
+                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            }`}
+                          >
+                            <div className="text-sm font-bold text-white mb-0.5">Normal</div>
+                            <div className="text-[10px] text-gray-400">Pas de localisation</div>
+                          </button>
+                          <button
+                            onClick={() => { setLocationMode('field'); setIsZone(false); }}
+                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                              locationMode === 'field'
+                                ? 'border-orange-500 bg-orange-900/20'
+                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            }`}
+                          >
+                            <div className="text-sm font-bold text-white mb-0.5">Position</div>
+                            <div className="text-[10px] text-gray-400">Terrain cliquable</div>
+                          </button>
+                          <button
+                            onClick={() => { setLocationMode('field_and_goal'); setIsZone(false); }}
+                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                              locationMode === 'field_and_goal'
+                                ? 'border-red-500 bg-red-900/20'
+                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            }`}
+                          >
+                            <div className="text-sm font-bold text-white mb-0.5">Position + But</div>
+                            <div className="text-[10px] text-gray-400">Terrain + cage</div>
+                          </button>
+                        </div>
                       </div>
                     )}
 

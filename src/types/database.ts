@@ -118,6 +118,7 @@ export interface PanelButton {
   display_order: number;
   team_association: 'A' | 'B' | null;
   is_zone: boolean;
+  location_mode: 'none' | 'field' | 'field_and_goal';
   created_at: string;
 }
 

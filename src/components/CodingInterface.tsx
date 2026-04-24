@@ -355,10 +355,15 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         setLastEventId(data[0].id);
         setLastEventButtonId(parentButtonId ?? null);
 
-        // Ouvrir le sélecteur de position terrain
-        setFieldSelectorEventId(data[0].id);
-        setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
-        setShowFieldSelector(true);
+        // Déterminer le mode de localisation du bouton cliqué
+        const clickedButton = panelButtons.find(b => b.id === (parentButtonId ?? ''));
+        const locMode = clickedButton?.location_mode ?? 'none';
+
+        if (locMode === 'field' || locMode === 'field_and_goal') {
+          setFieldSelectorEventId(data[0].id);
+          setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
+          setShowFieldSelector(true);
+        }
       }
     }
   };
@@ -387,16 +392,13 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         prev.map(e => e.id === fieldSelectorEventId ? { ...e, field_x: x, field_y: y } : e)
       );
 
-      // Si c'est un tir, proposer aussi la zone du but
-      const event = events.find(e => e.id === fieldSelectorEventId);
-      const eventName = event?.event_type?.name || event?.label || fieldSelectorEventName;
-      const isShotEvent = ['tir', 'frappe', 'shot', 'but', 'penalty', 'coup franc'].some(
-        kw => eventName.toLowerCase().includes(kw)
-      );
+      // Vérifier si le bouton a le mode field_and_goal
+      const lastBtn = panelButtons.find(b => b.id === lastEventButtonId);
+      const locMode = lastBtn?.location_mode ?? 'none';
 
       setShowFieldSelector(false);
 
-      if (isShotEvent) {
+      if (locMode === 'field_and_goal') {
         setShowGoalSelector(true);
       } else {
         setFieldSelectorEventId(null);
