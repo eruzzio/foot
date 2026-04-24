@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2 } from 'lucide-react';
+import { ArrowLeft, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';
+import { exportTeamPdf } from '../utils/exportTeamPdf';
 import TeamSettings from './TeamSettings';
 import TeamMatchHistory from './TeamMatchHistory';
 import PlayerSeasonStats from './PlayerSeasonStats';
@@ -293,6 +294,17 @@ export default function MyTeam({ onBack }: MyTeamProps) {
     setEditingPlayer(null);
   };
 
+  const handleExportTeamPdf = () => {
+    if (!selectedTeam) return;
+    exportTeamPdf({
+      teamName: selectedTeam.name,
+      category: selectedTeam.category || 'Senior',
+      logoUrl: selectedTeam.logo_url || undefined,
+      formation: activeFormation?.name || '4-2-3-1',
+      players: teamPlayers,
+    });
+  };
+
   const handleDeletePlayer = async (playerId: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer ce joueur ?')) return;
     try {
@@ -399,6 +411,13 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               >
                 <Settings size={18} />
                 Paramètres
+              </button>
+              <button
+                onClick={handleExportTeamPdf}
+                className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white rounded-lg hover:bg-orange-600 transition-colors"
+              >
+                <Download size={18} />
+                Fiche PDF
               </button>
             </div>
 
