@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Copy, Plus, Save, LayoutGrid as Layout, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { TeamFormation, FormationPosition, Player } from '../types/database';
 import FieldVisualization from './FieldVisualization';
 
@@ -91,7 +90,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
   const loadData = async () => {
     try {
       setLoading(true);
-      const user = await getCurrentUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const [playersRes, matchFormationRes] = await Promise.all([
@@ -141,7 +140,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
   const handleCreateFromActive = async () => {
     try {
       setSaving(true);
-      const user = await getCurrentUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: activeFormation } = await supabase
@@ -214,7 +213,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
   const handleCreateNew = async () => {
     try {
       setSaving(true);
-      const user = await getCurrentUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: newFormation, error: formationError } = await supabase

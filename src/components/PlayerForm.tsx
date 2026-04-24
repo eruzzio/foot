@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { uploadPlayerPhoto } from '../utils/uploadImage';
 
 interface Player {
@@ -62,7 +61,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
       let finalPhotoUrl = formData.photo_url;
 
       if (selectedFile) {
-        const user = await getCurrentUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User not authenticated');
 
         finalPhotoUrl = await uploadPlayerPhoto(selectedFile, user.id);

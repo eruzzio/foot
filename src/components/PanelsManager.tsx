@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
 import { ArrowLeft, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
@@ -58,7 +57,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
   const loadData = async () => {
     setLoading(true);
-    const userData = { user: await getCurrentUser() };
+    const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
       await createDefaultFootballPanel(userData.user.id);
     }
@@ -77,7 +76,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   };
 
   const loadEventTypes = async () => {
-    const userData = { user: await getCurrentUser() };
+    const { data: userData } = await supabase.auth.getUser();
     const { data } = await supabase
       .from('event_types')
       .select('*')
@@ -148,7 +147,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         setView('panel');
       }
     } else {
-      const userData = { user: await getCurrentUser() };
+      const { data: userData } = await supabase.auth.getUser();
       const { data, error } = await supabase
         .from('panels')
         .insert({

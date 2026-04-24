@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, LayoutGrid as Layout, AlertCircle, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { getCurrentUser, getCurrentUserId } from '../lib/auth';
 import { Panel } from '../types/database';
 import { parseVEOUrl } from '../utils/veoParser';
 
@@ -67,7 +66,7 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
   }, [isOpen, initialTeamA, initialTeamB]);
 
   const loadTeams = async () => {
-    const userData = { user: await getCurrentUser() };
+    const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
 
     const { data, error } = await supabase
@@ -83,7 +82,7 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
 
   const loadPanels = async () => {
     setLoadingPanels(true);
-    const userData = { user: await getCurrentUser() };
+    const { data: userData } = await supabase.auth.getUser();
 
     if (userData.user) {
       const { data, error } = await supabase
