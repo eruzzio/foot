@@ -110,18 +110,18 @@ export default function FieldVisualization({ players, positions, onPositionClick
           return (
             <div
               key={pos.id}
-              className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${!player ? 'z-10' : ''}`}
+              className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
               style={{
                 left: `${pos.position_x}%`,
                 top: `${pos.position_y}%`,
                 padding: '12px',
+                cursor: 'default',
               }}
               onDragOver={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                if (!player) {
-                  setDragOverPosition(pos.id);
-                }
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverPosition(pos.id);
               }}
               onDragLeave={(e) => {
                 e.stopPropagation();
@@ -200,7 +200,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
                     )}
                   </div>
                   {dragOverPosition === pos.id && (
-                    <div className="absolute rounded-full border-4 border-orange-400 bg-orange-400/30 animate-pulse" style={{ width: '56px', height: '56px', top: '-6px', left: '-6px' }} />
+                    <div className="absolute rounded-full border-4 border-orange-400 bg-orange-400/30 " style={{ width: '56px', height: '56px', top: '-6px', left: '-6px' }} />
                   )}
                   {player ? (
                     <span
