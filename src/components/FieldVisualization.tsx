@@ -26,6 +26,8 @@ interface FieldVisualizationProps {
 
 export default function FieldVisualization({ players, positions, onPositionClick, onAssignPlayer }: FieldVisualizationProps) {
   const [selectingForPosition, setSelectingForPosition] = useState<string | null>(null);
+  const [dragOverPosition, setDragOverPosition] = useState<string | null>(null);
+
   const getPlayerForPosition = (playerId: string | null) => {
     if (!playerId) return null;
     return players.find(p => p.id === playerId);
@@ -98,6 +100,21 @@ export default function FieldVisualization({ players, positions, onPositionClick
                 left: `${pos.position_x}%`,
                 top: `${pos.position_y}%`,
               }}
+              onDragOver={(e) => {
+                if (!player) {
+                  e.preventDefault();
+                  setDragOverPosition(pos.id);
+                }
+              }}
+              onDragLeave={() => setDragOverPosition(null)}
+              onDrop={(e) => {
+                e.preventDefault();
+                const playerId = e.dataTransfer.getData('playerId');
+                if (playerId && !player) {
+                  onAssignPlayer(pos.id, playerId);
+                }
+                setDragOverPosition(null);
+              }}
             >
               {isSelecting && !player ? (
                 <div className="flex flex-col items-center gap-2" style={{ minWidth: '200px' }}>
@@ -155,6 +172,9 @@ export default function FieldVisualization({ players, positions, onPositionClick
                       </div>
                     )}
                   </div>
+                  {dragOverPosition === pos.id && !player && (
+                    <div className="absolute -inset-1 rounded-full border-4 border-orange-400 bg-orange-400/30 animate-pulse" />
+                  )}
                   {player ? (
                     <span
                       className="mt-1 text-white font-semibold leading-tight text-center whitespace-nowrap"

@@ -604,13 +604,18 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                       players.filter(p => !positions.some(pos => pos.player_id === p.id)).map(player => (
                         <button
                           key={player.id}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData('playerId', player.id);
+                            e.dataTransfer.effectAllowed = 'move';
+                          }}
                           onClick={() => {
                             const emptyPos = positions.find(pos => pos.player_id === null);
                             if (emptyPos) {
                               handleAssignPlayer(emptyPos.id, player.id);
                             }
                           }}
-                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group"
+                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group cursor-grab active:cursor-grabbing"
                         >
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
                             player.position === 'GK' ? 'bg-yellow-500' :
