@@ -383,7 +383,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
         category: selectedTeam.category || 'Senior',
         logoUrl: selectedTeam.logo_url || undefined,
         formation: selectedFormation || '4-2-3-1',
-        players: teamPlayers || [],
+        players: players || [],
         positions: (positions || []).map(p => ({
           player_id: p.player_id,
           position_x: p.position_x,
