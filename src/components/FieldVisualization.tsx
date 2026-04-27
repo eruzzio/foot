@@ -62,7 +62,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
     <div
       className="relative w-3/4 mx-auto bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl overflow-hidden"
       style={{ paddingBottom: '52%' }}
-      onDragOver={(e) => e.preventDefault()}
+      onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
       onDrop={(e) => {
         e.preventDefault();
         const playerId = e.dataTransfer.getData('playerId');
@@ -75,8 +75,8 @@ export default function FieldVisualization({ players, positions, onPositionClick
         setDragOverPosition(null);
       }}
     >
-      <div className="absolute inset-0">
-        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 140" preserveAspectRatio="none">
+      <div className="absolute inset-0" style={{ pointerEvents: 'none' }}>
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 140" preserveAspectRatio="none" style={{ pointerEvents: 'none' }}>
           <defs>
             <pattern id="grass" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
               <rect width="4" height="4" fill="rgba(255,255,255,0.05)" />
@@ -116,6 +116,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
                 top: `${pos.position_y}%`,
                 padding: '12px',
                 cursor: 'default',
+                pointerEvents: 'all',
               }}
               onDragOver={(e) => {
                 e.preventDefault();
