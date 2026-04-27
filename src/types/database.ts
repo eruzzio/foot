@@ -8,7 +8,11 @@ export interface Player {
   id: string;
   team_id: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
   number: number | null;
+  position?: string;
+  photo_url?: string;
   created_at: string;
 }
 

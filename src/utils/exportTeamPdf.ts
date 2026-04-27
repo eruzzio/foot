@@ -1,5 +1,20 @@
 import { Player } from '../types/database';
 
+
+function getPlayerFullName(p: Player): string {
+  if (p.first_name && p.last_name) return p.first_name + ' ' + p.last_name;
+  if (p.first_name) return p.first_name;
+  if (p.last_name) return p.last_name;
+  if (p.name) return p.name;
+  return 'Joueur';
+}
+
+function getPlayerShortName(p: Player): string {
+  if (p.last_name) return p.last_name;
+  if (p.name) return p.name.split(' ').pop() || '';
+  return '';
+}
+
 interface FormationPositionData {
   player_id: string | null;
   position_x: number;
@@ -364,7 +379,7 @@ export function exportTeamPdf(data: TeamPdfData): void {
         ${starters.map(p => `
           <div class="player-row" style="background: ${group.bg};">
             <div class="player-number" style="background: ${group.color}; color: white;">${p.number || '?'}</div>
-            <div class="player-name">${p.name || 'Joueur'}</div>
+            <div class="player-name">${getPlayerFullName(p)}</div>
             <div class="player-pos">${p.position || ''}</div>
           </div>
         `).join('')}
@@ -377,7 +392,7 @@ export function exportTeamPdf(data: TeamPdfData): void {
       ${substitutes.map(p => `
         <div class="sub-row">
           <div class="sub-num">${p.number || '?'}</div>
-          <span>${p.name || 'Joueur'}</span>
+          <span>${getPlayerFullName(p)}</span>
           <span style="margin-left:auto;font-size:9px;color:#6B7A99;">${p.position || ''}</span>
         </div>
       `).join('')}
@@ -432,7 +447,7 @@ function getCompositionPlayers(data: TeamPdfData): CompoPlayer[] {
           x: (pos.position_x / 100) * 660 + 10,
           y: (pos.position_y / 100) * 420 + 10,
           number: player?.number || '?',
-          name: player?.name?.split(' ').pop() || '',
+          name: player ? getPlayerShortName(player) : '',
           color: posColors[role] || posColors[player?.position || ''] || '#6B7280',
           playerId: pos.player_id,
         };
@@ -482,7 +497,7 @@ function getCompositionPlayers(data: TeamPdfData): CompoPlayer[] {
       x: slot.x,
       y: slot.y,
       number: player?.number || '?',
-      name: player?.name?.split(' ').pop() || '',
+      name: player ? getPlayerShortName(player) : '',
       color: posColors[slot.pos] || '#6B7280',
       playerId: player?.id || null,
     };
