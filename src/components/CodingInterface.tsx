@@ -39,6 +39,49 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [formationTeam, setFormationTeam] = useState<'A' | 'B'>('A');
   const [lastEventId, setLastEventId] = useState<string | null>(null);
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
+  const [showUndoBar, setShowUndoBar] = useState(false);
+  const [undoEvent, setUndoEvent] = useState<MatchEventWithDetails | null>(null);
+
+  // Sauvegarde locale anti-crash toutes les 30 secondes
+  useEffect(() => {
+    const saveInterval = setInterval(() => {
+      if (matchId && events.length > 0) {
+        const backup = {
+          matchId,
+          events,
+          currentTime,
+          teamAScore,
+          teamBScore,
+          teamAName,
+          teamBName,
+          savedAt: new Date().toISOString(),
+        };
+        try {
+          localStorage.setItem(`orion_backup_${matchId}`, JSON.stringify(backup));
+        } catch {}
+      }
+    }, 30000);
+    return () => clearInterval(saveInterval);
+  }, [matchId, events, currentTime, teamAScore, teamBScore]);
+
+  // Sauvegarder aussi à chaque nouvel événement
+  useEffect(() => {
+    if (matchId && events.length > 0) {
+      try {
+        const backup = {
+          matchId,
+          events,
+          currentTime,
+          teamAScore,
+          teamBScore,
+          teamAName,
+          teamBName,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(`orion_backup_${matchId}`, JSON.stringify(backup));
+      } catch {}
+    }
+  }, [events]);
   const [teamAColor, setTeamAColor] = useState<string>('#22c55e');
   const [teamALogoUrl, setTeamALogoUrl] = useState<string>('');
   const [halftimes, setHalftimes] = useState<number[]>([]);
@@ -355,6 +398,11 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         setLastEventId(data[0].id);
         setLastEventButtonId(parentButtonId ?? null);
 
+        // Undo bar
+        setUndoEvent(eventWithDetails);
+        setShowUndoBar(true);
+        setTimeout(() => setShowUndoBar(false), 8000);
+
         // Déterminer le mode de localisation du bouton cliqué
         const clickedButton = panelButtons.find(b => b.id === (parentButtonId ?? ''));
         const locMode = clickedButton?.location_mode ?? 'none';
@@ -438,7 +486,16 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
     if (error) {
       console.error('Error deleting event:', error);
+    } else {
+      setEvents(prev => prev.filter(e => e.id !== eventId));
     }
+  };
+
+  const handleUndo = async () => {
+    if (!undoEvent) return;
+    await handleDeleteEvent(undoEvent.id);
+    setUndoEvent(null);
+    setShowUndoBar(false);
   };
 
   const handleMatchSheetSave = async (data: any) => {
@@ -678,6 +735,26 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 setShowFormationManager(true);
               }}
             />
+
+            {/* Barre Undo */}
+            {showUndoBar && undoEvent && (
+              <div className="bg-yellow-900/30 border border-yellow-700/50 rounded-lg px-4 py-3 flex items-center justify-between animate-pulse">
+                <div className="flex items-center gap-3">
+                  <span className="text-yellow-400 text-sm font-medium">
+                    {undoEvent.event_type?.name || undoEvent.label || 'Action'} enregistré
+                  </span>
+                  <span className="text-yellow-600 text-xs">
+                    {Math.floor(undoEvent.timestamp / 60).toString().padStart(2, '0')}:{(undoEvent.timestamp % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+                <button
+                  onClick={handleUndo}
+                  className="flex items-center gap-2 px-4 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-sm font-semibold transition-colors"
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
 
             <ActionButtons
               panelButtons={panelButtons}
