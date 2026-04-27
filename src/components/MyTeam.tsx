@@ -300,8 +300,14 @@ export default function MyTeam({ onBack }: MyTeamProps) {
       teamName: selectedTeam.name,
       category: selectedTeam.category || 'Senior',
       logoUrl: selectedTeam.logo_url || undefined,
-      formation: activeFormation?.name || '4-2-3-1',
+      formation: selectedFormation || '4-2-3-1',
       players: teamPlayers,
+      positions: positions.map(p => ({
+        player_id: p.player_id,
+        position_x: p.position_x,
+        position_y: p.position_y,
+        role: p.role,
+      })),
     });
   };
 
