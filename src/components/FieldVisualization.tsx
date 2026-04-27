@@ -59,7 +59,22 @@ export default function FieldVisualization({ players, positions, onPositionClick
   };
 
   return (
-    <div className="relative w-3/4 mx-auto bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl overflow-hidden" style={{ paddingBottom: '52%' }}>
+    <div
+      className="relative w-3/4 mx-auto bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl overflow-hidden"
+      style={{ paddingBottom: '52%' }}
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        const playerId = e.dataTransfer.getData('playerId');
+        if (playerId) {
+          const emptyPos = positions.find(pos => pos.player_id === null);
+          if (emptyPos) {
+            onAssignPlayer(emptyPos.id, playerId);
+          }
+        }
+        setDragOverPosition(null);
+      }}
+    >
       <div className="absolute inset-0">
         <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 140" preserveAspectRatio="none">
           <defs>

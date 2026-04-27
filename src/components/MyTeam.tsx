@@ -602,9 +602,9 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                       <p className="text-xs text-gray-500 text-center py-4">Tous les joueurs sont placés</p>
                     ) : (
                       players.filter(p => !positions.some(pos => pos.player_id === p.id)).map(player => (
-                        <button
+                        <div
                           key={player.id}
-                          draggable
+                          draggable="true"
                           onDragStart={(e) => {
                             e.dataTransfer.setData('playerId', player.id);
                             e.dataTransfer.effectAllowed = 'move';
@@ -615,7 +615,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                               handleAssignPlayer(emptyPos.id, player.id);
                             }
                           }}
-                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group cursor-grab active:cursor-grabbing"
+                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group cursor-grab active:cursor-grabbing select-none"
                         >
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
                             player.position === 'GK' ? 'bg-yellow-500' :
@@ -635,7 +635,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                           <span className="text-[10px] text-gray-600 group-hover:text-orange-400 transition-colors">
                             + Placer
                           </span>
-                        </button>
+                        </div>
                       ))
                     )}
                   </div>
