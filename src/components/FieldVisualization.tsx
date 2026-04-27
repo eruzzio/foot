@@ -110,23 +110,35 @@ export default function FieldVisualization({ players, positions, onPositionClick
           return (
             <div
               key={pos.id}
-              className={`absolute transform -translate-x-1/2 -translate-y-1/2`}
+              className={`absolute transform -translate-x-1/2 -translate-y-1/2 ${!player ? 'z-10' : ''}`}
               style={{
                 left: `${pos.position_x}%`,
                 top: `${pos.position_y}%`,
+                padding: '12px',
               }}
               onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (!player) {
-                  e.preventDefault();
                   setDragOverPosition(pos.id);
                 }
               }}
-              onDragLeave={() => setDragOverPosition(null)}
+              onDragLeave={(e) => {
+                e.stopPropagation();
+                setDragOverPosition(null);
+              }}
               onDrop={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 const playerId = e.dataTransfer.getData('playerId');
-                if (playerId && !player) {
-                  onAssignPlayer(pos.id, playerId);
+                if (playerId) {
+                  if (player) {
+                    // Position occupée : remplacer le joueur
+                    onPositionClick(pos.id, pos.player_id);
+                    setTimeout(() => onAssignPlayer(pos.id, playerId), 100);
+                  } else {
+                    onAssignPlayer(pos.id, playerId);
+                  }
                 }
                 setDragOverPosition(null);
               }}
@@ -187,8 +199,8 @@ export default function FieldVisualization({ players, positions, onPositionClick
                       </div>
                     )}
                   </div>
-                  {dragOverPosition === pos.id && !player && (
-                    <div className="absolute -inset-1 rounded-full border-4 border-orange-400 bg-orange-400/30 animate-pulse" />
+                  {dragOverPosition === pos.id && (
+                    <div className="absolute rounded-full border-4 border-orange-400 bg-orange-400/30 animate-pulse" style={{ width: '56px', height: '56px', top: '-6px', left: '-6px' }} />
                   )}
                   {player ? (
                     <span
