@@ -373,20 +373,31 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   };
 
   const handleExportTeamPdf = () => {
-    if (!selectedTeam) return;
-    exportTeamPdf({
-      teamName: selectedTeam.name,
-      category: selectedTeam.category || 'Senior',
-      logoUrl: selectedTeam.logo_url || undefined,
-      formation: selectedFormation || '4-2-3-1',
-      players: teamPlayers,
-      positions: positions.map(p => ({
-        player_id: p.player_id,
-        position_x: p.position_x,
-        position_y: p.position_y,
-        role: p.role,
-      })),
-    });
+    if (!selectedTeam) {
+      alert('Aucune équipe sélectionnée');
+      return;
+    }
+    if (teamPlayers.length === 0) {
+      alert('Aucun joueur dans cette équipe');
+      return;
+    }
+    try {
+      exportTeamPdf({
+        teamName: selectedTeam.name,
+        category: selectedTeam.category || 'Senior',
+        logoUrl: selectedTeam.logo_url || undefined,
+        formation: selectedFormation || '4-2-3-1',
+        players: teamPlayers,
+        positions: positions.map(p => ({
+          player_id: p.player_id,
+          position_x: p.position_x,
+          position_y: p.position_y,
+          role: p.role,
+        })),
+      });
+    } catch (err: any) {
+      alert('Erreur export PDF: ' + (err?.message || err));
+    }
   };
 
   const handleDeletePlayer = async (playerId: string) => {
