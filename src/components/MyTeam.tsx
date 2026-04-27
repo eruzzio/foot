@@ -595,7 +595,87 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 </div>
               </div>
               <div>
-                <TeamMatchHistory teamId={selectedTeam.id} teamName={selectedTeam.name} />
+                <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-4">
+                  <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Joueurs disponibles</h3>
+                  <div className="space-y-1.5 max-h-[500px] overflow-y-auto">
+                    {players.filter(p => !positions.some(pos => pos.player_id === p.id)).length === 0 ? (
+                      <p className="text-xs text-gray-500 text-center py-4">Tous les joueurs sont placés</p>
+                    ) : (
+                      players.filter(p => !positions.some(pos => pos.player_id === p.id)).map(player => (
+                        <button
+                          key={player.id}
+                          onClick={() => {
+                            const emptyPos = positions.find(pos => pos.player_id === null);
+                            if (emptyPos) {
+                              handleAssignPlayer(emptyPos.id, player.id);
+                            }
+                          }}
+                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group"
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                            player.position === 'GK' ? 'bg-yellow-500' :
+                            player.position === 'DF' ? 'bg-blue-500' :
+                            player.position === 'MF' ? 'bg-green-500' :
+                            player.position === 'FW' || player.position === 'AT' ? 'bg-red-500' :
+                            'bg-gray-500'
+                          }`}>
+                            {player.number || '?'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium text-white truncate">
+                              {player.first_name || ''} {player.last_name || player.name || ''}
+                            </div>
+                            <div className="text-[10px] text-gray-500">{player.position || 'N/A'}</div>
+                          </div>
+                          <span className="text-[10px] text-gray-600 group-hover:text-orange-400 transition-colors">
+                            + Placer
+                          </span>
+                        </button>
+                      ))
+                    )}
+                  </div>
+
+                  {positions.some(pos => pos.player_id !== null) && (
+                    <>
+                      <div className="border-t border-gray-700 mt-4 pt-3">
+                        <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Sur le terrain</h3>
+                        <div className="space-y-1.5">
+                          {positions.filter(pos => pos.player_id !== null).map(pos => {
+                            const player = players.find(p => p.id === pos.player_id);
+                            if (!player) return null;
+                            return (
+                              <div
+                                key={pos.id}
+                                className="flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary border border-gray-700/50"
+                              >
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                                  pos.role === 'GK' ? 'bg-yellow-500' :
+                                  pos.role === 'DF' ? 'bg-blue-500' :
+                                  pos.role === 'MF' ? 'bg-green-500' :
+                                  'bg-red-500'
+                                }`}>
+                                  {player.number || '?'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-sm font-medium text-white truncate">
+                                    {player.first_name || ''} {player.last_name || player.name || ''}
+                                  </div>
+                                  <div className="text-[10px] text-gray-500">{pos.role}</div>
+                                </div>
+                                <button
+                                  onClick={() => handlePositionClick(pos.id, pos.player_id)}
+                                  className="text-[10px] text-red-400 hover:text-red-300 transition-colors"
+                                >
+                                  Retirer
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           ) : activeTab === 'squad' ? (
