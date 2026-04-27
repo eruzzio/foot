@@ -190,7 +190,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: FC Marseille"
               />
             </div>
@@ -203,7 +203,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 type="text"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: U13, U15, Senior, Féminine"
               />
             </div>
@@ -217,7 +217,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="Description de votre équipe..."
             />
           </div>
@@ -307,7 +307,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                     setPreviewUrl(e.target.value);
                     setSelectedFile(null);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-gray-500 mt-1">

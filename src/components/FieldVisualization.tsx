@@ -109,7 +109,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
                       }
                     }}
                     onBlur={() => setSelectingForPosition(null)}
-                    className="w-full px-2 py-1.5 border-2 border-blue-500 bg-white rounded-lg shadow-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    className="w-full px-2 py-1.5 border-2 border-blue-500 bg-white text-gray-900 rounded-lg shadow-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-400"
                     defaultValue=""
                   >
                     <option value="" disabled>

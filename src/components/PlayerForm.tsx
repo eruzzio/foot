@@ -107,7 +107,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
               required
               value={formData.first_name}
               onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Ex: Kylian"
             />
           </div>
@@ -121,7 +121,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
               required
               value={formData.last_name}
               onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Ex: Mbappé"
             />
           </div>
@@ -137,7 +137,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
               max="99"
               value={formData.number}
               onChange={(e) => setFormData({ ...formData, number: e.target.value ? parseInt(e.target.value) : '' })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Ex: 10"
             />
           </div>
@@ -149,7 +149,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
             <select
               value={formData.position}
               onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="Gardien">Gardien</option>
               <option value="Défenseur">Défenseur</option>
@@ -214,7 +214,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                     setPreviewUrl(e.target.value);
                     setSelectedFile(null);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/photo.jpg"
                 />
                 <p className="text-xs text-gray-500 mt-1">

@@ -144,7 +144,7 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
               onChange={handleVideoUrlChange}
               placeholder="https://veo.co/shared-videos/..."
               disabled={isLoading}
-              className={`flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+              className={`flex-1 px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 transition-colors ${
                 videoUrlError
                   ? 'border-red-300 focus:ring-red-400'
                   : match.video_share_id && videoUrl
