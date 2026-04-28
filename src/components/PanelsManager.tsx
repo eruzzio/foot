@@ -821,7 +821,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     {!parentButtonId && (
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Localisation</label>
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-4 gap-2">
                           <button
                             onClick={() => { setLocationMode('none'); setIsZone(false); }}
                             className={`p-3 rounded-lg border-2 transition-all text-center ${
@@ -832,6 +832,17 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           >
                             <div className="text-sm font-bold text-white mb-0.5">Normal</div>
                             <div className="text-[10px] text-gray-400">Pas de localisation</div>
+                          </button>
+                          <button
+                            onClick={() => { setLocationMode('zones'); setIsZone(false); }}
+                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                              locationMode === 'zones'
+                                ? 'border-blue-500 bg-blue-900/20'
+                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            }`}
+                          >
+                            <div className="text-sm font-bold text-white mb-0.5">3 Zones</div>
+                            <div className="text-[10px] text-gray-400">Déf / Méd / Off</div>
                           </button>
                           <button
                             onClick={() => { setLocationMode('field'); setIsZone(false); }}

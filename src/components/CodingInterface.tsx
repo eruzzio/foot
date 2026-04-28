@@ -13,6 +13,7 @@ import ExportButton from './ExportButton';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
+import ZoneSelector from './ZoneSelector';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
@@ -102,6 +103,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showFieldSelector, setShowFieldSelector] = useState(false);
   const [showGoalSelector, setShowGoalSelector] = useState(false);
   const [showOutcomeSelector, setShowOutcomeSelector] = useState(false);
+  const [showZoneSelector, setShowZoneSelector] = useState(false);
   const [fieldSelectorEventId, setFieldSelectorEventId] = useState<string | null>(null);
   const [fieldSelectorEventName, setFieldSelectorEventName] = useState<string>('');
 
@@ -415,6 +417,10 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           setFieldSelectorEventId(data[0].id);
           setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
           setShowFieldSelector(true);
+        } else if (locMode === 'zones') {
+          setFieldSelectorEventId(data[0].id);
+          setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
+          setShowZoneSelector(true);
         }
       }
     }
@@ -496,6 +502,23 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     setShowFieldSelector(false);
     setShowGoalSelector(false);
     setShowOutcomeSelector(false);
+    setShowZoneSelector(false);
+    setFieldSelectorEventId(null);
+    setFieldSelectorEventName('');
+  };
+
+  const handleZoneSelectorSelected = async (zone: string, x: number, y: number) => {
+    if (fieldSelectorEventId) {
+      await supabase
+        .from('match_events')
+        .update({ field_x: x, field_y: y, label: zone })
+        .eq('id', fieldSelectorEventId);
+
+      setEvents(prev =>
+        prev.map(e => e.id === fieldSelectorEventId ? { ...e, field_x: x, field_y: y } : e)
+      );
+    }
+    setShowZoneSelector(false);
     setFieldSelectorEventId(null);
     setFieldSelectorEventName('');
   };
@@ -958,6 +981,14 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       {showFieldSelector && (
         <FieldPositionSelector
           onPositionSelected={handleFieldPositionSelected}
+          onSkip={handleSkipFieldSelector}
+          eventName={fieldSelectorEventName}
+        />
+      )}
+
+      {showZoneSelector && (
+        <ZoneSelector
+          onZoneSelected={handleZoneSelectorSelected}
           onSkip={handleSkipFieldSelector}
           eventName={fieldSelectorEventName}
         />
