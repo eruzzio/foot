@@ -169,7 +169,11 @@ export default function ActionButtons({
     return (
       <button
         key={btn.id}
-        onClick={() => handleEventButtonClick(btn)}
+        onClick={() => {
+          // Retour haptique sur mobile
+          if (navigator.vibrate) navigator.vibrate(30);
+          handleEventButtonClick(btn);
+        }}
         title={btn.shortcut_key ? `Raccourci: ${btn.shortcut_key.toUpperCase()}` : undefined}
         className={`
           relative flex flex-col items-center justify-center gap-0.5 rounded-xl
@@ -181,14 +185,14 @@ export default function ActionButtons({
         `}
         style={{
           backgroundColor: baseColor,
-          minHeight: '72px',
-          padding: '10px 12px',
+          minHeight: '80px',
+          padding: '14px 12px',
           boxShadow: isActive
             ? `0 0 20px ${baseColor}88, 0 4px 12px ${baseColor}66`
             : `0 2px 10px ${baseColor}44`,
         }}
       >
-        <span className="text-sm font-bold leading-tight text-center px-1 break-words w-full">
+        <span className="text-base font-bold leading-tight text-center px-1 break-words w-full">
           {btn.label}
         </span>
         {hasSubs && (
@@ -223,7 +227,10 @@ export default function ActionButtons({
     return (
       <button
         key={btn.id}
-        onClick={() => handleSubButtonClick(btn)}
+        onClick={() => {
+          if (navigator.vibrate) navigator.vibrate(20);
+          handleSubButtonClick(btn);
+        }}
         disabled={disabled}
         className={`
           relative flex items-center justify-center gap-1.5 rounded-lg
@@ -235,8 +242,8 @@ export default function ActionButtons({
         `}
         style={{
           backgroundColor: isActive ? baseColor : isKeyword ? `${baseColor}cc` : baseColor,
-          minHeight: '52px',
-          padding: '8px 14px',
+          minHeight: '56px',
+          padding: '10px 14px',
           boxShadow: isActive ? `0 0 14px ${baseColor}88` : `0 2px 8px ${baseColor}44`,
         }}
       >
@@ -307,7 +314,10 @@ export default function ActionButtons({
           return (
             <button
               key={btn.id}
-              onClick={() => handleEventButtonClick(btn)}
+              onClick={() => {
+                if (navigator.vibrate) navigator.vibrate(30);
+                handleEventButtonClick(btn);
+              }}
               className={`
                 absolute flex flex-col items-center justify-center gap-1 rounded-xl
                 font-semibold text-white transition-all select-none cursor-pointer

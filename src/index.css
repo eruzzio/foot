@@ -89,3 +89,34 @@
       radial-gradient(circle at 80% 80%, rgba(47, 141, 228, 0.04) 0%, transparent 50%);
   }
 }
+
+/* Mobile/Tablet optimizations */
+@media (max-width: 768px) {
+  .btn-grid-mobile {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  .live-layout-landscape {
+    grid-template-columns: 1fr 280px !important;
+  }
+}
+
+/* Touch-friendly: prevent double-tap zoom on buttons */
+button {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on buttons during rapid tapping */
+.select-none {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth active state for touch */
+button:active {
+  transition: transform 0.05s ease;
+}

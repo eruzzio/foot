@@ -135,15 +135,15 @@ export default function MatchTimer({
           </div>
           <div className="flex flex-col gap-1 mt-1">
             <button
-              onClick={() => onScoreChange('A', 1)}
-              className="px-3 py-1 text-white rounded-lg text-xs font-bold transition-colors"
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(50); onScoreChange('A', 1); }}
+              className="px-4 py-2 text-white rounded-lg text-sm font-bold transition-colors"
               style={{ backgroundColor: teamAColor }}
             >
               But
             </button>
             <button
-              onClick={() => onScoreChange('A', -1)}
-              className="px-3 py-1 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(20); onScoreChange('A', -1); }}
+              className="px-4 py-1.5 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
             >
               Annulé
             </button>
@@ -240,14 +240,14 @@ export default function MatchTimer({
           </div>
           <div className="flex flex-col gap-1 mt-1">
             <button
-              onClick={() => onScoreChange('B', 1)}
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(50); onScoreChange('B', 1); }}
               className="px-3 py-1 bg-orange-primary hover-orange text-white rounded-lg text-xs font-bold transition-colors"
             >
               But
             </button>
             <button
-              onClick={() => onScoreChange('B', -1)}
-              className="px-3 py-1 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(20); onScoreChange('B', -1); }}
+              className="px-4 py-1.5 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
             >
               Annulé
             </button>
