@@ -101,6 +101,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [veoKickoffInput, setVeoKickoffInput] = useState<string>('');
   const [showFieldSelector, setShowFieldSelector] = useState(false);
   const [showGoalSelector, setShowGoalSelector] = useState(false);
+  const [showOutcomeSelector, setShowOutcomeSelector] = useState(false);
   const [fieldSelectorEventId, setFieldSelectorEventId] = useState<string | null>(null);
   const [fieldSelectorEventName, setFieldSelectorEventName] = useState<string>('');
 
@@ -450,12 +451,29 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       setShowFieldSelector(false);
 
       if (locMode === 'field_and_goal') {
-        setShowGoalSelector(true);
+        // Afficher le sélecteur de résultat avant la cage
+        setShowOutcomeSelector(true);
       } else {
         setFieldSelectorEventId(null);
         setFieldSelectorEventName('');
       }
     }
+  };
+
+  const handleOutcomeSelected = async (outcome: 'success' | 'failure' | 'neutral') => {
+    if (fieldSelectorEventId) {
+      await supabase
+        .from('match_events')
+        .update({ outcome })
+        .eq('id', fieldSelectorEventId);
+
+      setEvents(prev =>
+        prev.map(e => e.id === fieldSelectorEventId ? { ...e, outcome } : e)
+      );
+    }
+    setShowOutcomeSelector(false);
+    // Passer à la cage de but
+    setShowGoalSelector(true);
   };
 
   const handleGoalPositionSelected = async (x: number, y: number) => {
@@ -477,6 +495,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const handleSkipFieldSelector = () => {
     setShowFieldSelector(false);
     setShowGoalSelector(false);
+    setShowOutcomeSelector(false);
     setFieldSelectorEventId(null);
     setFieldSelectorEventName('');
   };
@@ -942,6 +961,41 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           onSkip={handleSkipFieldSelector}
           eventName={fieldSelectorEventName}
         />
+      )}
+
+      {showOutcomeSelector && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-sm p-6">
+            <h2 className="font-bold text-white text-lg mb-1 text-center">Résultat du tir</h2>
+            <p className="text-xs text-gray-400 mb-6 text-center">{fieldSelectorEventName}</p>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleOutcomeSelected('success')}
+                className="w-full py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl text-lg font-bold transition-colors"
+              >
+                But
+              </button>
+              <button
+                onClick={() => handleOutcomeSelected('neutral')}
+                className="w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl text-lg font-bold transition-colors"
+              >
+                Arrêté / Cadré
+              </button>
+              <button
+                onClick={() => handleOutcomeSelected('failure')}
+                className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl text-lg font-bold transition-colors"
+              >
+                Hors cadre / Manqué
+              </button>
+            </div>
+            <button
+              onClick={handleSkipFieldSelector}
+              className="w-full mt-4 py-2 text-gray-400 hover:text-white text-sm transition-colors"
+            >
+              Passer
+            </button>
+          </div>
+        </div>
       )}
 
       {showGoalSelector && (
