@@ -233,6 +233,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [formation, setFormation] = useState<Formation | null>(null);
+  const [formations, setFormations] = useState<Formation[]>([]);
   const [positions, setPositions] = useState<FormationPosition[]>([]);
   const [showPlayerForm, setShowPlayerForm] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
@@ -241,6 +242,8 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const [showTeamSettings, setShowTeamSettings] = useState(false);
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'composition' | 'squad' | 'stats'>('composition');
+  const [showNewCompoForm, setShowNewCompoForm] = useState(false);
+  const [newCompoName, setNewCompoName] = useState('');
 
   useEffect(() => {
     loadTeams();
@@ -278,20 +281,22 @@ export default function MyTeam({ onBack }: MyTeamProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const [playersRes, formationRes] = await Promise.all([
+      const [playersRes, formationsRes] = await Promise.all([
         supabase.from('players').select('*').eq('user_id', user.id).eq('team_id', teamId).order('number'),
-        supabase.from('team_formations').select('*').eq('user_id', user.id).eq('team_id', teamId).eq('is_active', true).maybeSingle(),
+        supabase.from('team_formations').select('*').eq('user_id', user.id).eq('team_id', teamId).order('created_at'),
       ]);
 
       if (playersRes.data) setPlayers(playersRes.data);
 
-      if (formationRes.data) {
-        setFormation(formationRes.data);
-        setSelectedFormation(formationRes.data.name as keyof typeof FORMATIONS);
+      if (formationsRes.data && formationsRes.data.length > 0) {
+        setFormations(formationsRes.data);
+        const active = formationsRes.data.find((f: any) => f.is_active) || formationsRes.data[0];
+        setFormation(active);
+        setSelectedFormation(active.name as keyof typeof FORMATIONS);
         const positionsRes = await supabase
           .from('formation_positions')
           .select('*')
-          .eq('formation_id', formationRes.data.id);
+          .eq('formation_id', active.id);
         if (positionsRes.data) setPositions(positionsRes.data);
       } else {
         await createDefaultFormation(teamId);
@@ -393,6 +398,87 @@ export default function MyTeam({ onBack }: MyTeamProps) {
       });
     } catch (err: any) {
       alert('Erreur export PDF: ' + (err?.message || err));
+    }
+  };
+
+  const handleCreateComposition = async () => {
+    if (!selectedTeam || !newCompoName.trim()) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Désactiver toutes les formations existantes
+      await supabase.from('team_formations').update({ is_active: false }).eq('team_id', selectedTeam.id).eq('user_id', user.id);
+
+      const { data: newFormation } = await supabase
+        .from('team_formations')
+        .insert({ user_id: user.id, team_id: selectedTeam.id, name: selectedFormation, is_active: true })
+        .select()
+        .single();
+
+      if (newFormation) {
+        // Créer les positions vides
+        const formationPositions = FORMATIONS[selectedFormation].map(pos => ({
+          formation_id: newFormation.id,
+          player_id: null,
+          position_x: pos.x,
+          position_y: pos.y,
+          role: pos.role,
+        }));
+        await supabase.from('formation_positions').insert(formationPositions);
+
+        // Renommer avec le nom custom
+        await supabase.from('team_formations').update({ name: newCompoName.trim() }).eq('id', newFormation.id);
+        newFormation.name = newCompoName.trim();
+
+        setFormations(prev => [...prev, newFormation]);
+        setFormation(newFormation);
+        const { data: posData } = await supabase.from('formation_positions').select('*').eq('formation_id', newFormation.id);
+        if (posData) setPositions(posData);
+      }
+      setShowNewCompoForm(false);
+      setNewCompoName('');
+    } catch (err) {
+      console.error('Error creating composition:', err);
+    }
+  };
+
+  const handleSwitchComposition = async (compoId: string) => {
+    if (!selectedTeam) return;
+    const compo = formations.find(f => f.id === compoId);
+    if (!compo) return;
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Désactiver toutes puis activer celle-ci
+      await supabase.from('team_formations').update({ is_active: false }).eq('team_id', selectedTeam.id).eq('user_id', user.id);
+      await supabase.from('team_formations').update({ is_active: true }).eq('id', compoId);
+
+      setFormation(compo);
+      setSelectedFormation(compo.name as keyof typeof FORMATIONS || '4-4-2');
+      setFormations(prev => prev.map(f => ({ ...f, is_active: f.id === compoId })));
+
+      const { data: posData } = await supabase.from('formation_positions').select('*').eq('formation_id', compoId);
+      if (posData) setPositions(posData);
+    } catch (err) {
+      console.error('Error switching composition:', err);
+    }
+  };
+
+  const handleDeleteComposition = async (compoId: string) => {
+    if (formations.length <= 1) return; // Garder au moins 1
+    try {
+      await supabase.from('formation_positions').delete().eq('formation_id', compoId);
+      await supabase.from('team_formations').delete().eq('id', compoId);
+      const remaining = formations.filter(f => f.id !== compoId);
+      setFormations(remaining);
+      if (formation?.id === compoId && remaining.length > 0) {
+        handleSwitchComposition(remaining[0].id);
+      }
+    } catch (err) {
+      console.error('Error deleting composition:', err);
     }
   };
 
@@ -570,6 +656,63 @@ export default function MyTeam({ onBack }: MyTeamProps) {
           ) : activeTab === 'composition' ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
+                {/* Sélecteur de compositions */}
+                <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Compositions</h3>
+                    <button
+                      onClick={() => setShowNewCompoForm(!showNewCompoForm)}
+                      className="text-xs px-3 py-1.5 bg-orange-primary hover:bg-orange-600 text-white rounded-lg transition-colors font-medium"
+                    >
+                      + Nouvelle
+                    </button>
+                  </div>
+
+                  {showNewCompoForm && (
+                    <div className="flex gap-2 mb-3">
+                      <input
+                        type="text"
+                        value={newCompoName}
+                        onChange={e => setNewCompoName(e.target.value)}
+                        placeholder="Nom de la composition (ex: vs Toulouse)"
+                        className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                      <button
+                        onClick={handleCreateComposition}
+                        disabled={!newCompoName.trim()}
+                        className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Créer
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {formations.map(f => (
+                      <div
+                        key={f.id}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm cursor-pointer transition-all ${
+                          formation?.id === f.id
+                            ? 'bg-orange-primary/20 border-2 border-orange-primary text-white'
+                            : 'bg-dark-tertiary border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
+                        }`}
+                        onClick={() => handleSwitchComposition(f.id)}
+                      >
+                        <span className="font-medium">{f.name}</span>
+                        {f.is_active && <span className="text-[9px] bg-green-600 text-white px-1.5 py-0.5 rounded">Actif</span>}
+                        {formations.length > 1 && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeleteComposition(f.id); }}
+                            className="text-gray-600 hover:text-red-400 transition-colors ml-1"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold text-white">Composition Tactique</h2>
