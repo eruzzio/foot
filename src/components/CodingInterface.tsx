@@ -37,6 +37,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [matchSheetPanelId, setMatchSheetPanelId] = useState<string | null>(null);
   const [showFormationManager, setShowFormationManager] = useState(false);
   const [formationTeam, setFormationTeam] = useState<'A' | 'B'>('A');
+  const [showCompoSelector, setShowCompoSelector] = useState(false);
+  const [savedCompositions, setSavedCompositions] = useState<any[]>([]);
+  const [selectedCompoId, setSelectedCompoId] = useState<string | null>(null);
   const [lastEventId, setLastEventId] = useState<string | null>(null);
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
   const [showUndoBar, setShowUndoBar] = useState(false);
@@ -533,6 +536,55 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     }
   };
 
+  const loadSavedCompositions = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: formations } = await supabase
+      .from('team_formations')
+      .select('*, formation_positions(*)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (formations) {
+      // Récupérer les noms d'équipes liées
+      const teamIds = [...new Set(formations.map((f: any) => f.team_id).filter(Boolean))];
+      let teamsMap: Record<string, string> = {};
+      if (teamIds.length > 0) {
+        const { data: teams } = await supabase.from('teams').select('id, name').in('id', teamIds);
+        if (teams) {
+          teams.forEach((t: any) => { teamsMap[t.id] = t.name; });
+        }
+      }
+
+      const composWithTeam = formations.map((f: any) => ({
+        ...f,
+        team_name: teamsMap[f.team_id] || 'Équipe',
+        positions_count: f.formation_positions?.filter((p: any) => p.player_id).length || 0,
+        total_positions: f.formation_positions?.length || 0,
+      }));
+
+      setSavedCompositions(composWithTeam);
+    }
+    setShowCompoSelector(true);
+  };
+
+  const applyComposition = async (compoId: string) => {
+    if (!matchId) return;
+    const compo = savedCompositions.find((c: any) => c.id === compoId);
+    if (!compo) return;
+
+    // Sauvegarder le lien match-formation
+    await supabase.from('match_formations').upsert({
+      match_id: matchId,
+      formation_id: compoId,
+      team: 'A',
+    }, { onConflict: 'match_id,team' });
+
+    setSelectedCompoId(compoId);
+    setShowCompoSelector(false);
+  };
+
   // Calcule le décalage VEO : on saisit le timecode VEO du coup d'envoi (ex: "2:34")
   // VEO offset = secondes VEO au coup d'envoi
   const handleVeoSync = async () => {
@@ -668,6 +720,16 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 className="px-4 py-2 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
               >
                 Fiche Match
+              </button>
+              <button
+                onClick={loadSavedCompositions}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  selectedCompoId
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-dark-tertiary hover:bg-gray-700 text-blue-400 border border-blue-800/50'
+                }`}
+              >
+                {selectedCompoId ? 'Compo liée' : 'Composition'}
               </button>
               <button
                 onClick={handleEndMatch}
@@ -817,6 +879,63 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           }}
         />
       )}
+      {showCompoSelector && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="bg-dark-secondary border border-blue-800/50 rounded-xl p-6 w-full max-w-lg shadow-2xl">
+            <h2 className="text-lg font-bold text-white mb-1">Choisir une composition</h2>
+            <p className="text-sm text-gray-400 mb-5">
+              {"S\u00e9lectionnez la composition \u00e0 utiliser pour ce match"}
+            </p>
+
+            {savedCompositions.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-2">Aucune composition sauvegardée</p>
+                <p className="text-xs text-gray-600">{"Cr\u00e9ez des compositions dans Mes \u00c9quipes d\u2019abord"}</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto mb-4">
+                {savedCompositions.map((compo: any) => (
+                  <button
+                    key={compo.id}
+                    onClick={() => applyComposition(compo.id)}
+                    className={`w-full flex items-center gap-4 p-4 rounded-lg text-left transition-all ${
+                      selectedCompoId === compo.id
+                        ? 'bg-blue-900/30 border-2 border-blue-500'
+                        : 'bg-dark-tertiary border border-gray-700 hover:border-blue-800/50'
+                    }`}
+                  >
+                    <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                      {compo.name?.match(/\d[-]\d[-]?\d?/)?.[0] || 'FC'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-white truncate">{compo.name}</div>
+                      <div className="text-xs text-gray-500">
+                        {compo.team_name} — {compo.positions_count}/{compo.total_positions} joueurs
+                      </div>
+                    </div>
+                    {compo.is_active && (
+                      <span className="text-[9px] bg-green-600 text-white px-2 py-0.5 rounded font-medium">Actif</span>
+                    )}
+                    {selectedCompoId === compo.id && (
+                      <span className="text-[9px] bg-blue-600 text-white px-2 py-0.5 rounded font-medium">Match</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCompoSelector(false)}
+                className="flex-1 py-2 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-sm transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showFieldSelector && (
         <FieldPositionSelector
           onPositionSelected={handleFieldPositionSelected}
