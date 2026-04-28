@@ -337,20 +337,20 @@ export function exportTeamPdf(data: TeamPdfData): void {
     </div>
 
     <div class="terrain-wrap">
-      <svg class="terrain-svg" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
-        <rect width="680" height="440" fill="#1A6B35" rx="8"/>
-        <rect x="10" y="10" width="660" height="420" fill="none" stroke="#2A8A4A" stroke-width="2"/>
-        <line x1="340" y1="10" x2="340" y2="430" stroke="#2A8A4A" stroke-width="1.5"/>
-        <circle cx="340" cy="220" r="50" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
-        <circle cx="340" cy="220" r="3" fill="#2A8A4A"/>
-        <rect x="10" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
-        <rect x="10" y="170" width="30" height="100" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
-        <circle cx="65" cy="220" r="3" fill="#2A8A4A"/>
-        <rect x="590" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+      <svg class="terrain-svg" viewBox="0 0 440 680" xmlns="http://www.w3.org/2000/svg">
+        <rect width="440" height="680" fill="#1A6B35" rx="8"/>
+        <rect x="10" y="10" width="420" height="660" fill="none" stroke="#2A8A4A" stroke-width="2"/>
+        <line x1="10" y1="340" x2="430" y2="340" stroke="#2A8A4A" stroke-width="1.5"/>
+        <circle cx="220" cy="340" r="50" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+        <circle cx="220" cy="340" r="3" fill="#2A8A4A"/>
+        <rect x="130" y="10" width="180" height="80" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+        <rect x="170" y="10" width="100" height="30" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+        <circle cx="220" cy="65" r="3" fill="#2A8A4A"/>
+        <rect x="130" y="590" width="180" height="80" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
         <rect x="640" y="170" width="30" height="100" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
-        <circle cx="615" cy="220" r="3" fill="#2A8A4A"/>
-        <path d="M 80 190 A 30 30 0 0 1 80 250" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
-        <path d="M 600 190 A 30 30 0 0 0 600 250" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+        <circle cx="220" cy="615" r="3" fill="#2A8A4A"/>
+        <path d="M 190 80 A 30 30 0 0 0 250 80" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
+        <path d="M 190 600 A 30 30 0 0 1 250 600" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>
 
         ${compositionPlayers.map(p => `
           <circle cx="${p.x}" cy="${p.y}" r="20" fill="${p.color}" stroke="white" stroke-width="2.5" opacity="0.95"/>
@@ -444,8 +444,8 @@ function getCompositionPlayers(data: TeamPdfData): CompoPlayer[] {
         const player = data.players.find(p => p.id === pos.player_id);
         const role = pos.role || player?.position || 'MF';
         return {
-          x: (pos.position_x / 100) * 660 + 10,
-          y: (pos.position_y / 100) * 420 + 10,
+          x: (pos.position_x / 100) * 420 + 10,
+          y: (pos.position_y / 100) * 660 + 10,
           number: player?.number || '?',
           name: player ? getPlayerShortName(player) : '',
           color: posColors[role] || posColors[player?.position || ''] || '#6B7280',
@@ -457,29 +457,29 @@ function getCompositionPlayers(data: TeamPdfData): CompoPlayer[] {
   // Fallback : positions par défaut selon la formation
   const layouts: Record<string, { pos: string; x: number; y: number }[]> = {
     '4-4-2': [
-      { pos: 'GK', x: 340, y: 400 },
-      { pos: 'DF', x: 120, y: 320 }, { pos: 'DF', x: 240, y: 330 }, { pos: 'DF', x: 440, y: 330 }, { pos: 'DF', x: 560, y: 320 },
-      { pos: 'MF', x: 120, y: 210 }, { pos: 'MF', x: 260, y: 220 }, { pos: 'MF', x: 420, y: 220 }, { pos: 'MF', x: 560, y: 210 },
-      { pos: 'FW', x: 240, y: 100 }, { pos: 'FW', x: 440, y: 100 },
+      { pos: 'GK', x: 220, y: 640 },
+      { pos: 'DF', x: 70, y: 520 }, { pos: 'DF', x: 170, y: 530 }, { pos: 'DF', x: 270, y: 530 }, { pos: 'DF', x: 370, y: 520 },
+      { pos: 'MF', x: 70, y: 350 }, { pos: 'MF', x: 170, y: 340 }, { pos: 'MF', x: 270, y: 340 }, { pos: 'MF', x: 370, y: 350 },
+      { pos: 'FW', x: 160, y: 150 }, { pos: 'FW', x: 280, y: 150 },
     ],
     '4-3-3': [
-      { pos: 'GK', x: 340, y: 400 },
-      { pos: 'DF', x: 120, y: 320 }, { pos: 'DF', x: 240, y: 330 }, { pos: 'DF', x: 440, y: 330 }, { pos: 'DF', x: 560, y: 320 },
-      { pos: 'MF', x: 200, y: 210 }, { pos: 'MF', x: 340, y: 220 }, { pos: 'MF', x: 480, y: 210 },
-      { pos: 'FW', x: 160, y: 90 }, { pos: 'FW', x: 340, y: 80 }, { pos: 'FW', x: 520, y: 90 },
+      { pos: 'GK', x: 220, y: 640 },
+      { pos: 'DF', x: 70, y: 520 }, { pos: 'DF', x: 170, y: 530 }, { pos: 'DF', x: 270, y: 530 }, { pos: 'DF', x: 370, y: 520 },
+      { pos: 'MF', x: 130, y: 360 }, { pos: 'MF', x: 220, y: 340 }, { pos: 'MF', x: 310, y: 360 },
+      { pos: 'FW', x: 100, y: 140 }, { pos: 'FW', x: 220, y: 120 }, { pos: 'FW', x: 340, y: 140 },
     ],
     '4-2-3-1': [
-      { pos: 'GK', x: 340, y: 400 },
-      { pos: 'DF', x: 120, y: 320 }, { pos: 'DF', x: 240, y: 340 }, { pos: 'DF', x: 440, y: 340 }, { pos: 'DF', x: 560, y: 320 },
-      { pos: 'MF', x: 260, y: 250 }, { pos: 'MF', x: 420, y: 250 },
-      { pos: 'MF', x: 140, y: 160 }, { pos: 'MF', x: 340, y: 150 }, { pos: 'MF', x: 540, y: 160 },
-      { pos: 'FW', x: 340, y: 70 },
+      { pos: 'GK', x: 220, y: 640 },
+      { pos: 'DF', x: 70, y: 520 }, { pos: 'DF', x: 170, y: 530 }, { pos: 'DF', x: 270, y: 530 }, { pos: 'DF', x: 370, y: 520 },
+      { pos: 'MF', x: 160, y: 420 }, { pos: 'MF', x: 280, y: 420 },
+      { pos: 'MF', x: 90, y: 270 }, { pos: 'MF', x: 220, y: 250 }, { pos: 'MF', x: 350, y: 270 },
+      { pos: 'FW', x: 220, y: 120 },
     ],
     '3-5-2': [
-      { pos: 'GK', x: 340, y: 400 },
-      { pos: 'DF', x: 180, y: 330 }, { pos: 'DF', x: 340, y: 340 }, { pos: 'DF', x: 500, y: 330 },
-      { pos: 'MF', x: 100, y: 220 }, { pos: 'MF', x: 230, y: 230 }, { pos: 'MF', x: 340, y: 210 }, { pos: 'MF', x: 450, y: 230 }, { pos: 'MF', x: 580, y: 220 },
-      { pos: 'FW', x: 260, y: 90 }, { pos: 'FW', x: 420, y: 90 },
+      { pos: 'GK', x: 220, y: 640 },
+      { pos: 'DF', x: 110, y: 530 }, { pos: 'DF', x: 220, y: 540 }, { pos: 'DF', x: 330, y: 530 },
+      { pos: 'MF', x: 60, y: 360 }, { pos: 'MF', x: 140, y: 350 }, { pos: 'MF', x: 220, y: 340 }, { pos: 'MF', x: 300, y: 350 }, { pos: 'MF', x: 380, y: 360 },
+      { pos: 'FW', x: 160, y: 140 }, { pos: 'FW', x: 280, y: 140 },
     ],
   };
 
