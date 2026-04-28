@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
 import { ArrowLeft, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
+import { createProFootballPanel } from '../utils/createProPanel';
 import FreeLayoutEditor from './FreeLayoutEditor';
 
 interface PanelsManagerProps {
@@ -114,6 +115,22 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     setError('');
     setSelectedPanel(null);
     setView('create');
+  };
+
+  const handleCreateProPanel = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setSaving(true);
+      const panelId = await createProFootballPanel(user.id);
+      if (panelId) {
+        await loadPanels();
+      }
+      setSaving(false);
+    } catch (err) {
+      console.error('Error creating pro panel:', err);
+      setSaving(false);
+    }
   };
 
   const startEdit = (panel: Panel) => {
@@ -536,6 +553,13 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
               >
                 <Plus size={18} />
                 Nouveau panneau
+              </button>
+              <button
+                onClick={handleCreateProPanel}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-medium shadow"
+              >
+                <Plus size={18} />
+                Football Pro
               </button>
             </div>
 
