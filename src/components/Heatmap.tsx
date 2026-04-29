@@ -14,7 +14,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
   const [filterType, setFilterType] = useState<string>('all');
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null);
-  const [view, setView] = useState<'field' | 'goal'>('field');
+  const [view, setView] = useState<'field' | 'goal' | 'zones'>('field');
 
   const eventTypes = useMemo(() => {
     const types = new Set<string>();
@@ -33,6 +33,16 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
 
   const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null);
   const goalEvents = filteredEvents.filter(e => e.goal_x !== null && e.goal_y !== null);
+
+  // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
+  const zoneEvents = useMemo(() => {
+    const offensive = fieldEvents.filter(e => (e.field_y ?? 0) < 33);
+    const mediane = fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66);
+    const defensive = fieldEvents.filter(e => (e.field_y ?? 0) > 66);
+    return { offensive, mediane, defensive };
+  }, [fieldEvents]);
+
+  const hasZoneData = fieldEvents.length > 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -101,16 +111,24 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
 
         <div className="flex flex-wrap gap-2 items-center">
           {/* Vue toggle */}
-          {hasGoalData && (
-            <div className="flex bg-dark-tertiary rounded-lg border border-gray-700 overflow-hidden mr-2">
-              <button
-                onClick={() => setView('field')}
-                className={`px-3 py-1 text-xs font-medium transition-colors ${
-                  view === 'field' ? 'bg-orange-primary text-white' : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Terrain
-              </button>
+          <div className="flex bg-dark-tertiary rounded-lg border border-gray-700 overflow-hidden mr-2">
+            <button
+              onClick={() => setView('field')}
+              className={`px-3 py-1 text-xs font-medium transition-colors ${
+                view === 'field' ? 'bg-orange-primary text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Terrain
+            </button>
+            <button
+              onClick={() => setView('zones')}
+              className={`px-3 py-1 text-xs font-medium transition-colors ${
+                view === 'zones' ? 'bg-orange-primary text-white' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Zones
+            </button>
+            {hasGoalData && (
               <button
                 onClick={() => setView('goal')}
                 className={`px-3 py-1 text-xs font-medium transition-colors flex items-center gap-1 ${
@@ -120,8 +138,8 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                 <Target size={11} />
                 But
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <Filter size={13} className="text-gray-500" />
           {(['all', 'A', 'B'] as const).map(t => (
@@ -215,6 +233,74 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                 <span className="text-[10px] text-gray-400">Intense</span>
               </div>
               <span className="text-[10px] text-gray-600 ml-auto">{fieldEvents.length} actions</span>
+            </div>
+          </>
+        )}
+
+        {view === 'zones' && hasZoneData && (
+          <>
+            <div className="relative rounded-lg overflow-hidden border border-gray-700" style={{ aspectRatio: '68/100' }}>
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 440 680" xmlns="http://www.w3.org/2000/svg" style={{ pointerEvents: 'none' }}>
+                <rect width="440" height="680" fill="#1A6B35" rx="8"/>
+                <rect x="10" y="10" width="420" height="660" fill="none" stroke="#2A8A4A" strokeWidth="2"/>
+                <line x1="10" y1="340" x2="430" y2="340" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <circle cx="220" cy="340" r="50" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <rect x="130" y="10" width="180" height="80" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <rect x="130" y="590" width="180" height="80" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+              </svg>
+
+              <div className="absolute inset-0 flex flex-col">
+                {/* Zone Offensive */}
+                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderBottom: '2px dashed rgba(239, 68, 68, 0.4)' }}>
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
+                    <div className="text-xs font-semibold text-red-300 mt-1">Zone Offensive</div>
+                    <div className="text-[10px] text-red-400/60 mt-0.5">
+                      {fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%
+                    </div>
+                  </div>
+                </div>
+                {/* Zone Médiane */}
+                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(250, 204, 21, 0.12)', borderBottom: '2px dashed rgba(250, 204, 21, 0.4)' }}>
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
+                    <div className="text-xs font-semibold text-yellow-300 mt-1">Zone Médiane</div>
+                    <div className="text-[10px] text-yellow-400/60 mt-0.5">
+                      {fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%
+                    </div>
+                  </div>
+                </div>
+                {/* Zone Défensive */}
+                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)' }}>
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.defensive.length}</div>
+                    <div className="text-xs font-semibold text-blue-300 mt-1">Zone Défensive</div>
+                    <div className="text-[10px] text-blue-400/60 mt-0.5">
+                      {fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Barres de répartition */}
+            <div className="mt-3 space-y-2">
+              {[
+                { label: 'Offensive', count: zoneEvents.offensive.length, color: '#EF4444', bg: 'bg-red-500' },
+                { label: 'Médiane', count: zoneEvents.mediane.length, color: '#FACC15', bg: 'bg-yellow-400' },
+                { label: 'Défensive', count: zoneEvents.defensive.length, color: '#3B82F6', bg: 'bg-blue-500' },
+              ].map(z => (
+                <div key={z.label} className="flex items-center gap-3">
+                  <span className="text-xs text-gray-400 w-16">{z.label}</span>
+                  <div className="flex-1 bg-dark-tertiary rounded-full h-3 overflow-hidden">
+                    <div
+                      className={`h-full ${z.bg} rounded-full transition-all`}
+                      style={{ width: `${fieldEvents.length > 0 ? (z.count / fieldEvents.length) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-white font-bold w-8 text-right">{z.count}</span>
+                </div>
+              ))}
             </div>
           </>
         )}
