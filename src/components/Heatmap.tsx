@@ -164,24 +164,6 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
               }}
             >
               <div className="absolute inset-0">
-                {/* Grille de chaleur */}
-                {heatGrid.map((row, ri) =>
-                  row.map((val, ci) => (
-                    <div
-                      key={`${ri}-${ci}`}
-                      className="absolute"
-                      style={{
-                        left: `${(ci / 10) * 100}%`,
-                        top: `${(ri / 6) * 100}%`,
-                        width: `${100 / 10}%`,
-                        height: `${100 / 6}%`,
-                        backgroundColor: getHeatColor(val),
-                        transition: 'background-color 0.3s',
-                      }}
-                    />
-                  ))
-                )}
-
                 {/* Points individuels */}
                 {fieldEvents.map(e => (
                   <div
