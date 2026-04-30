@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { MatchEventWithDetails } from '../types/database';
-import { Activity } from 'lucide-react';
+import { Activity, Target } from 'lucide-react';
+import { calculateTeamXG, getShotEvents } from '../utils/xg';
 
 interface StatisticsProps {
   events: MatchEventWithDetails[];
@@ -71,12 +72,51 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
 
   const showTabs = halftimes.length > 0;
 
+  const xgA = calculateTeamXG(filteredEvents, 'A');
+  const xgB = calculateTeamXG(filteredEvents, 'B');
+  const shotsA = getShotEvents(filteredEvents.filter(e => e.team === 'A')).length;
+  const shotsB = getShotEvents(filteredEvents.filter(e => e.team === 'B')).length;
+  const hasXG = xgA + xgB > 0;
+
   return (
     <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6 text-white">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <Activity size={20} />
         Statistiques comparatives
       </h3>
+
+      {/* Widget xG */}
+      {hasXG && (
+        <div className="bg-dark-tertiary border border-gray-700 rounded-xl p-4 mb-5">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Target size={14} className="text-orange-primary" />
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Expected Goals (xG)</span>
+          </div>
+          <div className="grid grid-cols-3 items-center gap-2">
+            <div className="text-center">
+              <div className="text-3xl font-black text-green-400">{xgA.toFixed(2)}</div>
+              <div className="text-xs text-gray-500 mt-0.5">{teamAName}</div>
+              <div className="text-[10px] text-gray-600">{shotsA} tir{shotsA > 1 ? 's' : ''}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">xG</div>
+              <div className="w-full bg-gray-800 rounded-full h-2 mt-2 overflow-hidden flex">
+                <div
+                  className="h-full bg-green-500 rounded-l-full transition-all"
+                  style={{ width: `${xgA + xgB > 0 ? (xgA / (xgA + xgB)) * 100 : 50}%` }}
+                />
+                <div className="h-full flex-1 bg-orange-500 rounded-r-full" />
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-black text-orange-400">{xgB.toFixed(2)}</div>
+              <div className="text-xs text-gray-500 mt-0.5">{teamBName}</div>
+              <div className="text-[10px] text-gray-600">{shotsB} tir{shotsB > 1 ? 's' : ''}</div>
+            </div>
+          </div>
+          <p className="text-center text-[9px] text-gray-700 mt-3">Basé sur la position et l&apos;angle des tirs</p>
+        </div>
+      )}
 
       {showTabs && (
         <div className="flex gap-1 mb-4 bg-dark-tertiary rounded-lg p-1">
