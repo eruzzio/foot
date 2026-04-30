@@ -42,7 +42,24 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
     return { offensive, mediane, defensive };
   }, [fieldEvents]);
 
-  const hasZoneData = fieldEvents.length > 0;
+  // Détail par zone : quels types dans chaque zone
+  const zoneDetail = useMemo(() => {
+    const detail = (evts: MatchEventWithDetails[]) => {
+      const byType: Record<string, { count: number; color: string }> = {};
+      evts.forEach(e => {
+        const name = e.event_type?.name || e.label || 'Autre';
+        const color = e.event_type?.color || '#9CA3AF';
+        if (!byType[name]) byType[name] = { count: 0, color };
+        byType[name].count++;
+      });
+      return Object.entries(byType).sort((a, b) => b[1].count - a[1].count).slice(0, 3);
+    };
+    return {
+      defensive: detail(fieldEvents.filter(e => (e.field_y ?? 0) < 33)),
+      mediane: detail(fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66)),
+      offensive: detail(fieldEvents.filter(e => (e.field_y ?? 0) > 66)),
+    };
+  }, [fieldEvents]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -79,6 +96,21 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
 
   const hasFieldData = fieldEvents.length > 0;
   const hasGoalData = goalEvents.length > 0;
+  const hasZoneData = fieldEvents.length > 0;
+
+  const ZoneTypeTags = ({ entries }: { entries: [string, { count: number; color: string }][] }) => (
+    <div className="flex flex-col items-center gap-0.5 mt-1">
+      {entries.map(([name, data]) => (
+        <span
+          key={name}
+          className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+          style={{ backgroundColor: `${data.color}30`, color: data.color, border: `1px solid ${data.color}60` }}
+        >
+          {name} {data.count}
+        </span>
+      ))}
+    </div>
+  );
 
   if (!hasFieldData && !hasGoalData) {
     return (
@@ -265,6 +297,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                     <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.defensive.length}</div>
                     <div className="text-xs font-semibold text-blue-300 mt-1">Défensif</div>
                     <div className="text-[10px] text-blue-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%</div>
+                    <ZoneTypeTags entries={zoneDetail.defensive} />
                   </div>
                 </div>
                 {/* Zone Médiane (centre) */}
@@ -273,6 +306,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                     <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
                     <div className="text-xs font-semibold text-yellow-300 mt-1">Médian</div>
                     <div className="text-[10px] text-yellow-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%</div>
+                    <ZoneTypeTags entries={zoneDetail.mediane} />
                   </div>
                 </div>
                 {/* Zone Offensive (droite) */}
@@ -281,6 +315,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                     <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
                     <div className="text-xs font-semibold text-red-300 mt-1">Offensif</div>
                     <div className="text-[10px] text-red-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%</div>
+                    <ZoneTypeTags entries={zoneDetail.offensive} />
                   </div>
                 </div>
               </div>
