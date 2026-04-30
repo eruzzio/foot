@@ -6,6 +6,8 @@ interface PdfExportData {
   matchInfo: {
     teamA: string;
     teamB: string;
+    teamAColor?: string;
+    teamBColor?: string;
     date: string;
     scoreA?: number;
     scoreB?: number;
@@ -24,6 +26,8 @@ function formatTime(seconds: number): string {
 }
 
 export function exportToPdf(data: PdfExportData): void {
+  const colorA = data.matchInfo.teamAColor || '#22c55e';
+  const colorB = data.matchInfo.teamBColor || '#f97316';
   const teamAEvents = data.events.filter(e => e.team === 'A');
   const teamBEvents = data.events.filter(e => e.team === 'B');
 
@@ -105,7 +109,7 @@ export function exportToPdf(data: PdfExportData): void {
   // Type rows
   const typeRows = sortedTypes.map(t => {
     const aW = t.total > 0 ? (t.teamA / t.total) * 100 : 50;
-    return `<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;border-bottom:1px solid #f1f5f9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${t.color};margin-right:5px;vertical-align:middle;"></span>${t.name}</td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:#16a34a;border-bottom:1px solid #f1f5f9;">${t.teamA}</td><td style="padding:5px 6px;border-bottom:1px solid #f1f5f9;"><div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;"><div style="width:${aW}%;background:#22c55e;"></div><div style="width:${100 - aW}%;background:#f97316;"></div></div></td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:#f97316;border-bottom:1px solid #f1f5f9;">${t.teamB}</td></tr>`;
+    return `<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;border-bottom:1px solid #f1f5f9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${t.color};margin-right:5px;vertical-align:middle;"></span>${t.name}</td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorA};border-bottom:1px solid #f1f5f9;">${t.teamA}</td><td style="padding:5px 6px;border-bottom:1px solid #f1f5f9;"><div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;"><div style="width:${aW}%;background:${colorA};"></div><div style="width:${100 - aW}%;background:${colorB};"></div></div></td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorB};border-bottom:1px solid #f1f5f9;">${t.teamB}</td></tr>`;
   }).join('');
 
   // Period rows condensees
@@ -114,7 +118,7 @@ export function exportToPdf(data: PdfExportData): void {
       const col = typeMap[n]?.color || '#6B7280';
       return `<span style="display:inline-block;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:600;background:${col}18;color:${col};margin-right:3px;">${n} ${c}</span>`;
     }).join('');
-    return `<tr><td style="padding:5px 8px;font-weight:700;font-size:12px;border-bottom:1px solid #f1f5f9;width:60px;">${p.label}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:#16a34a;border-bottom:1px solid #f1f5f9;width:30px;">${p.teamA}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:#f97316;border-bottom:1px solid #f1f5f9;width:30px;">${p.teamB}</td><td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;">${tags}</td></tr>`;
+    return `<tr><td style="padding:5px 8px;font-weight:700;font-size:12px;border-bottom:1px solid #f1f5f9;width:60px;">${p.label}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:${colorA};border-bottom:1px solid #f1f5f9;width:30px;">${p.teamA}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:${colorB};border-bottom:1px solid #f1f5f9;width:30px;">${p.teamB}</td><td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;">${tags}</td></tr>`;
   }).join('');
 
   const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Rapport - ${data.matchInfo.teamA} vs ${data.matchInfo.teamB}</title>
@@ -124,14 +128,14 @@ export function exportToPdf(data: PdfExportData): void {
 <div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:10px;padding:16px 20px;margin-bottom:12px;color:white;">
 ${data.matchInfo.competition ? `<div style="text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#94a3b8;margin-bottom:8px;">${data.matchInfo.competition}</div>` : ''}
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
-<div style="display:flex;align-items:center;gap:8px;">${mkLogo(data.matchInfo.teamALogoUrl, data.matchInfo.teamA, '#22c55e')}<div style="font-size:14px;font-weight:800;color:#22c55e;">${data.matchInfo.teamA}</div></div>
+<div style="display:flex;align-items:center;gap:8px;">${mkLogo(data.matchInfo.teamALogoUrl, data.matchInfo.teamA, '#22c55e')}<div style="font-size:14px;font-weight:800;color:${colorA};">${data.matchInfo.teamA}</div></div>
 <div style="text-align:center;"><div style="font-size:36px;font-weight:900;letter-spacing:4px;">${scoreDisplay}</div><div style="font-size:9px;color:#94a3b8;margin-top:2px;">${data.matchInfo.date}${data.matchInfo.duration ? ' | ' + formatTime(data.matchInfo.duration) : ''}</div></div>
-<div style="display:flex;align-items:center;gap:8px;flex-direction:row-reverse;text-align:right;">${mkLogo(data.matchInfo.teamBLogoUrl, data.matchInfo.teamB, '#f97316')}<div style="font-size:14px;font-weight:800;color:#f97316;">${data.matchInfo.teamB}</div></div>
+<div style="display:flex;align-items:center;gap:8px;flex-direction:row-reverse;text-align:right;">${mkLogo(data.matchInfo.teamBLogoUrl, data.matchInfo.teamB, '#f97316')}<div style="font-size:14px;font-weight:800;color:${colorB};">${data.matchInfo.teamB}</div></div>
 </div></div>
 
 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
-<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#16a34a;">${teamAEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamA}</div></div>
-<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#f97316;">${teamBEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamB}</div></div>
+<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:${colorA};">${teamAEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamA}</div></div>
+<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:${colorB};">${teamBEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamB}</div></div>
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#0ea5e9;">${data.events.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Total</div></div>
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#8b5cf6;">${fieldEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Localisées</div></div>
 </div>
@@ -141,19 +145,19 @@ ${xgA + xgB > 0 ? `
   <div style="text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:8px;">⚽ Expected Goals (xG)</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:8px;">
     <div style="text-align:center;">
-      <div style="font-size:28px;font-weight:900;color:#16a34a;">${xgA.toFixed(2)}</div>
+      <div style="font-size:28px;font-weight:900;color:${colorA};">${xgA.toFixed(2)}</div>
       <div style="font-size:9px;color:#64748b;">${data.matchInfo.teamA}</div>
       <div style="font-size:8px;color:#94a3b8;">${shotsA} tir${shotsA > 1 ? 's' : ''}</div>
     </div>
     <div>
       <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;">
-        <div style="width:${xgBarA}%;background:#16a34a;"></div>
-        <div style="flex:1;background:#f97316;"></div>
+        <div style="width:${xgBarA}%;background:${colorA};"></div>
+        <div style="flex:1;background:${colorB};"></div>
       </div>
       <div style="text-align:center;font-size:8px;color:#94a3b8;margin-top:3px;">Position · Angle · Type</div>
     </div>
     <div style="text-align:center;">
-      <div style="font-size:28px;font-weight:900;color:#f97316;">${xgB.toFixed(2)}</div>
+      <div style="font-size:28px;font-weight:900;color:${colorB};">${xgB.toFixed(2)}</div>
       <div style="font-size:9px;color:#64748b;">${data.matchInfo.teamB}</div>
       <div style="font-size:8px;color:#94a3b8;">${shotsB} tir${shotsB > 1 ? 's' : ''}</div>
     </div>
@@ -167,8 +171,8 @@ ${goalEvents.length > 0 ? `<div><h2>Zones de frappe</h2><div class="card" style=
 </div>
 
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
-<div><h2>Actions par type</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Type</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:#16a34a;width:30px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;min-width:60px;"></th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:#f97316;width:30px;">${data.matchInfo.teamB}</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
-<div><h2>Activité par période</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Période</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:#16a34a;width:25px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:#f97316;width:25px;">${data.matchInfo.teamB}</th><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Détail</th></tr></thead><tbody>${periodRows}</tbody></table></div></div>
+<div><h2>Actions par type</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Type</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorA};width:30px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;min-width:60px;"></th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorB};width:30px;">${data.matchInfo.teamB}</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>
+<div><h2>Activité par période</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Période</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorA};width:25px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorB};width:25px;">${data.matchInfo.teamB}</th><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Détail</th></tr></thead><tbody>${periodRows}</tbody></table></div></div>
 </div>
 
 <div style="padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;"><span style="font-size:8px;color:#94a3b8;">ORION — Sports Video Analytics & Coding</span><span style="font-size:8px;color:#94a3b8;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span></div>

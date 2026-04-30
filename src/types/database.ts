@@ -34,6 +34,8 @@ export interface Match {
   team_b_name: string;
   team_a_score: number;
   team_b_score: number;
+  team_a_color?: string | null;
+  team_b_color?: string | null;
   match_date: string;
   status: 'setup' | 'in_progress' | 'paused' | 'completed';
   match_time: number;

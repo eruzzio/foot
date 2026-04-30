@@ -9,6 +9,8 @@ interface ExportButtonProps {
   events: MatchEventWithDetails[];
   teamAName: string;
   teamBName: string;
+  teamAColor?: string;
+  teamBColor?: string;
   matchDate?: string;
   scoreA?: number;
   scoreB?: number;
@@ -20,7 +22,7 @@ interface ExportButtonProps {
   disabled?: boolean;
 }
 
-export default function ExportButton({ events, teamAName, teamBName, matchDate, scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl, disabled }: ExportButtonProps) {
+export default function ExportButton({ events, teamAName, teamBName, teamAColor, teamBColor, matchDate, scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl, disabled }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleExport = (format: 'csv' | 'excel' | 'pdf' | 'sportscode' | 'dartfish' | 'longomatch') => {
@@ -29,6 +31,8 @@ export default function ExportButton({ events, teamAName, teamBName, matchDate, 
       matchInfo: {
         teamA: teamAName,
         teamB: teamBName,
+        teamAColor: teamAColor || '#22c55e',
+        teamBColor: teamBColor || '#f97316',
         date: matchDate || new Date().toLocaleDateString('fr-FR'),
         scoreA,
         scoreB,

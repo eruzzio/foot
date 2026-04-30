@@ -742,6 +742,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 events={events}
                 teamAName={teamAName}
                 teamBName={teamBName}
+                teamAColor={teamAColor}
+                teamBColor="#f97316"
                 scoreA={teamAScore}
                 scoreB={teamBScore}
                 duration={currentTime}

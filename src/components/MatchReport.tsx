@@ -150,6 +150,8 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
                   events={match.events}
                   teamAName={match.team_a_name}
                   teamBName={match.team_b_name}
+                  teamAColor={match.team_a_color || '#22c55e'}
+                  teamBColor={match.team_b_color || '#f97316'}
                   matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
                   scoreA={match.team_a_score}
                   scoreB={match.team_b_score}
