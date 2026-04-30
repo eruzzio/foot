@@ -36,9 +36,9 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
 
   // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
   const zoneEvents = useMemo(() => {
-    const offensive = fieldEvents.filter(e => (e.field_y ?? 0) < 33);
-    const mediane = fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66);
-    const defensive = fieldEvents.filter(e => (e.field_y ?? 0) > 66);
+    const offensive = fieldEvents.filter(e => (e.field_x ?? 0) > 66);
+    const mediane = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+    const defensive = fieldEvents.filter(e => (e.field_x ?? 0) < 33);
     return { offensive, mediane, defensive };
   }, [fieldEvents]);
 
@@ -55,9 +55,9 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
       return Object.entries(byType).sort((a, b) => b[1].count - a[1].count).slice(0, 3);
     };
     return {
-      defensive: detail(fieldEvents.filter(e => (e.field_y ?? 0) < 33)),
-      mediane: detail(fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66)),
-      offensive: detail(fieldEvents.filter(e => (e.field_y ?? 0) > 66)),
+      defensive: detail(fieldEvents.filter(e => (e.field_x ?? 0) < 33)),
+      mediane: detail(fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66)),
+      offensive: detail(fieldEvents.filter(e => (e.field_x ?? 0) > 66)),
     };
   }, [fieldEvents]);
 

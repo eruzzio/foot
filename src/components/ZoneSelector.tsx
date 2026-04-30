@@ -5,9 +5,9 @@ interface ZoneSelectorProps {
 }
 
 const ZONES = [
-  { id: 'offensive', label: 'Zone Offensive', color: '#DC2626', bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444', y: 16.5 },
-  { id: 'mediane', label: 'Zone Médiane', color: '#CA8A04', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', y: 50 },
-  { id: 'defensive', label: 'Zone Défensive', color: '#2563EB', bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', y: 83.5 },
+  { id: 'defensive', label: 'Zone Défensive', color: '#2563EB', bg: 'rgba(59, 130, 246, 0.2)', border: '#3b82f6', x: 16.5, y: 50 },
+  { id: 'mediane', label: 'Zone Médiane', color: '#CA8A04', bg: 'rgba(250, 204, 21, 0.15)', border: '#facc15', x: 50, y: 50 },
+  { id: 'offensive', label: 'Zone Offensive', color: '#DC2626', bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444', x: 83.5, y: 50 },
 ];
 
 export default function ZoneSelector({ onZoneSelected, onSkip, eventName }: ZoneSelectorProps) {
@@ -34,7 +34,7 @@ export default function ZoneSelector({ onZoneSelected, onSkip, eventName }: Zone
             key={zone.id}
             onClick={() => {
               if (navigator.vibrate) navigator.vibrate(40);
-              onZoneSelected(zone.id, 50, zone.y);
+              onZoneSelected(zone.id, zone.x, zone.y);
             }}
             className="flex-1 flex items-center justify-center rounded-xl transition-all active:scale-[0.97] select-none min-h-0"
             style={{
