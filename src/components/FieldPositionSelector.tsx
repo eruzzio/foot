@@ -25,8 +25,8 @@ export default function FieldPositionSelector({ onPositionSelected, onSkip, even
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-2xl">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-2xl max-h-[95vh] overflow-auto">
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-primary/20 rounded-lg">
