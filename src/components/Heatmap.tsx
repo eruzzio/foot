@@ -312,7 +312,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
           <>
             {/* Cage de but avec points */}
             <div className="relative mx-auto" style={{ maxWidth: '480px' }}>
-              <div className="relative border-4 border-white rounded-t-md overflow-hidden" style={{ aspectRatio: '7.32 / 2.44' }}>
+              <div className="relative border-4 border-white rounded-t-md" style={{ aspectRatio: '7.32 / 2.44' }}>
                 <div
                   className="absolute inset-0"
                   style={{
@@ -329,35 +329,38 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
                   </div>
 
                   {/* Points de tir */}
-                  {goalEvents.map(e => (
-                    <div
-                      key={e.id}
-                      className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
-                      style={{
-                        left: `${e.goal_x}%`,
-                        top: `${e.goal_y}%`,
-                      }}
-                      onMouseEnter={() => setHoveredEvent(e.id)}
-                      onMouseLeave={() => setHoveredEvent(null)}
-                    >
+                  {goalEvents.map(e => {
+                    const isTop = (e.goal_y ?? 50) < 50;
+                    return (
                       <div
-                        className="rounded-full border-2 border-white/80"
-                        style={{
-                          width: hoveredEvent === e.id ? '16px' : '12px',
-                          height: hoveredEvent === e.id ? '16px' : '12px',
-                          backgroundColor: e.outcome === 'success' ? '#22c55e' : e.outcome === 'failure' ? '#ef4444' : '#f59e0b',
-                          boxShadow: '0 0 8px rgba(255,255,255,0.3)',
-                          transition: 'width 0.15s, height 0.15s',
-                        }}
-                      />
-                      {hoveredEvent === e.id && (
-                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-dark-secondary border border-gray-700 rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-30 shadow-xl">
-                          <p className="text-white font-medium">{e.event_type?.name || e.label}</p>
-                          <p className="text-gray-400">{formatTime(e.timestamp)} · {e.outcome === 'success' ? 'But' : e.outcome === 'failure' ? 'Manqué' : 'Arrêté'}</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                        key={e.id}
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 z-20"
+                        style={{ left: `${e.goal_x}%`, top: `${e.goal_y}%` }}
+                        onMouseEnter={() => setHoveredEvent(e.id)}
+                        onMouseLeave={() => setHoveredEvent(null)}
+                      >
+                        <div
+                          className="rounded-full border-2 border-white/80"
+                          style={{
+                            width: hoveredEvent === e.id ? '18px' : '13px',
+                            height: hoveredEvent === e.id ? '18px' : '13px',
+                            backgroundColor: e.outcome === 'success' ? '#22c55e' : e.outcome === 'failure' ? '#ef4444' : '#f59e0b',
+                            boxShadow: '0 0 8px rgba(255,255,255,0.3)',
+                            transition: 'width 0.15s, height 0.15s',
+                          }}
+                        />
+                        {hoveredEvent === e.id && (
+                          <div
+                            className="absolute left-1/2 -translate-x-1/2 bg-dark-secondary border border-gray-600 rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-50 shadow-xl pointer-events-none"
+                            style={{ [isTop ? 'top' : 'bottom']: '100%', marginTop: isTop ? '6px' : 0, marginBottom: isTop ? 0 : '6px' }}
+                          >
+                            <p className="text-white font-semibold">{e.event_type?.name || e.label}</p>
+                            <p className="text-gray-400">{formatTime(e.timestamp)} · {e.outcome === 'success' ? '✅ But' : e.outcome === 'failure' ? '❌ Manqué' : '🟡 Arrêté'}</p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
               <div className="h-2 bg-green-800 rounded-b-sm" />
