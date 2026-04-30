@@ -15,6 +15,13 @@ interface PlayerStat {
   failureCount: number;
   neutralCount: number;
   successRate: number;
+  tirs: number;
+  passes: number;
+  pertes: number;
+  recuperations: number;
+  fautes: number;
+  tacles: number;
+  duels: number;
   eventsByType: Record<string, { label: string; count: number; success: number; failure: number }>;
 }
 
@@ -23,7 +30,7 @@ interface PlayerSeasonStatsProps {
   teamName: string;
 }
 
-type SortKey = 'name' | 'matchesPlayed' | 'totalEvents' | 'successRate';
+type SortKey = 'name' | 'matchesPlayed' | 'totalEvents' | 'successRate' | 'tirs' | 'passes' | 'pertes' | 'recuperations' | 'fautes' | 'tacles' | 'duels';
 
 export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
   const [stats, setStats] = useState<PlayerStat[]>([]);
@@ -91,6 +98,20 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
         const totalEvents = playerEvents.length;
         const successRate = totalEvents > 0 ? Math.round((successCount / (successCount + failureCount || 1)) * 100) : 0;
 
+        // Stats par type d'action (correspondance sur le nom)
+        const countByName = (keywords: string[]) => playerEvents.filter(e => {
+          const name = ((e.event_type as { name?: string } | null)?.name ?? e.label ?? '').toLowerCase();
+          return keywords.some(k => name.includes(k));
+        }).length;
+
+        const tirs = countByName(['tir', 'shot', 'frappe', 'penalty']);
+        const passes = countByName(['passe', 'pass', 'centre', 'relance']);
+        const pertes = countByName(['perte', 'perd', 'lost', 'dépossédé']);
+        const recuperations = countByName(['récup', 'recup', 'interception', 'intercepté']);
+        const fautes = countByName(['faute', 'foul']);
+        const tacles = countByName(['tacle', 'tackle']);
+        const duels = countByName(['duel', 'combat', '1v1', '1 contre 1']);
+
         const eventsByType: PlayerStat['eventsByType'] = {};
         playerEvents.forEach(e => {
           const key = e.event_type_id ?? 'other';
@@ -116,6 +137,13 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
           failureCount,
           neutralCount,
           successRate,
+          tirs,
+          passes,
+          pertes,
+          recuperations,
+          fautes,
+          tacles,
+          duels,
           eventsByType,
         };
       });
@@ -203,139 +231,84 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
       </div>
 
       <div className="bg-dark-secondary border border-gray-800 rounded-lg overflow-hidden">
-        <div className="grid grid-cols-[2fr_1fr_1fr_1fr] gap-2 px-4 py-2 border-b border-gray-800 bg-dark-tertiary/50">
-          <SortButton label="Joueur" sKey="name" />
-          <SortButton label="Matchs" sKey="matchesPlayed" />
-          <SortButton label="Actions" sKey="totalEvents" />
-          <SortButton label="Réussite" sKey="successRate" />
-        </div>
-
-        <div className="divide-y divide-gray-800/60">
-          {sorted.map(player => {
-            const isExpanded = expandedPlayer === player.id;
-            const typeEntries = Object.entries(player.eventsByType).sort((a, b) => b[1].count - a[1].count);
-
-            return (
-              <div key={player.id}>
-                <button
-                  onClick={() => setExpandedPlayer(isExpanded ? null : player.id)}
-                  className="w-full grid grid-cols-[2fr_1fr_1fr_1fr] gap-2 px-4 py-3 hover:bg-dark-tertiary/40 transition-colors text-left"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    {player.photo_url ? (
-                      <img
-                        src={player.photo_url}
-                        alt={`${player.first_name} ${player.last_name}`}
-                        className="w-8 h-8 rounded-full object-cover border border-gray-700 flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
-                        {player.number}
-                      </div>
-                    )}
-                    <div className="min-w-0">
-                      <div className="text-sm font-semibold text-white truncate">
-                        {player.first_name} {player.last_name}
-                      </div>
-                      <div className="text-xs text-gray-500 truncate">{player.position || `#${player.number}`}</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sm font-semibold text-gray-300">{player.matchesPlayed}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-sm font-semibold text-gray-300">{player.totalEvents}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="flex-1 max-w-[40px] bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full"
-                        style={{ width: `${player.successRate}%` }}
-                      />
-                    </div>
-                    <span className={`text-xs font-bold ${
-                      player.successRate >= 70 ? 'text-green-400' :
-                      player.successRate >= 50 ? 'text-yellow-400' :
-                      player.totalEvents === 0 ? 'text-gray-600' :
-                      'text-red-400'
-                    }`}>
-                      {player.totalEvents === 0 ? '-' : `${player.successRate}%`}
-                    </span>
-                  </div>
-                </button>
-
-                {isExpanded && (
-                  <div className="px-4 pb-4 bg-dark-tertiary/20 border-t border-gray-800/50">
-                    {player.totalEvents === 0 ? (
-                      <p className="text-gray-500 text-xs py-3 text-center">Aucune action codée pour ce joueur</p>
-                    ) : (
-                      <div className="pt-3 space-y-3">
-                        <div className="grid grid-cols-3 gap-2">
-                          <div className="bg-green-900/20 border border-green-800/40 rounded-lg p-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1 mb-0.5">
-                              <Target size={12} className="text-green-400" />
-                              <span className="text-xs text-green-400 font-medium">Réussies</span>
-                            </div>
-                            <div className="text-lg font-bold text-green-300">{player.successCount}</div>
-                          </div>
-                          <div className="bg-red-900/20 border border-red-800/40 rounded-lg p-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1 mb-0.5">
-                              <TrendingUp size={12} className="text-red-400" />
-                              <span className="text-xs text-red-400 font-medium">Manquées</span>
-                            </div>
-                            <div className="text-lg font-bold text-red-300">{player.failureCount}</div>
-                          </div>
-                          <div className="bg-gray-800/40 border border-gray-700/40 rounded-lg p-2.5 text-center">
-                            <div className="flex items-center justify-center gap-1 mb-0.5">
-                              <Award size={12} className="text-gray-400" />
-                              <span className="text-xs text-gray-400 font-medium">Neutres</span>
-                            </div>
-                            <div className="text-lg font-bold text-gray-300">{player.neutralCount}</div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px]">
+            <thead>
+              <tr className="border-b border-gray-800 bg-dark-tertiary/50">
+                <th className="text-left px-4 py-2"><SortButton label="Joueur" sKey="name" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="MJ" sKey="matchesPlayed" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Actions" sKey="totalEvents" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Tirs" sKey="tirs" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Passes" sKey="passes" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Récup" sKey="recuperations" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Pertes" sKey="pertes" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Tacles" sKey="tacles" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="Fautes" sKey="fautes" /></th>
+                <th className="text-center px-2 py-2"><SortButton label="%" sKey="successRate" /></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800/60">
+              {sorted.map(player => {
+                const isExpanded = expandedPlayer === player.id;
+                const typeEntries = Object.entries(player.eventsByType).sort((a, b) => b[1].count - a[1].count);
+                return (
+                  <>
+                    <tr
+                      key={player.id}
+                      onClick={() => setExpandedPlayer(isExpanded ? null : player.id)}
+                      className="hover:bg-dark-tertiary/40 transition-colors cursor-pointer"
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {player.photo_url ? (
+                            <img src={player.photo_url} className="w-8 h-8 rounded-full object-cover border border-gray-700 flex-shrink-0" />
+                          ) : (
+                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">{player.number}</div>
+                          )}
+                          <div>
+                            <div className="text-sm font-semibold text-white">{player.first_name} {player.last_name}</div>
+                            <div className="text-xs text-gray-500">{player.position || `#${player.number}`}</div>
                           </div>
                         </div>
-
-                        {typeEntries.length > 0 && (
-                          <div>
-                            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                              Par type d'action
-                            </div>
-                            <div className="space-y-1.5">
-                              {typeEntries.map(([key, type]) => {
-                                const rate = type.count > 0 && (type.success + type.failure) > 0
-                                  ? Math.round((type.success / (type.success + type.failure)) * 100)
-                                  : null;
-                                return (
-                                  <div key={key} className="flex items-center gap-3">
-                                    <div className="flex-1 text-xs text-gray-300 truncate">{type.label}</div>
-                                    <div className="flex items-center gap-2 flex-shrink-0">
-                                      <span className="text-xs font-semibold text-white w-5 text-right">{type.count}</span>
-                                      {rate !== null && (
-                                        <div className="flex items-center gap-1">
-                                          <div className="w-12 bg-gray-800 rounded-full h-1 overflow-hidden">
-                                            <div
-                                              className={`h-full rounded-full ${rate >= 70 ? 'bg-green-500' : rate >= 50 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                                              style={{ width: `${rate}%` }}
-                                            />
-                                          </div>
-                                          <span className={`text-xs font-bold w-8 text-right ${rate >= 70 ? 'text-green-400' : rate >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
-                                            {rate}%
-                                          </span>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
+                      </td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-gray-300">{player.matchesPlayed}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-orange-400">{player.totalEvents}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-green-400">{player.tirs || '–'}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-blue-400">{player.passes || '–'}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-teal-400">{player.recuperations || '–'}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-red-400">{player.pertes || '–'}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-indigo-400">{player.tacles || '–'}</td>
+                      <td className="text-center px-2 py-3 text-sm font-semibold text-yellow-400">{player.fautes || '–'}</td>
+                      <td className="text-center px-2 py-3">
+                        <div className="flex items-center gap-1 justify-center">
+                          <div className="w-10 bg-gray-800 rounded-full h-1.5 overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${player.successRate}%` }} />
                           </div>
-                        )}
-                      </div>
+                          <span className="text-xs text-gray-400">{player.successRate}%</span>
+                        </div>
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr key={`${player.id}-expanded`}>
+                        <td colSpan={10} className="px-4 py-3 bg-dark-tertiary/30">
+                          <div className="flex flex-wrap gap-2">
+                            {typeEntries.map(([key, data]) => (
+                              <span key={key} className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-dark-secondary border border-gray-700 text-xs">
+                                <span className="text-gray-300 font-medium">{data.label}</span>
+                                <span className="text-orange-400 font-bold">{data.count}</span>
+                                {data.success > 0 && <span className="text-green-400 text-[10px]">✓{data.success}</span>}
+                                {data.failure > 0 && <span className="text-red-400 text-[10px]">✗{data.failure}</span>}
+                              </span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
                     )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
