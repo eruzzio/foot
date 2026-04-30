@@ -1,4 +1,5 @@
 import { MatchEventWithDetails } from '../types/database';
+import { calculateTeamXG, getShotEvents } from './xg';
 
 interface PdfExportData {
   events: MatchEventWithDetails[];
@@ -25,6 +26,13 @@ function formatTime(seconds: number): string {
 export function exportToPdf(data: PdfExportData): void {
   const teamAEvents = data.events.filter(e => e.team === 'A');
   const teamBEvents = data.events.filter(e => e.team === 'B');
+
+  // xG
+  const xgA = calculateTeamXG(data.events, 'A');
+  const xgB = calculateTeamXG(data.events, 'B');
+  const shotsA = getShotEvents(data.events.filter(e => e.team === 'A')).length;
+  const shotsB = getShotEvents(data.events.filter(e => e.team === 'B')).length;
+  const xgBarA = xgA + xgB > 0 ? Math.round((xgA / (xgA + xgB)) * 100) : 50;
   const scoreDisplay = data.matchInfo.scoreA !== undefined && data.matchInfo.scoreB !== undefined
     ? `${data.matchInfo.scoreA} - ${data.matchInfo.scoreB}` : 'vs';
 
@@ -127,6 +135,30 @@ ${data.matchInfo.competition ? `<div style="text-align:center;font-size:9px;font
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#0ea5e9;">${data.events.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Total</div></div>
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#8b5cf6;">${fieldEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Localisées</div></div>
 </div>
+
+${xgA + xgB > 0 ? `
+<div class="card" style="margin-bottom:12px;padding:10px 16px;">
+  <div style="text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:8px;">⚽ Expected Goals (xG)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:8px;">
+    <div style="text-align:center;">
+      <div style="font-size:28px;font-weight:900;color:#16a34a;">${xgA.toFixed(2)}</div>
+      <div style="font-size:9px;color:#64748b;">${data.matchInfo.teamA}</div>
+      <div style="font-size:8px;color:#94a3b8;">${shotsA} tir${shotsA > 1 ? 's' : ''}</div>
+    </div>
+    <div>
+      <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;">
+        <div style="width:${xgBarA}%;background:#16a34a;"></div>
+        <div style="flex:1;background:#f97316;"></div>
+      </div>
+      <div style="text-align:center;font-size:8px;color:#94a3b8;margin-top:3px;">Position · Angle · Type</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:28px;font-weight:900;color:#f97316;">${xgB.toFixed(2)}</div>
+      <div style="font-size:9px;color:#64748b;">${data.matchInfo.teamB}</div>
+      <div style="font-size:8px;color:#94a3b8;">${shotsB} tir${shotsB > 1 ? 's' : ''}</div>
+    </div>
+  </div>
+</div>` : ''}
 
 <div style="display:grid;grid-template-columns:${goalEvents.length > 0 ? '1fr 1fr 1fr' : '1fr 1fr'};gap:10px;margin-bottom:12px;">
 <div><h2>Heatmap terrain</h2><div class="card" style="padding:3px;"><svg viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg" style="width:100%;border-radius:4px;"><rect width="680" height="440" fill="#1A6B35" rx="4"/><rect x="10" y="10" width="660" height="420" fill="none" stroke="#2A8A4A" stroke-width="2"/><line x1="340" y1="10" x2="340" y2="430" stroke="#2A8A4A" stroke-width="1.5"/><circle cx="340" cy="220" r="50" fill="none" stroke="#2A8A4A" stroke-width="1.5"/><rect x="10" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" stroke-width="1.5"/><rect x="10" y="170" width="30" height="100" fill="none" stroke="#2A8A4A" stroke-width="1.5"/><rect x="590" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" stroke-width="1.5"/><rect x="640" y="170" width="30" height="100" fill="none" stroke="#2A8A4A" stroke-width="1.5"/>${fieldPts}</svg></div></div>
