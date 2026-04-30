@@ -239,45 +239,48 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
 
         {view === 'zones' && hasZoneData && (
           <>
-            <div className="relative rounded-lg overflow-hidden border border-gray-700" style={{ aspectRatio: '68/100' }}>
-              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 440 680" xmlns="http://www.w3.org/2000/svg" style={{ pointerEvents: 'none' }}>
-                <rect width="440" height="680" fill="#1A6B35" rx="8"/>
-                <rect x="10" y="10" width="420" height="660" fill="none" stroke="#2A8A4A" strokeWidth="2"/>
-                <line x1="10" y1="340" x2="430" y2="340" stroke="#2A8A4A" strokeWidth="1.5"/>
-                <circle cx="220" cy="340" r="50" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
-                <rect x="130" y="10" width="180" height="80" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
-                <rect x="130" y="590" width="180" height="80" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+            {/* Terrain horizontal avec 3 zones */}
+            <div
+              className="relative rounded-lg overflow-hidden border border-gray-700"
+              style={{ paddingBottom: '60%' }}
+            >
+              {/* Fond terrain */}
+              <div className="absolute inset-0" style={{
+                background: 'linear-gradient(to bottom, #1A6B35, #1e7a3d)',
+              }} />
+              {/* Lignes terrain */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg" style={{ pointerEvents: 'none' }}>
+                <rect x="10" y="10" width="660" height="420" fill="none" stroke="#2A8A4A" strokeWidth="2"/>
+                <line x1="340" y1="10" x2="340" y2="430" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <circle cx="340" cy="220" r="50" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <rect x="10" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
+                <rect x="590" y="130" width="80" height="180" fill="none" stroke="#2A8A4A" strokeWidth="1.5"/>
               </svg>
 
-              <div className="absolute inset-0 flex flex-col">
-                {/* Zone Offensive */}
-                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(239, 68, 68, 0.15)', borderBottom: '2px dashed rgba(239, 68, 68, 0.4)' }}>
-                  <div className="text-center z-10">
-                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
-                    <div className="text-xs font-semibold text-red-300 mt-1">Zone Offensive</div>
-                    <div className="text-[10px] text-red-400/60 mt-0.5">
-                      {fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%
-                    </div>
-                  </div>
-                </div>
-                {/* Zone Médiane */}
-                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(250, 204, 21, 0.12)', borderBottom: '2px dashed rgba(250, 204, 21, 0.4)' }}>
-                  <div className="text-center z-10">
-                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
-                    <div className="text-xs font-semibold text-yellow-300 mt-1">Zone Médiane</div>
-                    <div className="text-[10px] text-yellow-400/60 mt-0.5">
-                      {fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%
-                    </div>
-                  </div>
-                </div>
-                {/* Zone Défensive */}
-                <div className="flex-1 flex items-center justify-center relative" style={{ backgroundColor: 'rgba(59, 130, 246, 0.15)' }}>
+              {/* 3 zones horizontales */}
+              <div className="absolute inset-0 flex flex-row">
+                {/* Zone Défensive (gauche) */}
+                <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRight: '2px dashed rgba(59,130,246,0.5)' }}>
                   <div className="text-center z-10">
                     <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.defensive.length}</div>
-                    <div className="text-xs font-semibold text-blue-300 mt-1">Zone Défensive</div>
-                    <div className="text-[10px] text-blue-400/60 mt-0.5">
-                      {fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%
-                    </div>
+                    <div className="text-xs font-semibold text-blue-300 mt-1">Défensif</div>
+                    <div className="text-[10px] text-blue-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%</div>
+                  </div>
+                </div>
+                {/* Zone Médiane (centre) */}
+                <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(250,204,21,0.12)', borderRight: '2px dashed rgba(250,204,21,0.5)' }}>
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
+                    <div className="text-xs font-semibold text-yellow-300 mt-1">Médian</div>
+                    <div className="text-[10px] text-yellow-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%</div>
+                  </div>
+                </div>
+                {/* Zone Offensive (droite) */}
+                <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(239,68,68,0.18)' }}>
+                  <div className="text-center z-10">
+                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
+                    <div className="text-xs font-semibold text-red-300 mt-1">Offensif</div>
+                    <div className="text-[10px] text-red-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%</div>
                   </div>
                 </div>
               </div>
@@ -286,9 +289,9 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
             {/* Barres de répartition */}
             <div className="mt-3 space-y-2">
               {[
-                { label: 'Offensive', count: zoneEvents.offensive.length, color: '#EF4444', bg: 'bg-red-500' },
-                { label: 'Médiane', count: zoneEvents.mediane.length, color: '#FACC15', bg: 'bg-yellow-400' },
-                { label: 'Défensive', count: zoneEvents.defensive.length, color: '#3B82F6', bg: 'bg-blue-500' },
+                { label: 'Défensif', count: zoneEvents.defensive.length, color: '#3B82F6', bg: 'bg-blue-500' },
+                { label: 'Médian', count: zoneEvents.mediane.length, color: '#FACC15', bg: 'bg-yellow-400' },
+                { label: 'Offensif', count: zoneEvents.offensive.length, color: '#EF4444', bg: 'bg-red-500' },
               ].map(z => (
                 <div key={z.label} className="flex items-center gap-3">
                   <span className="text-xs text-gray-400 w-16">{z.label}</span>
