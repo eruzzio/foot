@@ -8,11 +8,13 @@ interface HeatmapProps {
   matchId: string;
   teamAName: string;
   teamBName: string;
+  halftimes?: number[];
 }
 
-export default function Heatmap({ events, matchId, teamAName, teamBName }: HeatmapProps) {
+export default function Heatmap({ events, matchId, teamAName, teamBName, halftimes = [] }: HeatmapProps) {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
+  const [filterHalf, setFilterHalf] = useState<'all' | '1' | '2'>('all');
   const [hoveredEvent, setHoveredEvent] = useState<string | null>(null);
   const [view, setView] = useState<'field' | 'goal' | 'zones'>('field');
 
@@ -25,11 +27,18 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
     return Array.from(types);
   }, [events]);
 
+  const halfTime = halftimes[0] ?? 2700; // 45min par défaut
+
   const filteredEvents = useMemo(() => {
     return events
       .filter(e => filterTeam === 'all' || e.team === filterTeam)
-      .filter(e => filterType === 'all' || (e.event_type?.name || e.label) === filterType);
-  }, [events, filterTeam, filterType]);
+      .filter(e => filterType === 'all' || (e.event_type?.name || e.label) === filterType)
+      .filter(e => {
+        if (filterHalf === 'all') return true;
+        if (filterHalf === '1') return e.timestamp <= halfTime;
+        return e.timestamp > halfTime;
+      });
+  }, [events, filterTeam, filterType, filterHalf, halfTime]);
 
   const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null);
   const goalEvents = filteredEvents.filter(e => e.goal_x !== null && e.goal_y !== null);
@@ -187,6 +196,22 @@ export default function Heatmap({ events, matchId, teamAName, teamBName }: Heatm
               {t === 'all' ? 'Tous' : t === 'A' ? teamAName : teamBName}
             </button>
           ))}
+          {/* Filtre mi-temps */}
+          <div className="flex bg-dark-tertiary border border-gray-700 rounded-lg overflow-hidden">
+            {(['all', '1', '2'] as const).map(h => (
+              <button
+                key={h}
+                onClick={() => setFilterHalf(h)}
+                className={`px-2.5 py-1 text-xs font-medium transition-colors ${
+                  filterHalf === h
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {h === 'all' ? 'Match' : `${h}ère MT`}
+              </button>
+            ))}
+          </div>
           <select
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
