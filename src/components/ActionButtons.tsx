@@ -373,40 +373,101 @@ export default function ActionButtons({
     const renderTeamButtons = (team: 'A' | 'B') => {
       const teamColor = team === 'A' ? (teamAColor || '#22c55e') : '#f97316';
       const teamName = team === 'A' ? teamAName : teamBName;
-      const btns = allRootButtons.filter(b => !b.team_association || b.team_association === team);
+
+      // Boutons racine pour cette équipe sur la page active
+      const teamRootBtns = allRootButtons
+        .filter(b => (!b.team_association || b.team_association === team) && (b.tab_page ?? 1) === activePage);
+
+      // Sous-boutons actifs (si un bouton parent est cliqué)
+      const teamActiveSubs = activeParentId
+        ? panelButtons.filter(b =>
+            b.parent_button_id === activeParentId &&
+            (!b.team_association || b.team_association === team)
+          )
+        : [];
+
+      const isThisTeamActive = selectedTeam === team;
+
       return (
         <div
           className="flex-1 rounded-xl border-2 overflow-hidden"
-          style={{ borderColor: `${teamColor}50` }}
+          style={{ borderColor: `${teamColor}${isThisTeamActive ? 'aa' : '40'}`, transition: 'border-color 0.2s' }}
         >
+          {/* Header équipe */}
           <div
             className="px-3 py-2 flex items-center justify-between"
-            style={{ backgroundColor: `${teamColor}25`, borderBottom: `1px solid ${teamColor}40` }}
+            style={{ backgroundColor: `${teamColor}${isThisTeamActive ? '30' : '15'}`, borderBottom: `1px solid ${teamColor}40` }}
           >
             <span className="text-sm font-bold text-white truncate">{teamName}</span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: teamColor }}>{team}</span>
           </div>
+
+          {/* Sous-boutons actifs si applicable */}
+          {activeParentId && teamActiveSubs.length > 0 && (
+            <div className="px-2 pt-2">
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {teamActiveSubs.map(sub => {
+                  const isActive = lastEventButtonId === activeParentId && (lastEventKeywords ?? []).includes(sub.label);
+                  return (
+                    <button
+                      key={sub.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (navigator.vibrate) navigator.vibrate(20);
+                        onSelectTeam?.(team);
+                        onActionClick(sub.event_type ?? null, undefined, 'keyword', sub.label, activeParentId, sub.label);
+                      }}
+                      className={`px-3 py-2 rounded-lg text-xs font-semibold text-white transition-all active:scale-95 ${isActive ? 'ring-2 ring-white' : ''}`}
+                      style={{ backgroundColor: sub.color || '#374151', minHeight: '44px' }}
+                    >
+                      {sub.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Boutons principaux */}
           <div className="p-2 grid grid-cols-2 gap-1.5">
-            {btns
-              .filter(b => b.tab_page === activePage)
-              .map(btn => {
-                const baseColor = btn.color || '#374151';
-                return (
-                  <button
-                    key={btn.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (navigator.vibrate) navigator.vibrate(30);
-                      onSelectTeam?.(team);
-                      onActionClick(btn.event_type ?? null, undefined, btn.button_type as 'event'|'keyword', undefined, btn.parent_button_id ?? undefined, btn.label);
-                    }}
-                    className="flex items-center justify-center rounded-xl font-bold text-white active:scale-95 transition-all select-none"
-                    style={{ backgroundColor: baseColor, minHeight: '64px', padding: '10px 8px', fontSize: '12px', textAlign: 'center', wordBreak: 'break-word' }}
-                  >
-                    {btn.label}
-                  </button>
-                );
-              })}
+            {teamRootBtns.map(btn => {
+              const baseColor = btn.color || '#374151';
+              const hasSubs = panelButtons.some(b => b.parent_button_id === btn.id);
+              const isActive = activeParentId === btn.id;
+              return (
+                <button
+                  key={btn.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (navigator.vibrate) navigator.vibrate(30);
+                    onSelectTeam?.(team);
+                    if (hasSubs) {
+                      setActiveParentId(isActive ? null : btn.id);
+                    } else {
+                      setActiveParentId(null);
+                    }
+                    if (btn.button_type === 'event') {
+                      onActionClick(btn.event_type ?? null, undefined, 'event', undefined, undefined, btn.label);
+                    }
+                  }}
+                  className={`flex flex-col items-center justify-center rounded-xl font-bold text-white active:scale-95 transition-all select-none relative ${isActive ? 'ring-2 ring-white/80' : ''}`}
+                  style={{
+                    backgroundColor: baseColor,
+                    minHeight: '72px',
+                    padding: '10px 8px',
+                    fontSize: '12px',
+                    textAlign: 'center',
+                    wordBreak: 'break-word',
+                    boxShadow: isActive ? `0 0 16px ${baseColor}88` : `0 2px 8px ${baseColor}44`,
+                  }}
+                >
+                  <span className="leading-tight">{btn.label}</span>
+                  {hasSubs && (
+                    <span className="text-[9px] text-white/50 mt-0.5">▾</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       );
@@ -424,13 +485,9 @@ export default function ActionButtons({
           </div>
         )}
         <div className="p-3 flex gap-2">
-          <div onClick={() => onSelectTeam?.('A')} className="flex-1">
-            {renderTeamButtons('A')}
-          </div>
+          {renderTeamButtons('A')}
           <div className="w-px bg-gray-700 self-stretch" />
-          <div onClick={() => onSelectTeam?.('B')} className="flex-1">
-            {renderTeamButtons('B')}
-          </div>
+          {renderTeamButtons('B')}
         </div>
         {maxPage > 1 && (
           <div className="flex items-center justify-center gap-1 pb-3">
