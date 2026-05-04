@@ -291,12 +291,14 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
                 teamAName={match.team_a_name}
                 teamBName={match.team_b_name}
               />
-              <Heatmap
-                events={match.events}
-                matchId={match.id}
-                teamAName={match.team_a_name}
-                teamBName={match.team_b_name}
-              />
+              {match.events.some(e => e.field_x !== null && e.field_y !== null) && (
+                <Heatmap
+                  events={match.events}
+                  matchId={match.id}
+                  teamAName={match.team_a_name}
+                  teamBName={match.team_b_name}
+                />
+              )}
               <Timeline
                 events={match.events}
                 match={match}
