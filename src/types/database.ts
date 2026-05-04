@@ -51,6 +51,13 @@ export interface Match {
   video_provider?: string | null;
   video_share_id?: string | null;
   video_duration?: number | null;
+  // Tags contextuels
+  tag_competition?: string | null;
+  tag_venue?: 'home' | 'away' | 'neutral' | null;
+  tag_stake?: 'decisive' | 'normal' | 'friendly' | null;
+  tag_surface?: 'grass' | 'synthetic' | null;
+  tag_weather?: 'sun' | 'rain' | 'wind' | 'snow' | null;
+  tag_notes?: string | null;
 }
 
 export interface ButtonTemplate {

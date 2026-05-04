@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, BarChart3, Users, Video } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, BarChart3, Users, Video, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
@@ -8,6 +8,7 @@ import ExportButton from './ExportButton';
 import PostMatchTab from './PostMatchTab';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
+import MatchTags from './MatchTags';
 
 interface MatchReportProps {
   matchId: string;
@@ -23,7 +24,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [loading, setLoading] = useState(true);
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video' | 'tags'>('overview');
 
   useEffect(() => {
     loadMatchData();
@@ -232,6 +233,23 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400" />
             )}
           </button>
+          <button
+            onClick={() => setActiveTab('tags')}
+            className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
+              activeTab === 'tags'
+                ? 'text-orange-primary'
+                : 'text-gray-400 hover:text-gray-300'
+            }`}
+          >
+            <Tag size={15} />
+            Tags
+            {(match.tag_competition || match.tag_venue || match.tag_stake) && (
+              <span className="w-2 h-2 rounded-full bg-orange-primary" />
+            )}
+            {activeTab === 'tags' && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-primary" />
+            )}
+          </button>
         </div>
 
         {activeTab === 'overview' && (
@@ -321,6 +339,14 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             match={{ ...match, events: match.events }}
             teamAName={match.team_a_name}
             teamBName={match.team_b_name}
+          />
+        )}
+
+        {activeTab === 'tags' && (
+          <MatchTags
+            matchId={matchId}
+            match={match}
+            onUpdate={(updated) => setMatch(prev => prev ? { ...prev, ...updated } : prev)}
           />
         )}
       </div>
