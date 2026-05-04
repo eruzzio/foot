@@ -13,6 +13,13 @@ export interface Player {
   number: number | null;
   position?: string;
   photo_url?: string;
+  birth_date?: string;
+  height?: number;
+  weight?: number;
+  strong_foot?: string;
+  secondary_position?: string;
+  nationality?: string;
+  coach_notes?: string;
   created_at: string;
 }
 
