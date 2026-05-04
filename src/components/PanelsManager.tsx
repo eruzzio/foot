@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
 import { ArrowLeft, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
@@ -32,6 +32,8 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   const [view, setView] = useState<View>('list');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const dragItem = useRef<string | null>(null);
 
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
@@ -107,6 +109,33 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     setActiveTab('list');
     setShowCreateForm(false);
     setView('panel');
+  };
+
+  const handleReorderButtons = async (draggedId: string, targetId: string) => {
+    if (draggedId === targetId) return;
+    const rootBtns = panelButtons.filter(b => !b.parent_button_id);
+    const dragIdx = rootBtns.findIndex(b => b.id === draggedId);
+    const targetIdx = rootBtns.findIndex(b => b.id === targetId);
+    if (dragIdx === -1 || targetIdx === -1) return;
+
+    const reordered = [...rootBtns];
+    const [moved] = reordered.splice(dragIdx, 1);
+    reordered.splice(targetIdx, 0, moved);
+
+    // Mettre à jour localement
+    const updatedIds = reordered.map(b => b.id);
+    setPanelButtons(prev => {
+      const subs = prev.filter(b => b.parent_button_id);
+      const newRoots = reordered.map((b, i) => ({ ...b, display_order: i }));
+      return [...newRoots, ...subs];
+    });
+
+    // Sauvegarder en base
+    await Promise.all(
+      reordered.map((btn, i) =>
+        supabase.from('panel_buttons').update({ display_order: i }).eq('id', btn.id)
+      )
+    );
   };
 
   const startCreate = () => {
@@ -374,8 +403,23 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
     return (
       <div key={button.id}>
-        <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-800 bg-dark-tertiary/40 group">
-          <GripVertical size={15} className="text-gray-700 flex-shrink-0" />
+        <div
+          className={`flex items-center gap-3 p-3 rounded-lg border bg-dark-tertiary/40 group transition-colors ${
+            dragOverId === button.id ? 'border-orange-primary bg-orange-900/10' : 'border-gray-800'
+          }`}
+          draggable
+          onDragStart={() => { dragItem.current = button.id; }}
+          onDragOver={(e) => { e.preventDefault(); setDragOverId(button.id); }}
+          onDragLeave={() => setDragOverId(null)}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (dragItem.current) handleReorderButtons(dragItem.current, button.id);
+            dragItem.current = null;
+            setDragOverId(null);
+          }}
+          onDragEnd={() => { dragItem.current = null; setDragOverId(null); }}
+        >
+          <GripVertical size={15} className="text-gray-500 flex-shrink-0 cursor-grab active:cursor-grabbing" />
           <div
             className="w-3.5 h-3.5 rounded flex-shrink-0"
             style={{ backgroundColor: button.color }}
