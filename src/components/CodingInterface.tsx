@@ -307,6 +307,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const handleHalftime = () => {
     if (halftimes.length >= 2) return;
     setHalftimes(prev => [...prev, currentTime]);
+    // Réinitialiser le chrono à 45:00 pour la 2ème mi-temps
+    setCurrentTime(2700);
+    setIsRunning(false);
   };
 
   const handleEndMatch = async () => {
