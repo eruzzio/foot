@@ -55,17 +55,33 @@ export default function MatchTimer({
     }
   }, [teamALogoUrl, logoA]);
 
+  const startTimeRef = useRef<number | null>(null);
+  const baseTimeRef = useRef<number>(0);
+
   useEffect(() => {
-    let interval: number | undefined;
+    let animFrame: number | undefined;
+
     if (isRunning) {
-      interval = setInterval(() => {
-        onTimeUpdate(currentTime + 1);
-      }, 1000);
+      startTimeRef.current = Date.now();
+      baseTimeRef.current = currentTime;
+
+      const tick = () => {
+        const elapsed = Math.floor((Date.now() - (startTimeRef.current ?? Date.now())) / 1000);
+        const newTime = baseTimeRef.current + elapsed;
+        if (newTime !== currentTime) {
+          onTimeUpdate(newTime);
+        }
+        animFrame = requestAnimationFrame(tick);
+      };
+      animFrame = requestAnimationFrame(tick);
+    } else {
+      startTimeRef.current = null;
     }
+
     return () => {
-      if (interval) clearInterval(interval);
+      if (animFrame) cancelAnimationFrame(animFrame);
     };
-  }, [isRunning, currentTime, onTimeUpdate]);
+  }, [isRunning]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);

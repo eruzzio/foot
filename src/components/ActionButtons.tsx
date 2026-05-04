@@ -22,6 +22,11 @@ interface ActionButtonsProps {
   lastEventId?: string | null;
   lastEventKeywords?: string[];
   lastEventButtonId?: string | null;
+  dualTeamMode?: boolean;
+  teamAName?: string;
+  teamBName?: string;
+  teamAColor?: string;
+  onSelectTeam?: (team: 'A' | 'B') => void;
 }
 
 export default function ActionButtons({
@@ -36,6 +41,11 @@ export default function ActionButtons({
   lastEventId,
   lastEventKeywords = [],
   lastEventButtonId,
+  dualTeamMode = false,
+  teamAName = 'Équipe A',
+  teamBName = 'Équipe B',
+  teamAColor = '#22c55e',
+  onSelectTeam,
 }: ActionButtonsProps) {
   const [activePage, setActivePage] = useState(1);
   const [flashingButton, setFlashingButton] = useState<string | null>(null);
@@ -43,6 +53,7 @@ export default function ActionButtons({
   const subPanelRef = useRef<HTMLDivElement>(null);
 
   const rootButtons = panelButtons.filter((b) => !b.parent_button_id && (!b.team_association || b.team_association === selectedTeam));
+  const allRootButtons = panelButtons.filter((b) => !b.parent_button_id);
   const pages = Array.from(new Set(rootButtons.map((b) => b.tab_page ?? 1))).sort((a, b) => a - b);
   const maxPage = pages.length > 0 ? Math.max(...pages) : 1;
   const buttonsOnPage = rootButtons.filter((b) => (b.tab_page ?? 1) === activePage);
@@ -356,6 +367,86 @@ export default function ActionButtons({
       </div>
     </div>
   );
+
+  // En mode dual, on affiche 2 colonnes séparées
+  const renderDual = () => {
+    const renderTeamButtons = (team: 'A' | 'B') => {
+      const teamColor = team === 'A' ? (teamAColor || '#22c55e') : '#f97316';
+      const teamName = team === 'A' ? teamAName : teamBName;
+      const btns = allRootButtons.filter(b => !b.team_association || b.team_association === team);
+      return (
+        <div
+          className="flex-1 rounded-xl border-2 overflow-hidden"
+          style={{ borderColor: `${teamColor}50` }}
+        >
+          <div
+            className="px-3 py-2 flex items-center justify-between"
+            style={{ backgroundColor: `${teamColor}25`, borderBottom: `1px solid ${teamColor}40` }}
+          >
+            <span className="text-sm font-bold text-white truncate">{teamName}</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: teamColor }}>{team}</span>
+          </div>
+          <div className="p-2 grid grid-cols-2 gap-1.5">
+            {btns
+              .filter(b => b.tab_page === activePage)
+              .map(btn => {
+                const baseColor = btn.color || '#374151';
+                return (
+                  <button
+                    key={btn.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (navigator.vibrate) navigator.vibrate(30);
+                      onSelectTeam?.(team);
+                      onActionClick(btn.event_type ?? null, undefined, btn.button_type as 'event'|'keyword', undefined, btn.parent_button_id ?? undefined, btn.label);
+                    }}
+                    className="flex items-center justify-center rounded-xl font-bold text-white active:scale-95 transition-all select-none"
+                    style={{ backgroundColor: baseColor, minHeight: '64px', padding: '10px 8px', fontSize: '12px', textAlign: 'center', wordBreak: 'break-word' }}
+                  >
+                    {btn.label}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+      );
+    };
+    return (
+      <div className="bg-dark-secondary border border-gray-800 rounded-xl shadow-2xl text-white">
+        {!lockedPanelId && allPanels.length > 1 && (
+          <div className="flex items-center gap-1 px-3 pt-3 pb-0 overflow-x-auto">
+            {allPanels.map((panel) => (
+              <button key={panel.id} onClick={() => { onPanelChange(panel.id); setActivePage(1); setActiveParentId(null); }}
+                className={`px-3 py-1.5 rounded-t-lg text-xs font-semibold whitespace-nowrap transition-colors border-b-2 ${panel.id === currentPanelId ? 'bg-dark-tertiary text-white border-orange-primary' : 'text-gray-500 hover:text-gray-300 border-transparent'}`}>
+                {panel.name}
+              </button>
+            ))}
+          </div>
+        )}
+        <div className="p-3 flex gap-2">
+          <div onClick={() => onSelectTeam?.('A')} className="flex-1">
+            {renderTeamButtons('A')}
+          </div>
+          <div className="w-px bg-gray-700 self-stretch" />
+          <div onClick={() => onSelectTeam?.('B')} className="flex-1">
+            {renderTeamButtons('B')}
+          </div>
+        </div>
+        {maxPage > 1 && (
+          <div className="flex items-center justify-center gap-1 pb-3">
+            {Array.from({ length: maxPage }, (_, i) => i + 1).map((page) => (
+              <button key={page} onClick={() => { setActivePage(page); setActiveParentId(null); }}
+                className={`px-3 py-1 rounded text-xs font-bold ${activePage === page ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400'}`}>
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (dualTeamMode) return renderDual();
 
   return (
     <div className="bg-dark-secondary border border-gray-800 rounded-xl shadow-2xl text-white">

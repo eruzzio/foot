@@ -874,6 +874,11 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
               lastEventId={lastEventId}
               lastEventKeywords={lastEventId ? (events.find(e => e.id === lastEventId)?.keywords ?? []) : []}
               lastEventButtonId={lastEventButtonId}
+              dualTeamMode={true}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              teamAColor={teamAColor}
+              onSelectTeam={setSelectedTeam}
             />
 
             <Statistics
