@@ -272,42 +272,23 @@ export default function MatchTimer({
       </div>
 
       <div className="mt-5 flex gap-3">
-        <div className="flex-1 space-y-2">
-          <button
-            onClick={() => onSelectTeam('A')}
-            className={`w-full py-2.5 rounded-lg font-semibold transition-colors text-sm ${
-              selectedTeam === 'A' ? 'text-white' : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700'
-            }`}
-            style={selectedTeam === 'A' ? { backgroundColor: teamAColor } : undefined}
-          >
-            {teamAName}
-          </button>
+        <div className="flex-1">
           <button
             onClick={() => onOpenFormation('A')}
             className="w-full py-1.5 rounded-lg hover:opacity-80 transition-opacity text-xs font-medium flex items-center justify-center gap-1"
             style={{ backgroundColor: `rgba(${hexToRgb(teamAColor)}, 0.15)`, color: teamAColor }}
           >
             <Users size={13} />
-            Composition
+            Compo {teamAName}
           </button>
         </div>
-        <div className="flex-1 space-y-2">
-          <button
-            onClick={() => onSelectTeam('B')}
-            className={`w-full py-2.5 rounded-lg font-semibold transition-colors text-sm ${
-              selectedTeam === 'B'
-                ? 'bg-orange-primary text-white'
-                : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700'
-            }`}
-          >
-            {teamBName}
-          </button>
+        <div className="flex-1">
           <button
             onClick={() => onOpenFormation('B')}
             className="w-full py-1.5 bg-orange-900/30 text-orange-400 rounded-lg hover:bg-orange-900/50 transition-colors text-xs font-medium flex items-center justify-center gap-1"
           >
             <Users size={13} />
-            Composition
+            Compo {teamBName}
           </button>
         </div>
       </div>
