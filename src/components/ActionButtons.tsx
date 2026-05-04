@@ -447,7 +447,7 @@ export default function ActionButtons({
                       setActiveParentId(null);
                     }
                     if (btn.button_type === 'event') {
-                      onActionClick(btn.event_type ?? null, undefined, 'event', undefined, undefined, btn.label);
+                      onActionClick(btn.event_type ?? null, undefined, 'event', undefined, btn.id, btn.label);
                     }
                   }}
                   className={`flex flex-col items-center justify-center rounded-xl font-bold text-white active:scale-95 transition-all select-none relative ${isActive ? 'ring-2 ring-white/80' : ''}`}
