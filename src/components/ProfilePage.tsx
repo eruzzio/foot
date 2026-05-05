@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, User, Mail, Lock, Shield, Building2, Save, Check, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import ClubManager from './ClubManager';
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -33,6 +34,9 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   const [showNewPw, setShowNewPw] = useState(false);
   const [newEmail, setNewEmail] = useState('');
 
+  const [clubId, setClubId] = useState<string | null>(null);
+  const [clubLogo, setClubLogo] = useState<string | null>(null);
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -52,6 +56,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
     setClubName(meta.club_name || '');
     setClubCategory(meta.club_category || '');
     setClubCity(meta.club_city || '');
+    setClubId(meta.club_id || null);
+    setClubLogo(meta.club_logo || null);
     setLoading(false);
   };
 
@@ -247,6 +253,16 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Club ORION */}
+            <ClubManager
+              currentClubId={clubId}
+              onClubSelected={(club) => {
+                setClubId(club?.id || null);
+                setClubLogo(club?.logo_url || null);
+                if (club) setClubName(club.name);
+              }}
+            />
 
             <button onClick={handleSaveIdentity} disabled={saving}
               className={`w-full py-3 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 ${

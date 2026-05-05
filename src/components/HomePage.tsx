@@ -26,6 +26,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [teamName, setTeamName] = useState('');
+  const [clubLogo, setClubLogo] = useState<string | null>(null);
+  const [clubColors, setClubColors] = useState({ primary: '#22c55e', secondary: '#f97316' });
 
   useEffect(() => {
     initializeUserData();
@@ -34,6 +36,14 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const initializeUserData = async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
+
+    // Charger profil club
+    const meta = userData.user.user_metadata || {};
+    if (meta.club_logo) setClubLogo(meta.club_logo);
+    if (meta.club_id) {
+      const { data: clubData } = await supabase.from('clubs').select('color_primary, color_secondary').eq('id', meta.club_id).single();
+      if (clubData) setClubColors({ primary: clubData.color_primary, secondary: clubData.color_secondary });
+    }
 
     await createDefaultFootballPanel(userData.user.id);
 
@@ -143,7 +153,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         {/* Header compact */}
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <OrionLogo size={40} />
+            {clubLogo ? (
+              <img src={clubLogo} className="w-10 h-10 rounded-xl object-contain p-0.5" style={{ background: clubColors.primary + '20', border: `1px solid ${clubColors.primary}40` }} />
+            ) : (
+              <OrionLogo size={40} />
+            )}
             <div>
               <h1 className="text-xl font-black tracking-widest text-white uppercase" style={{ letterSpacing: '0.2em' }}>ORION</h1>
               <p className="text-xs" style={{ color: '#5aaff7' }}>Sports Video Analytics</p>
