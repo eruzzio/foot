@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabase';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import OrionLogo from './OrionLogo';
 import { calculateTeamXG } from '../utils/xg';
+import { useT } from '../i18n/I18nContext';
+import { calculateTeamXG } from '../utils/xg';
 
 interface HomePageProps {
   onNavigate: (page: string) => void;
@@ -23,6 +25,7 @@ interface MatchSummary {
 }
 
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const { t } = useT();
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [teamName, setTeamName] = useState('');
@@ -145,11 +148,11 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const maxXG = Math.max(1, ...matches.map(m => Math.max(m.xg_for, m.xg_against)));
 
   const navItems = [
-    { id: 'live', title: 'Codage Live', icon: Video },
-    { id: 'panels', title: 'Mon Panneau', icon: LayoutGrid },
-    { id: 'stats', title: 'Mes Stats', icon: BarChart3 },
-    { id: 'evolution', title: 'Évolution', icon: TrendingUp },
-    { id: 'team', title: 'Mes Équipes', icon: Users },
+    { id: 'live', title: t.nav.live, icon: Video },
+    { id: 'panels', title: t.nav.panels, icon: LayoutGrid },
+    { id: 'stats', title: t.nav.stats, icon: BarChart3 },
+    { id: 'evolution', title: t.nav.evolution, icon: TrendingUp },
+    { id: 'team', title: t.nav.team, icon: Users },
   ];
 
   return (
@@ -221,10 +224,10 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             {/* KPIs saison */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: 'Matchs', value: matches.length, sub: `${seasonStats.wins}V ${seasonStats.draws}N ${seasonStats.losses}D`, color: '#5aaff7' },
-                { label: 'Buts pour', value: seasonStats.goalsFor, sub: `${seasonStats.goalsAgainst} encaissés`, color: '#22c55e' },
-                { label: 'xG total', value: seasonStats.totalXGFor.toFixed(1), sub: `${seasonStats.totalXGAgainst.toFixed(1)} contre`, color: '#f97316' },
-                { label: 'Actions codées', value: seasonStats.totalEvents, sub: `${Math.round(seasonStats.totalEvents / matches.length)} / match`, color: '#a78bfa' },
+                { label: t.dashboard.matches, value: matches.length, sub: `${seasonStats.wins}V ${seasonStats.draws}N ${seasonStats.losses}D`, color: '#5aaff7' },
+                { label: t.dashboard.goalsFor, value: seasonStats.goalsFor, sub: `${seasonStats.goalsAgainst} encaissés`, color: '#22c55e' },
+                { label: t.dashboard.xgTotal, value: seasonStats.totalXGFor.toFixed(1), sub: `${seasonStats.totalXGAgainst.toFixed(1)} contre`, color: '#f97316' },
+                { label: t.dashboard.actions, value: seasonStats.totalEvents, sub: `${Math.round(seasonStats.totalEvents / matches.length)} / match`, color: '#a78bfa' },
               ].map(kpi => (
                 <div key={kpi.label} className="bg-dark-secondary border border-gray-800 rounded-xl p-4">
                   <div className="text-2xl font-black" style={{ color: kpi.color }}>{kpi.value}</div>

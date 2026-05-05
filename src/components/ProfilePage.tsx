@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, User, Mail, Lock, Shield, Save, Check, Eye, EyeOff, AlertCircle, LogOut, Trash2, Camera, Bell, Globe, Smartphone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ClubManager from './ClubManager';
+import { useT } from '../i18n/I18nContext';
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -41,6 +42,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   const [language, setLanguage] = useState('fr');
 
   // Danger
+  const { t, setLanguage: setAppLanguage } = useT();
   const [deleteConfirm, setDeleteConfirm] = useState('');
 
   const fileRef = useRef<HTMLInputElement>(null);
@@ -125,6 +127,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   };
 
   const handleSavePreferences = async () => {
+    setAppLanguage(language as any);
     setSaving(true);
     try {
       await supabase.auth.updateUser({

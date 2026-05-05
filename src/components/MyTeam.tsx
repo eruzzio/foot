@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';
 import { exportTeamPdf } from '../utils/exportTeamPdf';
+import { useT } from '../i18n/I18nContext';
 import TeamSettings from './TeamSettings';
 import TeamMatchHistory from './TeamMatchHistory';
 import PlayerSeasonStats from './PlayerSeasonStats';
@@ -243,6 +244,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'composition' | 'squad' | 'stats'>('composition');
   const [showNewCompoForm, setShowNewCompoForm] = useState(false);
+  const { t } = useT();
   const [newCompoName, setNewCompoName] = useState('');
 
   useEffect(() => {

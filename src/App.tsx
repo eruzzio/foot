@@ -8,6 +8,7 @@ import MyTeam from './components/MyTeam';
 import PanelsManager from './components/PanelsManager';
 import EvolutionDashboard from './components/EvolutionDashboard';
 import ProfilePage from './components/ProfilePage';
+import { I18nProvider } from './i18n/I18nContext';
 
 type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile';
 
@@ -75,7 +76,7 @@ function App() {
     }
   };
 
-  return <>{renderPage()}</>;
+  return <I18nProvider>{renderPage()}</I18nProvider>;
 }
 
 export default App;

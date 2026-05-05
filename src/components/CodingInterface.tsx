@@ -15,6 +15,7 @@ import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
 import ZoneSelector from './ZoneSelector';
 import HalftimeReport from './HalftimeReport';
+import { useT } from '../i18n/I18nContext';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
@@ -42,6 +43,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showCompoSelector, setShowCompoSelector] = useState(false);
   const [savedCompositions, setSavedCompositions] = useState<any[]>([]);
   const [selectedCompoId, setSelectedCompoId] = useState<string | null>(null);
+  const { t } = useT();
   const [showHalftimeReport, setShowHalftimeReport] = useState(false);
   const [lastEventId, setLastEventId] = useState<string | null>(null);
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
