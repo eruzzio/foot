@@ -754,17 +754,6 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 duration={currentTime}
               />
               <button
-                onClick={() => setShowVeoSync(true)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                  veoOffsetSeconds !== null
-                    ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-                    : 'bg-dark-tertiary hover:bg-gray-700 text-yellow-400 border border-yellow-800/50'
-                }`}
-                title="Synchroniser avec VEO"
-              >
-                {veoOffsetSeconds !== null ? 'VEO synchronisé' : 'Lier VEO'}
-              </button>
-              <button
                 onClick={() => setIsMatchSheetOpen(true)}
                 className="px-4 py-2 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
               >
