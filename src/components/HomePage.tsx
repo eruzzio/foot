@@ -210,43 +210,43 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                 </div>
               </div>
 
-              <div className="relative h-40">
-                <svg width="100%" height="100%" viewBox={`0 0 ${matches.length * 80} 160`} preserveAspectRatio="none">
+              <div className="relative h-56">
+                <svg width="100%" height="100%" viewBox={`0 0 ${Math.max(matches.length * 80, 480)} 220`} preserveAspectRatio="xMidYMid meet">
                   {/* Grille */}
-                  {[0, 1, 2, 3].map(i => (
-                    <line key={i} x1="0" y1={i * 40} x2={matches.length * 80} y2={i * 40} stroke="#1f2937" strokeWidth="1" />
+                  {[0, 1, 2, 3, 4].map(i => (
+                    <line key={i} x1="0" y1={i * 44} x2={Math.max(matches.length * 80, 480)} y2={i * 44} stroke="#1f2937" strokeWidth="1" />
                   ))}
 
                   {/* Ligne buts encaissés */}
                   <polyline
                     fill="none" stroke="#ef4444" strokeWidth="2" strokeDasharray="4,2"
-                    points={matches.map((m, i) => `${i * 80 + 40},${160 - (m.team_b_score / maxGoals) * 130}`).join(' ')}
+                    points={matches.map((m, i) => `${i * 80 + 40},${190 - (m.team_b_score / maxGoals) * 170}`).join(' ')}
                   />
 
                   {/* Ligne xG */}
                   <polyline
                     fill="none" stroke="#f97316" strokeWidth="2"
-                    points={matches.map((m, i) => `${i * 80 + 40},${160 - (m.xg_for / maxXG) * 130}`).join(' ')}
+                    points={matches.map((m, i) => `${i * 80 + 40},${190 - (m.xg_for / maxXG) * 170}`).join(' ')}
                   />
 
                   {/* Ligne buts */}
                   <polyline
                     fill="none" stroke="#22c55e" strokeWidth="2.5"
-                    points={matches.map((m, i) => `${i * 80 + 40},${160 - (m.team_a_score / maxGoals) * 130}`).join(' ')}
+                    points={matches.map((m, i) => `${i * 80 + 40},${190 - (m.team_a_score / maxGoals) * 170}`).join(' ')}
                   />
 
                   {/* Points et résultats */}
                   {matches.map((m, i) => {
                     const x = i * 80 + 40;
-                    const yGoal = 160 - (m.team_a_score / maxGoals) * 130;
+                    const yGoal = 190 - (m.team_a_score / maxGoals) * 170;
                     const resultColor = m.result === 'W' ? '#22c55e' : m.result === 'D' ? '#f59e0b' : '#ef4444';
                     return (
                       <g key={m.id}>
                         <circle cx={x} cy={yGoal} r="5" fill={resultColor} stroke="white" strokeWidth="1.5" />
-                        <text x={x} y="158" textAnchor="middle" fontSize="8" fill="#6b7280">
+                        <text x={x} y="212" textAnchor="middle" fontSize="9" fill="#6b7280">
                           {new Date(m.match_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                         </text>
-                        <text x={x} y="148" textAnchor="middle" fontSize="9" fill={resultColor} fontWeight="bold">
+                        <text x={x} y="200" textAnchor="middle" fontSize="10" fill={resultColor} fontWeight="bold">
                           {m.team_a_score}-{m.team_b_score}
                         </text>
                       </g>
