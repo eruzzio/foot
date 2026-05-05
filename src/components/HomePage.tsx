@@ -26,6 +26,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [teamName, setTeamName] = useState('');
+  const [userName, setUserName] = useState('');
   const [clubLogo, setClubLogo] = useState<string | null>(null);
   const [clubColors, setClubColors] = useState({ primary: '#22c55e', secondary: '#f97316' });
 
@@ -37,12 +38,17 @@ export default function HomePage({ onNavigate }: HomePageProps) {
     const { data: userData } = await supabase.auth.getUser();
     if (!userData.user) return;
 
-    // Charger profil club
+    // Charger profil utilisateur
     const meta = userData.user.user_metadata || {};
+    if (meta.first_name) setUserName(meta.first_name);
     if (meta.club_logo) setClubLogo(meta.club_logo);
     if (meta.club_id) {
-      const { data: clubData } = await supabase.from('clubs').select('color_primary, color_secondary').eq('id', meta.club_id).single();
-      if (clubData) setClubColors({ primary: clubData.color_primary, secondary: clubData.color_secondary });
+      const { data: clubData } = await supabase.from('clubs').select('color_primary, color_secondary, logo_url, name').eq('id', meta.club_id).single();
+      if (clubData) {
+        setClubColors({ primary: clubData.color_primary, secondary: clubData.color_secondary });
+        if (clubData.logo_url) setClubLogo(clubData.logo_url);
+        if (clubData.name && !meta.first_name) setUserName(clubData.name);
+      }
     }
 
     await createDefaultFootballPanel(userData.user.id);
@@ -165,6 +171,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           </div>
           <div className="flex items-center gap-3">
             {teamName && <div className="text-sm text-gray-400 font-medium hidden sm:block">{teamName}</div>}
+            {userName && <div className="text-sm text-gray-300 font-medium hidden sm:block">👋 {userName}</div>}
             <button
               onClick={() => onNavigate('profile')}
               className="w-9 h-9 rounded-full bg-orange-primary/20 border border-orange-primary/40 flex items-center justify-center hover:bg-orange-primary/30 transition-colors"

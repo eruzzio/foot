@@ -195,12 +195,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Prénom</label>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Lucas"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Nom</label>
                   <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Dupont"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
               </div>
 
@@ -214,42 +214,6 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                       }`}
                     >{r}</button>
                   ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Club */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Building2 size={16} className="text-orange-primary" />
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Mon Club</h3>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-500 mb-1.5">Nom du club</label>
-                  <input type="text" value={clubName} onChange={e => setClubName(e.target.value)} placeholder="AS Béziers"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Catégorie</label>
-                    <div className="flex flex-wrap gap-1.5">
-                      {CATEGORIES.map(c => (
-                        <button key={c} type="button" onClick={() => setClubCategory(c)}
-                          className={`px-2 py-1 rounded-md text-xs font-semibold transition-all ${
-                            clubCategory === c ? 'bg-blue-600 text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'
-                          }`}
-                        >{c}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-500 mb-1.5">Ville</label>
-                    <input type="text" value={clubCity} onChange={e => setClubCity(e.target.value)} placeholder="Béziers"
-                      className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
-                  </div>
                 </div>
               </div>
             </div>
@@ -286,7 +250,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               </div>
               <div className="flex gap-2">
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                  className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 <button onClick={handleUpdateEmail} disabled={newEmail === email || saving}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-lg text-sm font-semibold transition-colors">
                   Modifier
@@ -307,7 +271,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   <div className="relative">
                     <input type={showNewPw ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                       placeholder="8 caractères minimum"
-                      className="w-full px-3 py-2 pr-10 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                      className="w-full px-3 py-2 pr-10 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                     <button type="button" onClick={() => setShowNewPw(!showNewPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
                       {showNewPw ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
@@ -317,7 +281,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   <label className="block text-xs font-semibold text-gray-500 mb-1.5">Confirmer le mot de passe</label>
                   <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                     placeholder="Répéter le mot de passe"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-gray-900 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
                 {newPassword && confirmPassword && newPassword !== confirmPassword && (
                   <p className="text-xs text-red-400">Les mots de passe ne correspondent pas</p>
