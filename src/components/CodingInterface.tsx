@@ -14,6 +14,7 @@ import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
 import ZoneSelector from './ZoneSelector';
+import HalftimeReport from './HalftimeReport';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
@@ -41,6 +42,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showCompoSelector, setShowCompoSelector] = useState(false);
   const [savedCompositions, setSavedCompositions] = useState<any[]>([]);
   const [selectedCompoId, setSelectedCompoId] = useState<string | null>(null);
+  const [showHalftimeReport, setShowHalftimeReport] = useState(false);
   const [lastEventId, setLastEventId] = useState<string | null>(null);
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
   const [showUndoBar, setShowUndoBar] = useState(false);
@@ -779,6 +781,12 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 {selectedCompoId ? 'Compo liée' : 'Composition'}
               </button>
               <button
+                onClick={() => setShowHalftimeReport(true)}
+                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+              >
+                📊 Mi-Temps
+              </button>
+              <button
                 onClick={handleEndMatch}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               >
@@ -993,6 +1001,20 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           onPositionSelected={handleFieldPositionSelected}
           onSkip={handleSkipFieldSelector}
           eventName={fieldSelectorEventName}
+        />
+      )}
+
+      {showHalftimeReport && (
+        <HalftimeReport
+          events={events}
+          teamAName={teamAName}
+          teamBName={teamBName}
+          teamAScore={teamAScore}
+          teamBScore={teamBScore}
+          teamAColor={teamAColor}
+          teamBColor="#f97316"
+          currentTime={currentTime}
+          onClose={() => setShowHalftimeReport(false)}
         />
       )}
 
