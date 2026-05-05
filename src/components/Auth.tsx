@@ -38,18 +38,18 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{ background: 'linear-gradient(135deg, #0c0e14 0%, #0d1120 40%, #0c1028 70%, #0c0e14 100%)' }}
+      style={{ background: 'linear-gradient(135deg, #111118 0%, #111118 40%, #111118 70%, #111118 100%)' }}
     >
       {/* Background decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full opacity-10"
-          style={{ background: 'radial-gradient(ellipse, #2f8de4 0%, transparent 70%)' }}
+          style={{ background: 'radial-gradient(ellipse, #f97316 0%, transparent 70%)' }}
         />
         <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="auth-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#2f8de4" strokeWidth="0.5" />
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#f97316" strokeWidth="0.5" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#auth-grid)" />
@@ -63,7 +63,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             className="absolute w-1 h-1 rounded-full"
             style={{
               top: s.top, left: (s as any).left, right: (s as any).right,
-              background: '#5aaff7', opacity: 0.4,
+              background: '#fb923c', opacity: 0.4,
               boxShadow: '0 0 6px rgba(90,175,247,0.8)',
             }}
           />
@@ -81,11 +81,11 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
             ORION
           </h1>
           <div className="flex items-center gap-2">
-            <Star size={10} style={{ color: '#5aaff7' }} />
-            <span className="text-xs font-medium tracking-widest uppercase" style={{ color: '#5aaff7', letterSpacing: '0.2em' }}>
+            <Star size={10} style={{ color: '#fb923c' }} />
+            <span className="text-xs font-medium tracking-widest uppercase" style={{ color: '#fb923c', letterSpacing: '0.2em' }}>
               Analysed Solution
             </span>
-            <Star size={10} style={{ color: '#5aaff7' }} />
+            <Star size={10} style={{ color: '#fb923c' }} />
           </div>
         </div>
 
@@ -93,7 +93,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
         <div
           className="rounded-2xl p-8 border"
           style={{
-            background: 'linear-gradient(145deg, #161a27 0%, #1a1e2e 100%)',
+            background: 'linear-gradient(145deg, #1a1a22 0%, #1a1e2e 100%)',
             borderColor: 'rgba(47,141,228,0.2)',
             boxShadow: '0 0 60px rgba(47,141,228,0.08), 0 20px 60px rgba(0,0,0,0.5)',
           }}
@@ -110,7 +110,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
                 className="flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200"
                 style={
                   (tab === 'login') === isLogin
-                    ? { background: 'rgba(47,141,228,0.2)', color: '#5aaff7', border: '1px solid rgba(47,141,228,0.3)' }
+                    ? { background: 'rgba(47,141,228,0.2)', color: '#fb923c', border: '1px solid rgba(47,141,228,0.3)' }
                     : { color: '#6b7280' }
                 }
               >
@@ -175,7 +175,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
               disabled={loading}
               className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
               style={{
-                background: loading ? 'rgba(47,141,228,0.4)' : 'linear-gradient(135deg, #2f8de4 0%, #1a6bbf 100%)',
+                background: loading ? 'rgba(47,141,228,0.4)' : 'linear-gradient(135deg, #f97316 0%, #1a6bbf 100%)',
                 boxShadow: loading ? 'none' : '0 0 20px rgba(47,141,228,0.3)',
               }}
             >
