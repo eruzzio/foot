@@ -120,9 +120,9 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
     if (!logoFile) return null;
     const ext = logoFile.name.split('.').pop();
     const path = `clubs/${uid}/${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from('avatars').upload(path, logoFile, { upsert: true });
+    const { error } = await supabase.storage.from('team-logos').upload(path, logoFile, { upsert: true });
     if (error) return null;
-    return supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+    return supabase.storage.from('team-logos').getPublicUrl(path).data.publicUrl;
   };
 
   const handleCreate = async () => {
