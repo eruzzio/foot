@@ -160,7 +160,13 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <header className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {clubLogo ? (
-              <img src={clubLogo} className="w-10 h-10 rounded-xl object-contain p-0.5" style={{ background: clubColors.primary + '20', border: `1px solid ${clubColors.primary}40` }} />
+              <img
+                src={clubLogo}
+                alt="Logo club"
+                className="w-10 h-10 rounded-xl object-contain"
+                style={{ background: clubColors.primary + '20', border: `1px solid ${clubColors.primary}40`, padding: '2px' }}
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              />
             ) : (
               <OrionLogo size={40} />
             )}
@@ -170,7 +176,6 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {teamName && <div className="text-sm text-gray-400 font-medium hidden sm:block">{teamName}</div>}
             {userName && <div className="text-sm text-gray-300 font-medium hidden sm:block">👋 {userName}</div>}
             <button
               onClick={() => onNavigate('profile')}
