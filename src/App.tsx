@@ -7,8 +7,9 @@ import MyStats from './components/MyStats';
 import MyTeam from './components/MyTeam';
 import PanelsManager from './components/PanelsManager';
 import EvolutionDashboard from './components/EvolutionDashboard';
+import ProfilePage from './components/ProfilePage';
 
-type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution';
+type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -67,6 +68,8 @@ function App() {
         return <PanelsManager onBack={handleBackToHome} />;
       case 'evolution':
         return <EvolutionDashboard onBack={handleBackToHome} />;
+      case 'profile':
+        return <ProfilePage onBack={handleBackToHome} />;
       default:
         return <HomePage key={homeKey} onNavigate={(page) => setCurrentPage(page as PageType)} />;
     }

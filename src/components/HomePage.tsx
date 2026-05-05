@@ -149,7 +149,16 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <p className="text-xs" style={{ color: '#5aaff7' }}>Sports Video Analytics</p>
             </div>
           </div>
-          {teamName && <div className="text-sm text-gray-400 font-medium">{teamName}</div>}
+          <div className="flex items-center gap-3">
+            {teamName && <div className="text-sm text-gray-400 font-medium hidden sm:block">{teamName}</div>}
+            <button
+              onClick={() => onNavigate('profile')}
+              className="w-9 h-9 rounded-full bg-orange-primary/20 border border-orange-primary/40 flex items-center justify-center hover:bg-orange-primary/30 transition-colors"
+              title="Mon profil"
+            >
+              <span className="text-sm font-bold text-orange-400">👤</span>
+            </button>
+          </div>
         </header>
 
         {/* Navigation rapide */}
