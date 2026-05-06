@@ -308,37 +308,6 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
             </p>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-1">
-              Lien vidéo VEO (optionnel)
-            </label>
-            <input
-              type="text"
-              value={formData.videoUrl || ''}
-              onChange={handleVideoUrlChange}
-              placeholder="https://veo.co/shared-videos/..."
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition-colors bg-dark-secondary text-white placeholder-gray-500 ${
-                videoUrlError
-                  ? 'border-red-500 focus:ring-red-400'
-                  : formData.videoShareId
-                    ? 'border-green-500 focus:ring-green-400'
-                    : 'border-dark-secondary focus:ring-orange-primary'
-              }`}
-            />
-            {videoUrlError && (
-              <div className="flex items-center gap-1 mt-1.5 text-red-400">
-                <AlertCircle size={14} />
-                <span className="text-xs">{videoUrlError}</span>
-              </div>
-            )}
-            {formData.videoShareId && (
-              <div className="flex items-center gap-1 mt-1.5 text-green-400">
-                <CheckCircle size={14} />
-                <span className="text-xs">Vidéo VEO reconnue</span>
-              </div>
-            )}
-          </div>
-
           <div className="flex gap-3 pt-4">
             <button
               type="button"
