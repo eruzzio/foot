@@ -778,7 +778,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6" style={{ padding:'20px 24px' }}>
           <div className="lg:col-span-2 space-y-6">
             {(championship || matchday || location || matchDate) && (
-              <div className="bg-dark-secondary border border-gray-800 rounded-xl p-4">
+              <div style={{ background:"var(--orion-surface)", border:"1px solid var(--orion-line)", padding:"20px" }}>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {championship && (
                     <div>
@@ -920,7 +920,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       )}
       {showCompoSelector && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-secondary border border-blue-800/50 rounded-xl p-6 w-full max-w-lg shadow-2xl">
+          <div className="bg-dark-secondary border border-blue-800/50  p-6 w-full max-w-lg shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-1">Choisir une composition</h2>
             <p className="text-sm text-gray-400 mb-5">
               {"S\u00e9lectionnez la composition \u00e0 utiliser pour ce match"}
@@ -1007,25 +1007,25 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
       {showOutcomeSelector && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-sm p-6">
+          <div className="bg-dark-secondary border-2 border-orange-primary  w-full max-w-sm p-6">
             <h2 className="font-bold text-white text-lg mb-1 text-center">Résultat du tir</h2>
             <p className="text-xs text-gray-400 mb-6 text-center">{fieldSelectorEventName}</p>
             <div className="space-y-3">
               <button
                 onClick={() => handleOutcomeSelected('success')}
-                className="w-full py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl text-lg font-bold transition-colors"
+                className="w-full py-4 bg-green-600 hover:bg-green-500 text-white  text-lg font-bold transition-colors"
               >
                 But
               </button>
               <button
                 onClick={() => handleOutcomeSelected('neutral')}
-                className="w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl text-lg font-bold transition-colors"
+                className="w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-white  text-lg font-bold transition-colors"
               >
                 Arrêté / Cadré
               </button>
               <button
                 onClick={() => handleOutcomeSelected('failure')}
-                className="w-full py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl text-lg font-bold transition-colors"
+                className="w-full py-4 bg-red-600 hover:bg-red-500 text-white  text-lg font-bold transition-colors"
               >
                 Hors cadre / Manqué
               </button>
@@ -1049,7 +1049,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
       {showVeoSync && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-secondary border border-yellow-800/50 rounded-xl p-6 w-full max-w-md shadow-2xl">
+          <div className="bg-dark-secondary border border-yellow-800/50  p-6 w-full max-w-md shadow-2xl">
             <h2 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
               Synchronisation VEO
             </h2>

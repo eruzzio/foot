@@ -24,273 +24,163 @@ interface MatchTimerProps {
 }
 
 export default function MatchTimer({
-  onTimeUpdate,
-  isRunning,
-  onToggle,
-  onReset,
-  currentTime,
-  teamAName,
-  teamBName,
-  teamAScore,
-  teamBScore,
-  selectedTeam,
-  onScoreChange,
-  onSelectTeam,
-  onOpenFormation,
-  teamAColor = '#22c55e',
-  teamALogoUrl = '',
-  halftimes,
-  onHalftime,
-  kickoffRealTime,
-  onKickoff,
+  onTimeUpdate, isRunning, onToggle, onReset, currentTime,
+  teamAName, teamBName, teamAScore, teamBScore, selectedTeam,
+  onScoreChange, onSelectTeam, onOpenFormation,
+  teamAColor = '#5BE3FF', teamALogoUrl = '',
+  halftimes, onHalftime, kickoffRealTime, onKickoff,
 }: MatchTimerProps) {
   const [logoA, setLogoA] = useState<string | null>(teamALogoUrl || null);
   const [logoB, setLogoB] = useState<string | null>(null);
   const inputARef = useRef<HTMLInputElement>(null);
   const inputBRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (teamALogoUrl && !logoA) {
-      setLogoA(teamALogoUrl);
-    }
-  }, [teamALogoUrl, logoA]);
-
   const startTimeRef = useRef<number | null>(null);
   const baseTimeRef = useRef<number>(0);
 
+  useEffect(() => { if (teamALogoUrl && !logoA) setLogoA(teamALogoUrl); }, [teamALogoUrl]);
+
   useEffect(() => {
     let animFrame: number | undefined;
-
     if (isRunning) {
       startTimeRef.current = Date.now();
       baseTimeRef.current = currentTime;
-
       const tick = () => {
         const elapsed = Math.floor((Date.now() - (startTimeRef.current ?? Date.now())) / 1000);
         const newTime = baseTimeRef.current + elapsed;
-        if (newTime !== currentTime) {
-          onTimeUpdate(newTime);
-        }
+        if (newTime !== currentTime) onTimeUpdate(newTime);
         animFrame = requestAnimationFrame(tick);
       };
       animFrame = requestAnimationFrame(tick);
-    } else {
-      startTimeRef.current = null;
-    }
-
-    return () => {
-      if (animFrame) cancelAnimationFrame(animFrame);
-    };
+    } else { startTimeRef.current = null; }
+    return () => { if (animFrame) cancelAnimationFrame(animFrame); };
   }, [isRunning]);
 
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
+  const formatTime = (s: number) =>
+    `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
 
-  const hexToRgb = (hex: string) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
-      : '34, 197, 94';
-  };
-
-  const handleLogoUpload = (team: 'A' | 'B', file: File) => {
+  const handleLogoUpload = (team: 'A'|'B', file: File) => {
     const url = URL.createObjectURL(file);
-    if (team === 'A') setLogoA(url);
-    else setLogoB(url);
+    if (team === 'A') setLogoA(url); else setLogoB(url);
   };
 
-  const LogoSlot = ({ team, logo, inputRef }: { team: 'A' | 'B'; logo: string | null; inputRef: React.RefObject<HTMLInputElement> }) => (
-    <div className="flex flex-col items-center gap-2">
-      <div
-        className={`w-16 h-16 rounded-full border-2 flex items-center justify-center cursor-pointer overflow-hidden transition-all hover:opacity-80 ${
-          logo ? '' : 'bg-dark-tertiary border-dashed'
-        }`}
-        style={team === 'A' ? { borderColor: teamAColor } : { borderColor: '#f97316' }}
-        onClick={() => inputRef.current?.click()}
-        title="Cliquer pour changer le logo"
-      >
-        {logo ? (
-          <img src={logo} alt={`Logo ${team === 'A' ? teamAName : teamBName}`} className="w-full h-full object-cover" />
-        ) : (
-          <Upload size={20} className="text-gray-500" />
-        )}
-      </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp,image/gif"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) handleLogoUpload(team, file);
-          e.target.value = '';
-        }}
-      />
-    </div>
-  );
+  const TeamSide = ({ team, logo, inputRef, name, score, color }: {
+    team: 'A'|'B'; logo: string|null; inputRef: React.RefObject<HTMLInputElement>;
+    name: string; score: number; color: string;
+  }) => {
+    const isSelected = selectedTeam === team;
+    return (
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12, flex:1 }}>
+        {/* Logo */}
+        <div
+          onClick={() => inputRef.current?.click()}
+          style={{ width:52, height:52, border:`1px solid ${isSelected ? color : 'var(--orion-line-strong)'}`, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', overflow:'hidden', transition:'border-color .15s' }}
+        >
+          {logo ? <img src={logo} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Upload size={16} style={{ color:'var(--orion-text-mute)' }} />}
+        </div>
+        <input ref={inputRef} type="file" accept="image/*" className="hidden"
+          onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(team, f); e.target.value=''; }} />
 
-  return (
-    <div className="bg-dark-secondary border border-gray-800 rounded-xl shadow-2xl p-6 text-white">
-      <div className="flex items-stretch gap-4">
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <LogoSlot team="A" logo={logoA} inputRef={inputARef} />
-          <div
-            className="text-xs font-medium truncate max-w-[80px] text-center"
-            style={{ color: selectedTeam === 'A' ? teamAColor : '#9ca3af' }}
-          >
-            {teamAName}
-          </div>
-          <div
-            className="text-5xl font-bold font-mono leading-none"
-            style={{ color: selectedTeam === 'A' ? teamAColor : '#6b7280' }}
-          >
-            {teamAScore}
-          </div>
-          <div className="flex flex-col gap-1 mt-1">
-            <button
-              onClick={() => { if (navigator.vibrate) navigator.vibrate(50); onScoreChange('A', 1); }}
-              className="px-4 py-2 text-white rounded-lg text-sm font-bold transition-colors"
-              style={{ backgroundColor: teamAColor }}
-            >
-              But
-            </button>
-            <button
-              onClick={() => { if (navigator.vibrate) navigator.vibrate(20); onScoreChange('A', -1); }}
-              className="px-4 py-1.5 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
-            >
-              Annulé
-            </button>
-          </div>
+        {/* Nom */}
+        <button onClick={() => onSelectTeam(team)} style={{ background:'none', border:'none', cursor:'pointer', padding:0 }}>
+          <span className="o-eyebrow" style={{ color: isSelected ? color : 'var(--orion-text-mute)', transition:'color .15s' }}>
+            {name}
+          </span>
+        </button>
+
+        {/* Score */}
+        <div className="o-display" style={{ fontSize:52, color: isSelected ? color : 'var(--orion-text-mute)', transition:'color .15s', lineHeight:1 }}>
+          {score}
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-3 py-1">
-          <div className={`text-5xl font-bold font-mono tracking-wider ${isRunning ? 'text-white' : 'text-gray-400'}`}>
+        {/* Boutons score */}
+        <div style={{ display:'flex', flexDirection:'column', gap:4, width:'100%' }}>
+          <button
+            onClick={() => { if (navigator.vibrate) navigator.vibrate(40); onScoreChange(team, 1); }}
+            className="o-btn"
+            style={{ width:'100%', justifyContent:'center', borderColor: color, color: color, fontSize:12, padding:'8px' }}
+          >
+            But
+          </button>
+          <button
+            onClick={() => { if (navigator.vibrate) navigator.vibrate(20); onScoreChange(team, -1); }}
+            className="o-btn o-btn--ghost"
+            style={{ width:'100%', justifyContent:'center', fontSize:11, padding:'6px' }}
+          >
+            Annulé
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ background:'var(--orion-surface)', border:'1px solid var(--orion-line)', padding:'22px 20px' }}>
+      <div style={{ display:'flex', alignItems:'stretch', gap:16 }}>
+        <TeamSide team="A" logo={logoA} inputRef={inputARef} name={teamAName} score={teamAScore} color={teamAColor} />
+
+        {/* Centre */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', gap:10, padding:'4px 0' }}>
+          {/* Chrono */}
+          <div className="o-num" style={{ fontSize:44, color: isRunning ? 'var(--orion-text)' : 'var(--orion-text-mute)', letterSpacing:'0.04em', lineHeight:1 }}>
             {formatTime(currentTime)}
           </div>
 
-          <div className="text-gray-600 text-2xl font-bold">-</div>
+          {/* Séparateur */}
+          <div style={{ width:'1px', flex:1, background:'var(--orion-line)' }} />
 
-          <div className="flex gap-2">
-            <button
-              onClick={onToggle}
-              className={`p-2.5 rounded-lg transition-colors ${
-                isRunning
-                  ? 'bg-orange-primary hover-orange text-white'
-                  : 'text-white'
-              }`}
-              style={!isRunning ? { backgroundColor: teamAColor } : undefined}
-              title={isRunning ? 'Pause' : 'Lancer'}
-            >
-              {isRunning ? <Pause size={20} /> : <Play size={20} />}
+          {/* Contrôles */}
+          <div style={{ display:'flex', gap:6 }}>
+            <button onClick={onToggle} className="o-btn o-btn--sm"
+              style={{ borderColor: isRunning ? 'var(--orion-red)' : 'var(--orion-accent)', color: isRunning ? 'var(--orion-red)' : 'var(--orion-accent)' }}>
+              {isRunning ? <Pause size={16} /> : <Play size={16} />}
             </button>
-            <button
-              onClick={onReset}
-              className="p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 text-gray-300 transition-colors"
-              title="Remettre à zéro"
-            >
-              <RotateCcw size={20} />
+            <button onClick={onReset} className="o-btn o-btn--ghost o-btn--sm">
+              <RotateCcw size={14} />
             </button>
           </div>
 
+          {/* Mi-temps */}
           {halftimes.length < 2 ? (
-            <button
-              onClick={onHalftime}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                halftimes.length === 0
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-              title={halftimes.length === 0 ? 'Marquer la fin de la 1ère mi-temps' : 'Marquer le début de la 2ème mi-temps'}
-            >
-              <Timer size={13} />
+            <button onClick={onHalftime} className="o-btn o-btn--sm"
+              style={{ fontSize:10, borderColor:'var(--orion-text-mute)', color:'var(--orion-text-dim)' }}>
+              <Timer size={12} />
               {halftimes.length === 0 ? 'Mi-temps' : '2ème MT'}
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-900/30 text-blue-400 border border-blue-800/40">
-              <Timer size={13} />
-              <span>MT {formatTime(halftimes[0])} / {formatTime(halftimes[1])}</span>
-            </div>
+            <span className="o-eyebrow">{formatTime(halftimes[0])} / {formatTime(halftimes[1])}</span>
           )}
 
-          {/* Bouton Coup d'envoi VEO */}
+          {/* Coup d'envoi */}
           {onKickoff && (
             kickoffRealTime ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-900/30 text-yellow-400 border border-yellow-800/40" title={`Coup d'envoi enregistré à ${kickoffRealTime.toLocaleTimeString()}`}>
-                <Zap size={13} />
-                <span>{kickoffRealTime.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
-              </div>
+              <span className="o-num" style={{ fontSize:10, color:'var(--orion-amber)' }}>
+                {kickoffRealTime.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' })}
+              </span>
             ) : (
-              <button
-                onClick={() => onKickoff(new Date())}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-yellow-600 hover:bg-yellow-500 text-white transition-colors"
-                title="Appuyer au moment exact du coup d'envoi pour synchroniser avec VEO"
-              >
-                <Zap size={13} />
-                Coup d'envoi
+              <button onClick={() => onKickoff(new Date())} className="o-btn o-btn--sm"
+                style={{ borderColor:'var(--orion-amber)', color:'var(--orion-amber)', fontSize:10 }}>
+                <Zap size={12} /> Coup d'envoi
               </button>
             )
           )}
 
-          <div className="text-xs text-gray-500">
-            {isRunning ? (
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                En direct
-              </span>
-            ) : (
-              <span>En pause</span>
-            )}
-          </div>
+          {/* Status */}
+          <span className="o-eyebrow" style={{ color: isRunning ? 'var(--orion-red)' : 'var(--orion-text-mute)' }}>
+            {isRunning ? '● EN DIRECT' : 'PAUSE'}
+          </span>
         </div>
 
-        <div className="flex flex-col items-center gap-2 flex-1">
-          <LogoSlot team="B" logo={logoB} inputRef={inputBRef} />
-          <div className={`text-xs font-medium truncate max-w-[80px] text-center ${selectedTeam === 'B' ? 'text-orange-400' : 'text-gray-400'}`}>
-            {teamBName}
-          </div>
-          <div className={`text-5xl font-bold font-mono leading-none ${selectedTeam === 'B' ? 'text-orange-400' : 'text-gray-500'}`}>
-            {teamBScore}
-          </div>
-          <div className="flex flex-col gap-1 mt-1">
-            <button
-              onClick={() => { if (navigator.vibrate) navigator.vibrate(50); onScoreChange('B', 1); }}
-              className="px-3 py-1 bg-orange-primary hover-orange text-white rounded-lg text-xs font-bold transition-colors"
-            >
-              But
-            </button>
-            <button
-              onClick={() => { if (navigator.vibrate) navigator.vibrate(20); onScoreChange('B', -1); }}
-              className="px-4 py-1.5 bg-dark-tertiary hover:bg-gray-700 text-gray-300 rounded-lg text-xs font-bold transition-colors"
-            >
-              Annulé
-            </button>
-          </div>
-        </div>
+        <TeamSide team="B" logo={logoB} inputRef={inputBRef} name={teamBName} score={teamBScore} color="var(--orion-amber)" />
       </div>
 
-      <div className="mt-5 flex gap-3">
-        <div className="flex-1">
-          <button
-            onClick={() => onOpenFormation('A')}
-            className="w-full py-1.5 rounded-lg hover:opacity-80 transition-opacity text-xs font-medium flex items-center justify-center gap-1"
-            style={{ backgroundColor: `rgba(${hexToRgb(teamAColor)}, 0.15)`, color: teamAColor }}
-          >
-            <Users size={13} />
-            Compo {teamAName}
-          </button>
-        </div>
-        <div className="flex-1">
-          <button
-            onClick={() => onOpenFormation('B')}
-            className="w-full py-1.5 bg-orange-900/30 text-orange-400 rounded-lg hover:bg-orange-900/50 transition-colors text-xs font-medium flex items-center justify-center gap-1"
-          >
-            <Users size={13} />
-            Compo {teamBName}
-          </button>
-        </div>
+      {/* Compos */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginTop:16, borderTop:'1px solid var(--orion-line)', paddingTop:14 }}>
+        <button onClick={() => onOpenFormation('A')} className="o-btn o-btn--ghost o-btn--sm" style={{ justifyContent:'center', color: teamAColor }}>
+          <Users size={12} /> {teamAName}
+        </button>
+        <button onClick={() => onOpenFormation('B')} className="o-btn o-btn--ghost o-btn--sm" style={{ justifyContent:'center', color:'var(--orion-amber)' }}>
+          <Users size={12} /> {teamBName}
+        </button>
       </div>
     </div>
   );

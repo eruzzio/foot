@@ -187,17 +187,16 @@ export default function ActionButtons({
         }}
         title={btn.shortcut_key ? `Raccourci: ${btn.shortcut_key.toUpperCase()}` : undefined}
         className={`
-          relative flex flex-col items-center justify-center gap-0.5 rounded-xl
-          font-semibold text-white transition-all select-none cursor-pointer
-          focus:outline-none focus:ring-2 focus:ring-white/40
-          hover:brightness-110 active:scale-95
+          relative flex flex-col items-center justify-center gap-0.5 font-semibold text-white transition-all select-none cursor-pointer
+          focus:outline-none active:brightness-90
           ${isFlashing ? 'scale-90 brightness-150' : ''}
           ${isActive ? 'ring-2 ring-white/80 ring-offset-2 ring-offset-gray-900' : ''}
         `}
         style={{
           backgroundColor: baseColor,
-          minHeight: '80px',
+          minHeight: '72px',
           padding: '14px 12px',
+          borderRadius: 0,
           boxShadow: isActive
             ? `0 0 20px ${baseColor}88, 0 4px 12px ${baseColor}66`
             : `0 2px 10px ${baseColor}44`,
@@ -244,17 +243,17 @@ export default function ActionButtons({
         }}
         disabled={disabled}
         className={`
-          relative flex items-center justify-center gap-1.5 rounded-lg
-          font-semibold text-white transition-all select-none text-sm
-          focus:outline-none focus:ring-2 focus:ring-white/40
+          relative flex items-center justify-center gap-1.5 font-semibold text-white transition-all select-none text-sm
+          focus:outline-none
           disabled:opacity-30 disabled:cursor-not-allowed
           ${isFlashing ? 'scale-90 brightness-150' : 'hover:brightness-110 active:scale-95'}
           ${isActive ? 'ring-2 ring-white/70 ring-offset-1 ring-offset-gray-900' : ''}
         `}
         style={{
           backgroundColor: isActive ? baseColor : isKeyword ? `${baseColor}cc` : baseColor,
-          minHeight: '56px',
+          minHeight: '52px',
           padding: '10px 14px',
+          borderRadius: 0,
           boxShadow: isActive ? `0 0 14px ${baseColor}88` : `0 2px 8px ${baseColor}44`,
         }}
       >
@@ -330,8 +329,7 @@ export default function ActionButtons({
                 handleEventButtonClick(btn);
               }}
               className={`
-                absolute flex flex-col items-center justify-center gap-1 rounded-xl
-                font-semibold text-white transition-all select-none cursor-pointer
+                absolute flex flex-col items-center justify-center gap-1 font-semibold text-white transition-all select-none cursor-pointer
                 focus:outline-none focus:ring-2 focus:ring-white/40
                 hover:brightness-110 active:scale-95
                 ${isFlashing ? 'scale-90 brightness-150' : ''}
