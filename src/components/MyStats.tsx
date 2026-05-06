@@ -82,18 +82,18 @@ export default function MyStats({ onBack }: MyStatsProps) {
         <header className="mb-6 flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors"
+            className="o-btn o-btn--ghost o-btn--sm"
           >
             <ArrowLeft size={24} className="text-gray-300" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-white">Mes Stats</h1>
+            <h1 className="text-2xl font-medium text-orion-text">Mes Stats</h1>
             <p className="text-gray-400">Sélectionnez un match pour voir les statistiques</p>
           </div>
         </header>
 
         {matches.length === 0 ? (
-          <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-12 text-center">
+          <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-12 text-center">
             <BarChart3 size={80} className="text-orange-primary mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-white mb-2">
               Aucun match terminé
@@ -107,13 +107,13 @@ export default function MyStats({ onBack }: MyStatsProps) {
             {matches.map((match) => (
               <div key={match.id}>
                 <div
-                  className="w-full bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6 hover:border-orange-primary/50 transition-all group flex items-center justify-between"
+                  className="w-full bg-dark-secondary border border-orion-line  shadow-2xl p-6 hover:border-orion-accent/50 transition-all group flex items-center justify-between"
                 >
                   <button
                     onClick={() => setSelectedMatchId(match.id)}
                     className="flex-1 text-left"
                   >
-                    <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-primary transition-colors">
+                    <h3 className="text-base font-medium text-orion-text mb-2 group-hover:text-orange-primary transition-colors">
                       {match.team_a_name} vs {match.team_b_name}
                     </h3>
                     <div className="flex items-center gap-1 text-sm text-gray-400">
@@ -130,7 +130,7 @@ export default function MyStats({ onBack }: MyStatsProps) {
                     <ChevronRight size={24} className="text-gray-600 group-hover:text-orange-primary transition-colors" />
                     <button
                       onClick={(e) => handleDeleteClick(match.id, e)}
-                      className="p-2 hover:bg-red-900/30 rounded-lg transition-colors text-gray-400 hover:text-red-400"
+                      className="p-2 hover:bg-red-900/30  transition-colors text-gray-400 hover:text-red-400"
                       title="Supprimer ce rapport"
                     >
                       <Trash2 size={20} />
@@ -138,7 +138,7 @@ export default function MyStats({ onBack }: MyStatsProps) {
                   </div>
                 </div>
                 {deleteConfirmId === match.id && (
-                  <div className="mt-2 bg-red-900/20 border border-red-700/50 rounded-lg p-4 flex items-center justify-between">
+                  <div className="mt-2 bg-red-900/20 border border-red-700/50  p-4 flex items-center justify-between">
                     <p className="text-red-300 text-sm">Êtes-vous sûr ? Cette action est irréversible.</p>
                     <div className="flex gap-2">
                       <button

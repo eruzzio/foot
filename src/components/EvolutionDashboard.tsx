@@ -125,18 +125,18 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
         <header className="mb-8 flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors"
+            className="o-btn o-btn--ghost o-btn--sm"
           >
             <ArrowLeft size={24} className="text-gray-300" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-white">Évolution des Stats</h1>
+            <h1 className="text-2xl font-medium text-orion-text">Évolution des Stats</h1>
             <p className="text-gray-400">Suivi de votre progression sur plusieurs matchs</p>
           </div>
         </header>
 
         {matchesStats.length === 0 ? (
-          <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-12 text-center">
+          <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-12 text-center">
             <TrendingUp size={80} className="text-orange-primary mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-white mb-2">
               Aucune donnée disponible
@@ -149,38 +149,38 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
           <>
             {calculateAverages() && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg p-6 shadow-2xl">
+                <div className="bg-dark-secondary border border-orion-line  p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Buts marqués</span>
+                    <span className="text-xs text-orion-text-mute">Buts marqués</span>
                     <Trophy size={20} className="text-green-500" />
                   </div>
                   <div className="flex items-baseline gap-2">
                     <div className="text-3xl font-bold text-green-500">{calculateAverages()!.totalGoalsFor}</div>
-                    <div className="text-gray-400 text-sm">({calculateAverages()!.avgGoalsFor} /match)</div>
+                    <div className="text-xs text-orion-text-mute">({calculateAverages()!.avgGoalsFor} /match)</div>
                   </div>
                 </div>
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg p-6 shadow-2xl">
+                <div className="bg-dark-secondary border border-orion-line  p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Buts encaissés</span>
+                    <span className="text-xs text-orion-text-mute">Buts encaissés</span>
                     <Target size={20} className="text-red-500" />
                   </div>
                   <div className="flex items-baseline gap-2">
                     <div className="text-3xl font-bold text-red-500">{calculateAverages()!.totalGoalsAgainst}</div>
-                    <div className="text-gray-400 text-sm">({calculateAverages()!.avgGoalsAgainst} /match)</div>
+                    <div className="text-xs text-orion-text-mute">({calculateAverages()!.avgGoalsAgainst} /match)</div>
                   </div>
                 </div>
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg p-6 shadow-2xl">
+                <div className="bg-dark-secondary border border-orion-line  p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Différence de buts</span>
+                    <span className="text-xs text-orion-text-mute">Différence de buts</span>
                     <TrendingUp size={20} className={calculateAverages()!.goalDifference > 0 ? "text-orange-primary" : "text-red-500"} />
                   </div>
                   <div className={`text-3xl font-bold ${calculateAverages()!.goalDifference > 0 ? "text-orange-primary" : "text-red-500"}`}>
                     {calculateAverages()!.goalDifference > 0 ? '+' : ''}{calculateAverages()!.goalDifference}
                   </div>
                 </div>
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg p-6 shadow-2xl">
+                <div className="bg-dark-secondary border border-orion-line  p-6 shadow-2xl">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-400 text-sm">Matchs joués</span>
+                    <span className="text-xs text-orion-text-mute">Matchs joués</span>
                     <Zap size={20} className="text-blue-500" />
                   </div>
                   <div className="text-3xl font-bold text-blue-500">{calculateAverages()!.matchesPlayed}</div>
@@ -188,13 +188,13 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
               </div>
             )}
 
-            <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl overflow-hidden">
-              <div className="p-6 border-b border-gray-800">
-                <h2 className="text-xl font-bold text-white">Progression par match</h2>
+            <div className="bg-dark-secondary border border-orion-line  shadow-2xl overflow-hidden">
+              <div className="p-6 border-b border-orion-line">
+                <h2 className="text-base font-medium text-orion-text">Progression par match</h2>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-dark-tertiary border-b border-gray-800">
+                  <thead className="bg-dark-tertiary border-b border-orion-line">
                     <tr>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-300">Date</th>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-300">Match</th>

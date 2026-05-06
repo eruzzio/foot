@@ -87,10 +87,10 @@ export default function HalftimeReport({
 
   return (
     <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-3 overflow-y-auto">
-      <div className="bg-dark-secondary border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl my-2">
+      <div className="bg-dark-secondary border border-orion-line rounded-2xl w-full max-w-lg shadow-2xl my-2">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-orion-line">
           <div className="flex items-center gap-2">
             <div className="w-2 h-6 bg-orange-primary rounded-full" />
             <div>
@@ -98,7 +98,7 @@ export default function HalftimeReport({
               <p className="text-xs text-gray-400">{formatTime(currentTime)} · {events.length} actions codées</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-lg transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-dark-tertiary  transition-colors">
             <X size={18} className="text-gray-400" />
           </button>
         </div>
@@ -106,7 +106,7 @@ export default function HalftimeReport({
         <div className="p-5 space-y-5">
 
           {/* Score */}
-          <div className="bg-dark-tertiary rounded-xl p-4">
+          <div className="bg-dark-tertiary  p-4">
             <div className="grid grid-cols-3 items-center gap-3">
               <div className="text-center">
                 <div className="text-3xl font-black" style={{ color: teamAColor }}>{teamAScore}</div>
@@ -127,7 +127,7 @@ export default function HalftimeReport({
 
           {/* xG */}
           {(xgA + xgB) > 0 && (
-            <div className="bg-dark-tertiary rounded-xl p-4">
+            <div className="bg-dark-tertiary  p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Target size={14} className="text-orange-primary" />
                 <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">Expected Goals</span>
@@ -153,7 +153,7 @@ export default function HalftimeReport({
           )}
 
           {/* Stats comparatives */}
-          <div className="bg-dark-tertiary rounded-xl p-4">
+          <div className="bg-dark-tertiary  p-4">
             <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Comparatif</div>
             <div className="space-y-2.5">
               <StatBar a={teamAEvents.length} b={teamBEvents.length} label="Total actions" color={teamAColor} />
@@ -165,7 +165,7 @@ export default function HalftimeReport({
 
           {/* Zones si données disponibles */}
           {fieldEvents.length > 0 && (
-            <div className="bg-dark-tertiary rounded-xl p-4">
+            <div className="bg-dark-tertiary  p-4">
               <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Répartition par zone</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 {[
@@ -173,7 +173,7 @@ export default function HalftimeReport({
                   { label: 'Médian', aVal: zoneA.mid, bVal: zoneB.mid, color: '#F59E0B' },
                   { label: 'Offensif', aVal: zoneA.att, bVal: zoneB.att, color: '#EF4444' },
                 ].map(z => (
-                  <div key={z.label} className="bg-dark-secondary rounded-lg p-2">
+                  <div key={z.label} className="bg-dark-secondary  p-2">
                     <div className="text-[10px] font-semibold mb-1" style={{ color: z.color }}>{z.label}</div>
                     <div className="flex justify-around">
                       <span className="text-sm font-bold" style={{ color: teamAColor }}>{z.aVal}</span>
@@ -192,8 +192,8 @@ export default function HalftimeReport({
 
           {/* Moment chaud */}
           {hotMinute && (
-            <div className="bg-orange-primary/10 border border-orange-primary/30 rounded-xl p-3 flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="bg-orange-primary/10 border border-orion-accent/30  p-3 flex items-center gap-3">
+              <div className="w-8 h-8 bg-orange-primary/20  flex items-center justify-center flex-shrink-0">
                 <TrendingUp size={16} className="text-orange-primary" />
               </div>
               <div>
@@ -208,7 +208,7 @@ export default function HalftimeReport({
         <div className="px-5 pb-5">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white rounded-xl font-semibold transition-colors"
+            className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white  font-semibold transition-colors"
           >
             Retour au match
           </button>

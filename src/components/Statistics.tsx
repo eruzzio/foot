@@ -79,7 +79,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
   const hasXG = xgA + xgB > 0;
 
   return (
-    <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6 text-white">
+    <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6 text-white">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
         <Activity size={20} />
         Statistiques comparatives
@@ -87,7 +87,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
 
       {/* Widget xG */}
       {hasXG && (
-        <div className="bg-dark-tertiary border border-gray-700 rounded-xl p-4 mb-5">
+        <div className="bg-dark-tertiary border border-orion-line  p-4 mb-5">
           <div className="flex items-center justify-center gap-2 mb-3">
             <Target size={14} className="text-orange-primary" />
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Expected Goals (xG)</span>
@@ -109,7 +109,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-black text-orange-400">{xgB.toFixed(2)}</div>
+              <div className="text-3xl font-black text-orion-accent">{xgB.toFixed(2)}</div>
               <div className="text-xs text-gray-500 mt-0.5">{teamBName}</div>
               <div className="text-[10px] text-gray-600">{shotsB} tir{shotsB > 1 ? 's' : ''}</div>
             </div>
@@ -119,7 +119,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
       )}
 
       {showTabs && (
-        <div className="flex gap-1 mb-4 bg-dark-tertiary rounded-lg p-1">
+        <div className="flex gap-1 mb-4 bg-dark-tertiary  p-1">
           {tabs.map(tab => {
             const disabled = tab.key === 'second' && halftimes.length < 1;
             return (
@@ -127,7 +127,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
                 key={tab.key}
                 onClick={() => !disabled && setPeriod(tab.key)}
                 disabled={disabled}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                className={`flex-1 py-1.5 text-xs font-semibold  transition-colors ${
                   period === tab.key
                     ? 'bg-blue-600 text-white'
                     : disabled
@@ -167,7 +167,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
               const isEqual = stat.teamA === stat.teamB;
 
               return (
-                <div key={stat.name} className="bg-dark-tertiary/50 rounded-lg p-3 border border-gray-800/60">
+                <div key={stat.name} className="bg-dark-tertiary/50  p-3 border border-orion-line/60">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: stat.color }} />
@@ -202,7 +202,7 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
                       />
                     </div>
 
-                    <span className={`text-base font-bold w-7 text-left tabular-nums ${teamBDominant ? 'text-orange-400' : 'text-gray-500'}`}>
+                    <span className={`text-base font-bold w-7 text-left tabular-nums ${teamBDominant ? 'text-orion-accent' : 'text-gray-500'}`}>
                       {stat.teamB}
                     </span>
                   </div>

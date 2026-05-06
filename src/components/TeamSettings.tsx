@@ -157,7 +157,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6">
+        <div className="bg-white  p-6">
           <div className="text-gray-600">Chargement...</div>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 my-8 text-gray-900">
+      <div className="bg-white  shadow-xl max-w-2xl w-full p-6 my-8 text-gray-900">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-gray-800">
             {teamId ? "Paramètres de l'équipe" : "Créer une équipe"}
@@ -190,7 +190,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: FC Marseille"
               />
             </div>
@@ -203,7 +203,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 type="text"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: U13, U15, Senior, Féminine"
               />
             </div>
@@ -217,7 +217,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="Description de votre équipe..."
             />
           </div>
@@ -231,7 +231,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 type="color"
                 value={formData.color}
                 onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="w-10 h-10 rounded-lg border border-gray-300 cursor-pointer p-0.5"
+                className="w-10 h-10  border border-gray-300 cursor-pointer p-0.5"
               />
               <div className="flex flex-wrap gap-2">
                 {['#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#3b82f6','#06b6d4','#ec4899','#ffffff','#6b7280'].map(c => (
@@ -239,7 +239,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                     key={c}
                     type="button"
                     onClick={() => setFormData({ ...formData, color: c })}
-                    className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${formData.color === c ? 'border-gray-800 scale-110' : 'border-transparent'}`}
+                    className={`w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 ${formData.color === c ? 'border-orion-line scale-110' : 'border-transparent'}`}
                     style={{ backgroundColor: c }}
                   />
                 ))}
@@ -261,7 +261,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 <img
                   src={previewUrl}
                   alt="Logo aperçu"
-                  className="w-24 h-24 rounded-lg object-cover border-2 border-gray-200"
+                  className="w-24 h-24  object-cover border-2 border-gray-200"
                 />
               </div>
             )}
@@ -270,7 +270,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               <div>
                 <label
                   htmlFor="logo-upload"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300  hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
                 >
                   <Upload size={20} className="text-gray-600" />
                   <span className="text-sm text-gray-700">
@@ -307,7 +307,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                     setPreviewUrl(e.target.value);
                     setSelectedFile(null);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -322,14 +322,14 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               type="button"
               onClick={onClose}
               disabled={uploading}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700  hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Annuler
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white  hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {uploading ? (
                 <>

@@ -89,18 +89,18 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-dark-secondary border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg my-4">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-700">
-          <h3 className="text-lg font-bold text-white">{player ? 'Modifier le joueur' : 'Ajouter un joueur'}</h3>
-          <button onClick={onCancel} className="p-1.5 hover:bg-gray-700 rounded-lg transition-colors"><X size={18} className="text-gray-400" /></button>
+      <div className="bg-dark-secondary border border-orion-line  shadow-2xl w-full max-w-lg my-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-orion-line">
+          <h3 className="text-sm font-medium text-orion-text">{player ? 'Modifier le joueur' : 'Ajouter un joueur'}</h3>
+          <button onClick={onCancel} className="p-1.5 hover:bg-dark-tertiary  transition-colors"><X size={18} className="text-gray-400" /></button>
         </div>
 
         <form onSubmit={handleSubmit}>
           {/* Photo + identité rapide */}
-          <div className="px-6 pt-5 pb-4 flex items-center gap-4 border-b border-gray-800">
+          <div className="px-6 pt-5 pb-4 flex items-center gap-4 border-b border-orion-line">
             <div className="relative">
               {previewUrl ? (
-                <img src={previewUrl} className="w-16 h-16 rounded-full object-cover border-2 border-orange-primary" />
+                <img src={previewUrl} className="w-16 h-16 rounded-full object-cover border-2 border-orion-accent" />
               ) : (
                 <div className="w-16 h-16 rounded-full bg-dark-tertiary border-2 border-gray-600 flex items-center justify-center">
                   <User size={24} className="text-gray-500" />
@@ -113,20 +113,20 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
             </div>
             <div className="flex-1 space-y-2">
               <div className="flex gap-2">
-                <input type="text" required value={formData.first_name} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))} placeholder="Prénom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
-                <input type="text" required value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} placeholder="Nom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                <input type="text" required value={formData.first_name} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))} placeholder="Prénom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                <input type="text" required value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} placeholder="Nom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
               </div>
               <div className="flex gap-2">
-                <input type="number" required min="1" max="99" value={formData.number} onChange={e => setFormData(f => ({ ...f, number: e.target.value }))} placeholder="N° *" className="w-20 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
-                <input type="text" value={formData.nationality} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} placeholder="Nationalité" className="flex-1 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                <input type="number" required min="1" max="99" value={formData.number} onChange={e => setFormData(f => ({ ...f, number: e.target.value }))} placeholder="N° *" className="w-20 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                <input type="text" value={formData.nationality} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} placeholder="Nationalité" className="flex-1 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
               </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-gray-800">
+          <div className="flex border-b border-orion-line">
             {[{ key: 'identity', label: 'Identité' }, { key: 'physical', label: 'Physique' }, { key: 'notes', label: 'Notes coach' }].map(t => (
-              <button key={t.key} type="button" onClick={() => setTab(t.key as any)} className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t.key ? 'text-orange-400 border-b-2 border-orange-400' : 'text-gray-500 hover:text-gray-300'}`}>{t.label}</button>
+              <button key={t.key} type="button" onClick={() => setTab(t.key as any)} className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t.key ? 'text-orion-accent border-b-2 border-orange-400' : 'text-gray-500 hover:text-gray-300'}`}>{t.label}</button>
             ))}
           </div>
 
@@ -138,7 +138,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                   <div className="grid grid-cols-4 gap-2">
                     {POSITIONS.map(pos => (
                       <button key={pos} type="button" onClick={() => setFormData(f => ({ ...f, position: pos }))}
-                        className={`py-2 rounded-lg text-sm font-bold transition-all ${formData.position === pos ? (pos === 'GK' ? 'bg-yellow-500' : pos === 'DF' ? 'bg-blue-500' : pos === 'MF' ? 'bg-green-500' : 'bg-red-500') + ' text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'}`}
+                        className={`py-2  text-sm font-bold transition-all ${formData.position === pos ? (pos === 'GK' ? 'bg-yellow-500' : pos === 'DF' ? 'bg-blue-500' : pos === 'MF' ? 'bg-green-500' : 'bg-red-500') + ' text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'}`}
                       >{pos}</button>
                     ))}
                   </div>
@@ -149,7 +149,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                   <div className="grid grid-cols-4 gap-2">
                     {POSITIONS.filter(p => p !== formData.position).map(pos => (
                       <button key={pos} type="button" onClick={() => setFormData(f => ({ ...f, secondary_position: f.secondary_position === pos ? '' : pos }))}
-                        className={`py-2 rounded-lg text-sm font-bold transition-all ${formData.secondary_position === pos ? 'bg-gray-500 text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'}`}
+                        className={`py-2  text-sm font-bold transition-all ${formData.secondary_position === pos ? 'bg-gray-500 text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'}`}
                       >{pos}</button>
                     ))}
                   </div>
@@ -159,7 +159,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                   <div className="grid grid-cols-3 gap-2">
                     {[{ value: 'right', label: '🦵 Droit' }, { value: 'left', label: '🦵 Gauche' }, { value: 'both', label: '⚡ Les deux' }].map(foot => (
                       <button key={foot.value} type="button" onClick={() => setFormData(f => ({ ...f, strong_foot: foot.value }))}
-                        className={`py-2 rounded-lg text-sm font-semibold transition-all ${formData.strong_foot === foot.value ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'}`}
+                        className={`py-2  text-sm font-semibold transition-all ${formData.strong_foot === foot.value ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'}`}
                       >{foot.label}</button>
                     ))}
                   </div>
@@ -167,7 +167,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Date de naissance</label>
                   <div className="flex items-center gap-3">
-                    <input type="date" value={formData.birth_date} onChange={e => setFormData(f => ({ ...f, birth_date: e.target.value }))} className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    <input type="date" value={formData.birth_date} onChange={e => setFormData(f => ({ ...f, birth_date: e.target.value }))} className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                     {age !== null && <span className="text-sm text-gray-400 font-medium">{age} ans</span>}
                   </div>
                 </div>
@@ -179,15 +179,15 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Taille (cm)</label>
-                    <input type="number" min="140" max="220" value={formData.height} onChange={e => setFormData(f => ({ ...f, height: e.target.value }))} placeholder="Ex: 178" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    <input type="number" min="140" max="220" value={formData.height} onChange={e => setFormData(f => ({ ...f, height: e.target.value }))} placeholder="Ex: 178" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Poids (kg)</label>
-                    <input type="number" min="40" max="120" value={formData.weight} onChange={e => setFormData(f => ({ ...f, weight: e.target.value }))} placeholder="Ex: 72" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    <input type="number" min="40" max="120" value={formData.weight} onChange={e => setFormData(f => ({ ...f, weight: e.target.value }))} placeholder="Ex: 72" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                   </div>
                 </div>
                 {(formData.height || formData.weight) && (
-                  <div className="bg-dark-tertiary rounded-lg p-4 flex items-center gap-6 justify-center">
+                  <div className="bg-dark-tertiary  p-4 flex items-center gap-6 justify-center">
                     {formData.height && <div className="text-center"><div className="text-2xl font-black text-white">{formData.height}<span className="text-sm text-gray-400 font-normal"> cm</span></div><div className="text-xs text-gray-500">Taille</div></div>}
                     {formData.weight && <div className="text-center"><div className="text-2xl font-black text-white">{formData.weight}<span className="text-sm text-gray-400 font-normal"> kg</span></div><div className="text-xs text-gray-500">Poids</div></div>}
                     {formData.height && formData.weight && (
@@ -204,15 +204,15 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
             {tab === 'notes' && (
               <div>
                 <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Notes du coach</label>
-                <textarea value={formData.coach_notes} onChange={e => setFormData(f => ({ ...f, coach_notes: e.target.value }))} rows={8} placeholder="Forces, axes de progression, comportement, observations tactiques..." className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600 resize-none" />
+                <textarea value={formData.coach_notes} onChange={e => setFormData(f => ({ ...f, coach_notes: e.target.value }))} rows={8} placeholder="Forces, axes de progression, comportement, observations tactiques..." className="w-full px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600 resize-none" />
                 <p className="text-xs text-gray-600 mt-1">{formData.coach_notes.length} caractères</p>
               </div>
             )}
           </div>
 
-          <div className="flex gap-3 px-6 py-4 border-t border-gray-800">
-            <button type="button" onClick={onCancel} disabled={uploading} className="flex-1 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm">Annuler</button>
-            <button type="submit" disabled={uploading} className="flex-1 py-2 bg-orange-primary hover:bg-orange-600 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2">
+          <div className="flex gap-3 px-6 py-4 border-t border-orion-line">
+            <button type="button" onClick={onCancel} disabled={uploading} className="flex-1 py-2 border border-gray-600 text-gray-300  hover:bg-dark-tertiary transition-colors text-sm">Annuler</button>
+            <button type="submit" disabled={uploading} className="flex-1 py-2 bg-orange-primary hover:bg-orange-600 text-white  text-sm font-semibold flex items-center justify-center gap-2">
               {uploading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Upload...</> : player ? 'Modifier' : 'Ajouter'}
             </button>
           </div>

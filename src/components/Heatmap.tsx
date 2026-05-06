@@ -123,7 +123,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
 
   if (!hasFieldData && !hasGoalData) {
     return (
-      <div className="bg-dark-secondary border border-gray-800 rounded-xl p-8 text-center">
+      <div className="bg-dark-secondary border border-orion-line  p-8 text-center">
         <MapPin size={32} className="mx-auto mb-3 text-gray-600" />
         <p className="text-gray-400 font-medium mb-1">Heatmap indisponible</p>
         <p className="text-gray-600 text-sm">
@@ -135,11 +135,11 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
   }
 
   return (
-    <div className="bg-dark-secondary border border-gray-800 rounded-xl shadow-2xl overflow-hidden">
+    <div className="bg-dark-secondary border border-orion-line  shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between flex-wrap gap-3">
+      <div className="px-6 py-4 border-b border-orion-line flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-orange-primary/20 rounded-lg">
+          <div className="p-2 bg-orange-primary/20 ">
             <MapPin size={18} className="text-orange-primary" />
           </div>
           <div>
@@ -152,7 +152,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
 
         <div className="flex flex-wrap gap-2 items-center">
           {/* Vue toggle */}
-          <div className="flex bg-dark-tertiary rounded-lg border border-gray-700 overflow-hidden mr-2">
+          <div className="flex bg-dark-tertiary  border border-orion-line overflow-hidden mr-2">
             <button
               onClick={() => setView('field')}
               className={`px-3 py-1 text-xs font-medium transition-colors ${
@@ -187,17 +187,17 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
             <button
               key={t}
               onClick={() => setFilterTeam(t)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-3 py-1  text-xs font-medium transition-colors ${
                 filterTeam === t
                   ? 'bg-orange-primary text-white'
-                  : 'bg-dark-tertiary border border-gray-700 text-gray-400 hover:text-white'
+                  : 'bg-dark-tertiary border border-orion-line text-gray-400 hover:text-white'
               }`}
             >
               {t === 'all' ? 'Tous' : t === 'A' ? teamAName : teamBName}
             </button>
           ))}
           {/* Filtre mi-temps */}
-          <div className="flex bg-dark-tertiary border border-gray-700 rounded-lg overflow-hidden">
+          <div className="flex bg-dark-tertiary border border-orion-line  overflow-hidden">
             {(['all', '1', '2'] as const).map(h => (
               <button
                 key={h}
@@ -215,7 +215,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
           <select
             value={filterType}
             onChange={e => setFilterType(e.target.value)}
-            className="bg-dark-tertiary border border-gray-700 text-gray-300 text-xs rounded-lg px-2 py-1 focus:outline-none focus:border-orange-primary"
+            className="bg-dark-tertiary border border-orion-line text-gray-300 text-xs  px-2 py-1 focus:outline-none focus:border-orion-accent"
           >
             <option value="all">Tous les types</option>
             {eventTypes.map(t => (
@@ -230,7 +230,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
           <>
             {/* Terrain avec heatmap grille + points */}
             <div
-              className="relative rounded-lg border border-gray-700 overflow-hidden"
+              className="relative  border border-orion-line overflow-hidden"
               style={{
                 paddingBottom: '60%',
                 backgroundImage: `url('${getFootballFieldSVG()}')`,
@@ -261,7 +261,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                       }}
                     />
                     {hoveredEvent === e.id && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-dark-secondary border border-gray-700 rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-30 shadow-xl">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-dark-secondary border border-orion-line  px-3 py-2 text-[11px] whitespace-nowrap z-30 shadow-xl">
                         <p className="text-white font-medium">{e.event_type?.name || e.label}</p>
                         <p className="text-gray-400">{formatTime(e.timestamp)} · {e.team === 'A' ? teamAName : teamBName}</p>
                       </div>
@@ -298,7 +298,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
           <>
             {/* Terrain horizontal avec 3 zones */}
             <div
-              className="relative rounded-lg overflow-hidden border border-gray-700"
+              className="relative  overflow-hidden border border-orion-line"
               style={{ paddingBottom: '60%' }}
             >
               {/* Fond terrain */}
@@ -319,7 +319,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                 {/* Zone Défensive (gauche) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRight: '2px dashed rgba(59,130,246,0.5)' }}>
                   <div className="text-center z-10">
-                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.defensive.length}</div>
+                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.defensive.length}</div>
                     <div className="text-xs font-semibold text-blue-300 mt-1">Défensif</div>
                     <div className="text-[10px] text-blue-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.defensive} />
@@ -328,7 +328,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                 {/* Zone Médiane (centre) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(250,204,21,0.12)', borderRight: '2px dashed rgba(250,204,21,0.5)' }}>
                   <div className="text-center z-10">
-                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
+                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.mediane.length}</div>
                     <div className="text-xs font-semibold text-yellow-300 mt-1">Médian</div>
                     <div className="text-[10px] text-yellow-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.mediane} />
@@ -337,7 +337,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                 {/* Zone Offensive (droite) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(239,68,68,0.18)' }}>
                   <div className="text-center z-10">
-                    <div className="text-3xl font-bold text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
+                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.offensive.length}</div>
                     <div className="text-xs font-semibold text-red-300 mt-1">Offensif</div>
                     <div className="text-[10px] text-red-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.offensive} />
@@ -411,7 +411,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                         />
                         {hoveredEvent === e.id && (
                           <div
-                            className="absolute left-1/2 -translate-x-1/2 bg-dark-secondary border border-gray-600 rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-50 shadow-xl pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 bg-dark-secondary border border-gray-600  px-3 py-2 text-[11px] whitespace-nowrap z-50 shadow-xl pointer-events-none"
                             style={{ [isTop ? 'top' : 'bottom']: '100%', marginTop: isTop ? '6px' : 0, marginBottom: isTop ? 0 : '6px' }}
                           >
                             <p className="text-white font-semibold">{e.event_type?.name || e.label}</p>

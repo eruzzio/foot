@@ -404,8 +404,8 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     return (
       <div key={button.id}>
         <div
-          className={`flex items-center gap-3 p-3 rounded-lg border bg-dark-tertiary/40 group transition-colors ${
-            dragOverId === button.id ? 'border-orange-primary bg-orange-900/10' : 'border-gray-800'
+          className={`flex items-center gap-3 p-3  border bg-dark-tertiary/40 group transition-colors ${
+            dragOverId === button.id ? 'border-orion-accent bg-orange-900/10' : 'border-orion-line'
           }`}
           draggable
           onDragStart={() => { dragItem.current = button.id; }}
@@ -498,11 +498,11 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         </div>
 
         {subButtons.length > 0 && isExpanded && (
-          <div className="ml-6 mt-1 space-y-1 border-l-2 border-gray-700/50 pl-3">
+          <div className="ml-6 mt-1 space-y-1 border-l-2 border-orion-line/50 pl-3">
             {subButtons.map((sub) => (
               <div
                 key={sub.id}
-                className="flex items-center gap-3 p-2.5 rounded-lg border border-gray-800/60 bg-dark-tertiary/20 group"
+                className="flex items-center gap-3 p-2.5  border border-orion-line/60 bg-dark-tertiary/20 group"
               >
                 <div
                   className="w-3 h-3 rounded flex-shrink-0"
@@ -560,7 +560,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             ))}
             <button
               onClick={() => startAddSubButton(button)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-green-400 hover:bg-green-900/10 rounded-lg border border-dashed border-gray-700 hover:border-green-800 transition-colors w-full"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-gray-500 hover:text-green-400 hover:bg-green-900/10  border border-dashed border-orion-line hover:border-green-800 transition-colors w-full"
             >
               <Plus size={11} />
               Ajouter un sous-bouton
@@ -572,12 +572,12 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   };
 
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <div style={{ minHeight:"100vh", background:"var(--orion-bg)", color:"var(--orion-text)" }}>
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-secondary text-gray-300 hover:bg-dark-tertiary rounded-lg border border-gray-700 transition-colors font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-dark-secondary text-gray-300 hover:bg-dark-tertiary  border border-orion-line transition-colors font-medium"
           >
             <ArrowLeft size={18} />
             {view === 'list' ? "Retour à l'accueil" : 'Retour'}
@@ -590,17 +590,17 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         {view === 'list' && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold text-white">Mes Panneaux</h1>
+              <h1 className="text-2xl font-medium text-orion-text">Mes Panneaux</h1>
               <button
                 onClick={startCreate}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors font-medium shadow"
+                className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium shadow"
               >
                 <Plus size={18} />
                 Nouveau panneau
               </button>
               <button
                 onClick={handleCreateProPanel}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-medium shadow"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white  transition-colors font-medium shadow"
               >
                 <Plus size={18} />
                 Football Pro
@@ -609,14 +609,14 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
             <div className="space-y-3">
               {panels.length === 0 ? (
-                <div className="bg-dark-secondary rounded-xl border border-gray-800 p-8 text-center text-gray-500">
+                <div className="bg-dark-secondary  border border-orion-line p-8 text-center text-gray-500">
                   Aucun panneau. Créez-en un pour commencer.
                 </div>
               ) : (
                 panels.map((panel) => (
                   <div
                     key={panel.id}
-                    className="bg-dark-secondary rounded-xl border border-gray-800 p-4 flex items-center justify-between hover:border-gray-600 transition-colors group"
+                    className="bg-dark-secondary  border border-orion-line p-4 flex items-center justify-between hover:border-gray-600 transition-colors group"
                   >
                     <button
                       onClick={() => openPanel(panel)}
@@ -626,7 +626,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-white">{panel.name}</h3>
                           {panel.is_default && (
-                            <span className="text-xs px-2 py-0.5 bg-orange-900/40 text-orange-400 rounded-full font-medium border border-orange-800/50">
+                            <span className="text-xs px-2 py-0.5 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
                               Défaut
                             </span>
                           )}
@@ -651,13 +651,13 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
         {view === 'create' && (
           <div>
-            <h1 className="text-3xl font-bold text-white mb-6">
+            <h1 className="text-2xl font-medium text-orion-text mb-6">
               {selectedPanel ? 'Modifier le panneau' : 'Nouveau panneau'}
             </h1>
 
-            <div className="bg-dark-secondary rounded-xl border border-gray-800 p-6 space-y-4">
+            <div className="bg-dark-secondary  border border-orion-line p-6 space-y-4">
               {error && (
-                <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-400 text-sm">
+                <div className="p-3 bg-red-900/30 border border-red-700  text-red-400 text-sm">
                   {error}
                 </div>
               )}
@@ -670,7 +670,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: Panneau football"
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500"
                 />
               </div>
               <div>
@@ -682,21 +682,21 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Description du panneau..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500 resize-none"
+                  className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500 resize-none"
                 />
               </div>
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={savePanel}
                   disabled={saving}
-                  className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium disabled:opacity-50"
                 >
                   <Check size={16} />
                   {saving ? 'Enregistrement...' : 'Enregistrer'}
                 </button>
                 <button
                   onClick={handleBack}
-                  className="px-5 py-2 bg-dark-tertiary text-gray-300 rounded-lg hover:bg-gray-700 transition-colors font-medium"
+                  className="px-5 py-2 bg-dark-tertiary text-gray-300  hover:bg-dark-tertiary transition-colors font-medium"
                 >
                   Annuler
                 </button>
@@ -710,9 +710,9 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-3xl font-bold text-white">{selectedPanel.name}</h1>
+                  <h1 className="text-2xl font-medium text-orion-text">{selectedPanel.name}</h1>
                   {selectedPanel.is_default && (
-                    <span className="text-sm px-3 py-1 bg-orange-900/40 text-orange-400 rounded-full font-medium border border-orange-800/50">
+                    <span className="text-sm px-3 py-1 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
                       Défaut
                     </span>
                   )}
@@ -726,14 +726,14 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                   <>
                     <button
                       onClick={() => startEdit(selectedPanel)}
-                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-gray-300 rounded-lg border border-gray-700 hover:bg-dark-tertiary transition-colors text-sm font-medium"
+                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-gray-300  border border-orion-line hover:bg-dark-tertiary transition-colors text-sm font-medium"
                     >
                       <Pencil size={15} />
                       Renommer
                     </button>
                     <button
                       onClick={() => deletePanel(selectedPanel.id)}
-                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-red-400 rounded-lg border border-gray-700 hover:bg-red-900/20 transition-colors text-sm font-medium"
+                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-red-400  border border-orion-line hover:bg-red-900/20 transition-colors text-sm font-medium"
                     >
                       <Trash2 size={15} />
                       Supprimer
@@ -743,20 +743,20 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
               </div>
             </div>
 
-            <div className="bg-dark-secondary rounded-xl border border-gray-800 overflow-hidden">
-              <div className="flex border-b border-gray-800">
+            <div className="bg-dark-secondary  border border-orion-line overflow-hidden">
+              <div className="flex border-b border-orion-line">
                 <button
                   onClick={() => setActiveTab('list')}
                   className={`flex-1 px-4 py-3.5 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                     activeTab === 'list'
-                      ? 'bg-dark-secondary text-white border-b-2 border-orange-primary'
+                      ? 'bg-dark-secondary text-white border-b-2 border-orion-accent'
                       : 'bg-dark-tertiary/50 text-gray-500 hover:text-gray-300'
                   }`}
                 >
                   <LayoutGrid size={14} />
                   Mes boutons
                   <span className={`text-xs px-1.5 py-0.5 rounded-full font-mono ${
-                    activeTab === 'list' ? 'bg-orange-900/40 text-orange-400' : 'bg-gray-800 text-gray-500'
+                    activeTab === 'list' ? 'bg-orange-900/40 text-orion-accent' : 'bg-gray-800 text-gray-500'
                   }`}>
                     {rootButtons.length}
                   </span>
@@ -765,7 +765,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                   onClick={() => setActiveTab('layout')}
                   className={`flex-1 px-4 py-3.5 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                     activeTab === 'layout'
-                      ? 'bg-dark-secondary text-white border-b-2 border-orange-primary'
+                      ? 'bg-dark-secondary text-white border-b-2 border-orion-accent'
                       : 'bg-dark-tertiary/50 text-gray-500 hover:text-gray-300'
                   }`}
                 >
@@ -785,7 +785,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         <p className="text-sm mb-3">Aucun bouton dans ce panneau.</p>
                         <button
                           onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                          className="text-orange-400 hover:underline text-sm font-medium"
+                          className="text-orion-accent hover:underline text-sm font-medium"
                         >
                           Créer votre premier bouton
                         </button>
@@ -798,7 +798,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           </p>
                           <button
                             onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-primary hover-orange text-white rounded-lg text-xs font-medium flex-shrink-0 ml-4"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-primary hover-orange text-white  text-xs font-medium flex-shrink-0 ml-4"
                           >
                             <Plus size={12} />
                             Bouton
@@ -806,7 +806,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         </div>
                         {Array.from(new Set(rootButtons.map((b) => b.tab_page ?? 1))).sort((a, b) => a - b).map((page) => (
                           <div key={page} className="mb-6">
-                            <div className="text-xs font-semibold uppercase tracking-wider text-orange-400 mb-3 flex items-center gap-2">
+                            <div className="text-xs font-semibold uppercase tracking-wider text-orion-accent mb-3 flex items-center gap-2">
                               <span className="w-5 h-5 bg-orange-900/40 border border-orange-800/50 rounded flex items-center justify-center text-[10px]">{page}</span>
                               Page {page}
                             </div>
@@ -838,7 +838,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 {showCreateForm && activeTab === 'list' && (
                   <div className="max-w-lg space-y-5">
                     {parentBtnForForm && (
-                      <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-green-800/50 bg-green-900/10">
+                      <div className="flex items-center gap-2 px-3 py-2  border border-green-800/50 bg-green-900/10">
                         <div
                           className="w-3 h-3 rounded flex-shrink-0"
                           style={{ backgroundColor: parentBtnForForm.color }}
@@ -861,10 +861,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           setButtonType('event');
                           if (buttonColor === '#2563eb') setButtonColor('#dc2626');
                         }}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        className={`p-3  border-2 transition-all text-left ${
                           buttonType === 'event'
                             ? 'border-red-500 bg-red-900/20'
-                            : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                         }`}
                       >
                         <div className="text-sm font-bold text-white mb-0.5">Événement</div>
@@ -875,10 +875,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           setButtonType('keyword');
                           if (buttonColor === '#dc2626') setButtonColor('#2563eb');
                         }}
-                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                        className={`p-3  border-2 transition-all text-left ${
                           buttonType === 'keyword'
                             ? 'border-blue-500 bg-blue-900/20'
-                            : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                            : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                         }`}
                       >
                         <div className="text-sm font-bold text-white mb-0.5">Qualificatif</div>
@@ -892,10 +892,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         <div className="grid grid-cols-4 gap-2">
                           <button
                             onClick={() => { setLocationMode('none'); setIsZone(false); }}
-                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                            className={`p-3  border-2 transition-all text-center ${
                               locationMode === 'none'
                                 ? 'border-gray-400 bg-gray-800/40'
-                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                                : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
                             <div className="text-sm font-bold text-white mb-0.5">Normal</div>
@@ -903,10 +903,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           </button>
                           <button
                             onClick={() => { setLocationMode('zones'); setIsZone(false); }}
-                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                            className={`p-3  border-2 transition-all text-center ${
                               locationMode === 'zones'
                                 ? 'border-blue-500 bg-blue-900/20'
-                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                                : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
                             <div className="text-sm font-bold text-white mb-0.5">3 Zones</div>
@@ -914,10 +914,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           </button>
                           <button
                             onClick={() => { setLocationMode('field'); setIsZone(false); }}
-                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                            className={`p-3  border-2 transition-all text-center ${
                               locationMode === 'field'
                                 ? 'border-orange-500 bg-orange-900/20'
-                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                                : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
                             <div className="text-sm font-bold text-white mb-0.5">Position</div>
@@ -925,10 +925,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           </button>
                           <button
                             onClick={() => { setLocationMode('field_and_goal'); setIsZone(false); }}
-                            className={`p-3 rounded-lg border-2 transition-all text-center ${
+                            className={`p-3  border-2 transition-all text-center ${
                               locationMode === 'field_and_goal'
                                 ? 'border-red-500 bg-red-900/20'
-                                : 'border-gray-700 bg-dark-tertiary hover:border-gray-600'
+                                : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
                             <div className="text-sm font-bold text-white mb-0.5">Position + But</div>
@@ -947,7 +947,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         value={buttonLabel}
                         onChange={(e) => setButtonLabel(e.target.value)}
                         placeholder="Nom du bouton"
-                        className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       />
                     </div>
 
@@ -958,7 +958,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       <select
                         value={selectedEventTypeId}
                         onChange={(e) => handleEventTypeSelect(e.target.value)}
-                        className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                       >
                         <option value="">-- Non assigné --</option>
                         {Object.entries(groupedEventTypes).map(([category, types]) => (
@@ -991,7 +991,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                             type="color"
                             value={buttonColor}
                             onChange={(e) => setButtonColor(e.target.value)}
-                            className="w-8 h-8 rounded cursor-pointer border border-gray-700 bg-transparent"
+                            className="w-8 h-8 rounded cursor-pointer border border-orion-line bg-transparent"
                           />
                           <span className="text-xs text-gray-500">Personnalisée</span>
                         </div>
@@ -1000,7 +1000,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Aperçu</label>
                         <div
-                          className="relative flex flex-col items-center justify-center gap-1 rounded-lg text-white"
+                          className="relative flex flex-col items-center justify-center gap-1  text-white"
                           style={{ backgroundColor: buttonColor, minHeight: '72px', padding: '10px 8px' }}
                         >
                           <span className="text-sm font-bold leading-tight text-center">
@@ -1029,10 +1029,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                               <button
                                 key={p}
                                 onClick={() => setButtonTabPage(p)}
-                                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${
+                                className={`flex-1 py-2  text-sm font-bold transition-colors ${
                                   buttonTabPage === p
                                     ? 'bg-orange-primary text-white'
-                                    : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700'
+                                    : 'bg-dark-tertiary text-gray-400 hover:bg-dark-tertiary'
                                 }`}
                               >
                                 {p}
@@ -1051,7 +1051,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           onChange={(e) => setButtonShortcut(e.target.value.slice(-1))}
                           maxLength={1}
                           placeholder="Ex: s, p, t..."
-                          className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 text-center font-mono uppercase"
+                          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 text-center font-mono uppercase"
                         />
                       </div>
                     </div>
@@ -1067,7 +1067,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                           onChange={(e) => setButtonGroup(e.target.value)}
                           placeholder="Ex: Attaque, Défense..."
                           list="group-suggestions"
-                          className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                         />
                         {existingGroups.length > 0 && (
                           <datalist id="group-suggestions">
@@ -1085,30 +1085,30 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setButtonTeamAssociation(null)}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-3  text-sm font-medium transition-colors ${
                               buttonTeamAssociation === null
                                 ? 'bg-orange-primary text-white'
-                                : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700 border border-gray-700'
+                                : 'bg-dark-tertiary text-gray-400 hover:bg-dark-tertiary border border-orion-line'
                             }`}
                           >
                             Les deux équipes
                           </button>
                           <button
                             onClick={() => setButtonTeamAssociation('A')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-3  text-sm font-medium transition-colors ${
                               buttonTeamAssociation === 'A'
                                 ? 'bg-green-600 text-white'
-                                : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700 border border-gray-700'
+                                : 'bg-dark-tertiary text-gray-400 hover:bg-dark-tertiary border border-orion-line'
                             }`}
                           >
                             Équipe A
                           </button>
                           <button
                             onClick={() => setButtonTeamAssociation('B')}
-                            className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                            className={`flex-1 py-2 px-3  text-sm font-medium transition-colors ${
                               buttonTeamAssociation === 'B'
                                 ? 'bg-blue-600 text-white'
-                                : 'bg-dark-tertiary text-gray-400 hover:bg-gray-700 border border-gray-700'
+                                : 'bg-dark-tertiary text-gray-400 hover:bg-dark-tertiary border border-orion-line'
                             }`}
                           >
                             Équipe B
@@ -1121,7 +1121,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       <button
                         onClick={addButton}
                         disabled={saving || !buttonLabel.trim()}
-                        className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors text-sm font-medium disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white  transition-colors text-sm font-medium disabled:opacity-50"
                       >
                         <Check size={14} />
                         {editingButtonId ? (
@@ -1132,7 +1132,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       </button>
                       <button
                         onClick={() => { resetButtonForm(); setShowCreateForm(false); }}
-                        className="flex items-center gap-2 px-5 py-2 bg-dark-tertiary text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
+                        className="flex items-center gap-2 px-5 py-2 bg-dark-tertiary text-gray-300  hover:bg-dark-tertiary transition-colors text-sm font-medium"
                       >
                         <X size={14} />
                         Annuler
@@ -1144,7 +1144,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 {activeTab === 'layout' && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center justify-between flex-1 p-4 rounded-lg border border-gray-700 bg-dark-tertiary/40">
+                      <div className="flex items-center justify-between flex-1 p-4  border border-orion-line bg-dark-tertiary/40">
                         <div>
                           <h3 className="text-sm font-semibold text-white mb-0.5">Mode layout libre</h3>
                           <p className="text-xs text-gray-500">
@@ -1166,7 +1166,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       </div>
                       <button
                         onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                        className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors text-sm font-medium flex-shrink-0"
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors text-sm font-medium flex-shrink-0"
                       >
                         <Plus size={15} />
                         Bouton
@@ -1174,11 +1174,11 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     </div>
 
                     {rootButtons.length === 0 ? (
-                      <div className="text-center py-12 text-gray-500 border-2 border-dashed border-gray-700 rounded-lg">
+                      <div className="text-center py-12 text-gray-500 border-2 border-dashed border-orion-line ">
                         <p className="text-sm mb-2">Aucun bouton à positionner.</p>
                         <button
                           onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                          className="text-orange-400 hover:underline text-sm"
+                          className="text-orion-accent hover:underline text-sm"
                         >
                           Créer votre premier bouton
                         </button>

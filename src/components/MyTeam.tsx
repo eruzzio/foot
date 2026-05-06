@@ -574,63 +574,63 @@ export default function MyTeam({ onBack }: MyTeamProps) {
             <div className="flex items-center gap-4 mb-4">
               <button
                 onClick={() => { setView('list'); setSelectedTeam(null); }}
-                className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors"
+                className="o-btn o-btn--ghost o-btn--sm"
               >
                 <ArrowLeft size={24} className="text-gray-300" />
               </button>
               <div className="flex-1">
-                <h1 className="text-3xl font-bold text-white">{selectedTeam.name}</h1>
+                <h1 className="text-2xl font-medium text-orion-text">{selectedTeam.name}</h1>
                 {selectedTeam.category && (
-                  <p className="text-orange-400 text-sm font-medium">{selectedTeam.category}</p>
+                  <p className="text-orion-accent text-sm font-medium">{selectedTeam.category}</p>
                 )}
               </div>
               <button
                 onClick={() => { setEditingTeamId(selectedTeam.id); setShowTeamSettings(true); }}
-                className="flex items-center gap-2 px-4 py-2 bg-dark-tertiary text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-dark-tertiary text-white  hover:bg-dark-tertiary transition-colors"
               >
                 <Settings size={18} />
                 Paramètres
               </button>
               <button
                 onClick={handleExportTeamPdf}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white rounded-lg hover:bg-orange-600 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white  hover:bg-orange-600 transition-colors"
               >
                 <Download size={18} />
                 Fiche PDF
               </button>
             </div>
 
-            <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-4 md:p-6">
+            <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-4 md:p-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 {selectedTeam.logo_url ? (
                   <img
                     src={selectedTeam.logo_url}
                     alt={selectedTeam.name}
-                    className="w-20 h-20 sm:w-16 sm:h-16 rounded-lg object-cover border-2 border-gray-700 flex-shrink-0"
+                    className="w-20 h-20 sm:w-16 sm:h-16  object-cover border-2 border-orion-line flex-shrink-0"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-lg bg-dark-tertiary border-2 border-gray-700 flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16  bg-dark-tertiary border-2 border-orion-line flex items-center justify-center flex-shrink-0">
                     <Shield size={28} className="text-gray-500" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                    <h2 className="text-xl sm:text-2xl font-bold text-white truncate">{selectedTeam.name}</h2>
+                    <h2 className="text-xl sm:text-2xl font-medium text-orion-text truncate">{selectedTeam.name}</h2>
                     {selectedTeam.category && (
-                      <span className="px-3 py-1 bg-orange-primary/20 text-orange-400 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
+                      <span className="px-3 py-1 bg-orange-primary/20 text-orion-accent rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
                         {selectedTeam.category}
                       </span>
                     )}
                   </div>
                   {selectedTeam.description && (
-                    <p className="text-gray-400 text-sm line-clamp-2">{selectedTeam.description}</p>
+                    <p className="text-xs text-orion-text-mute line-clamp-2">{selectedTeam.description}</p>
                   )}
                 </div>
               </div>
             </div>
           </header>
 
-          <div className="flex gap-1 mb-6 bg-dark-secondary border border-gray-800 rounded-xl p-1">
+          <div className="flex gap-1 mb-6 bg-dark-secondary border border-orion-line  p-1">
             {([
               { key: 'composition', label: 'Composition', icon: Shield },
               { key: 'squad', label: 'Effectif', icon: Users },
@@ -639,7 +639,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg text-sm font-semibold transition-all duration-150 ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3  text-sm font-semibold transition-all duration-150 ${
                   activeTab === key
                     ? 'bg-orange-primary text-white shadow'
                     : 'text-gray-400 hover:text-white hover:bg-dark-tertiary'
@@ -659,12 +659,12 @@ export default function MyTeam({ onBack }: MyTeamProps) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 {/* Sélecteur de compositions */}
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-4 mb-4">
+                <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-4 mb-4">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Compositions</h3>
                     <button
                       onClick={() => setShowNewCompoForm(!showNewCompoForm)}
-                      className="text-xs px-3 py-1.5 bg-orange-primary hover:bg-orange-600 text-white rounded-lg transition-colors font-medium"
+                      className="text-xs px-3 py-1.5 bg-orange-primary hover:bg-orange-600 text-white  transition-colors font-medium"
                     >
                       + Nouvelle
                     </button>
@@ -677,12 +677,12 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                         value={newCompoName}
                         onChange={e => setNewCompoName(e.target.value)}
                         placeholder="Nom de la composition (ex: vs Toulouse)"
-                        className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="flex-1 px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       />
                       <button
                         onClick={handleCreateComposition}
                         disabled={!newCompoName.trim()}
-                        className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white  text-sm font-medium transition-colors"
                       >
                         Créer
                       </button>
@@ -693,10 +693,10 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                     {formations.map(f => (
                       <div
                         key={f.id}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm cursor-pointer transition-all ${
+                        className={`flex items-center gap-2 px-3 py-2  text-sm cursor-pointer transition-all ${
                           formation?.id === f.id
-                            ? 'bg-orange-primary/20 border-2 border-orange-primary text-white'
-                            : 'bg-dark-tertiary border border-gray-700 text-gray-400 hover:text-white hover:border-gray-600'
+                            ? 'bg-orange-primary/20 border-2 border-orion-accent text-white'
+                            : 'bg-dark-tertiary border border-orion-line text-gray-400 hover:text-white hover:border-gray-600'
                         }`}
                         onClick={() => handleSwitchComposition(f.id)}
                       >
@@ -715,15 +715,15 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                   </div>
                 </div>
 
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6">
+                <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold text-white">Composition Tactique</h2>
+                    <h2 className="text-base font-medium text-orion-text">Composition Tactique</h2>
                     <div className="flex items-center gap-2">
                       <label className="text-sm font-medium text-gray-300">Formation:</label>
                       <select
                         value={selectedFormation}
                         onChange={(e) => handleChangeFormation(e.target.value as keyof typeof FORMATIONS)}
-                        className="px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-orange-primary focus:border-orange-primary"
+                        className="px-3 py-2 bg-dark-tertiary border border-orion-line text-white  focus:ring-2 focus:ring-orange-primary focus:border-orion-accent"
                       >
                         {Object.keys(FORMATIONS).map(key => (
                           <option key={key} value={key}>{key}</option>
@@ -740,7 +740,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 </div>
               </div>
               <div>
-                <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-4">
+                <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-4">
                   <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Joueurs disponibles</h3>
                   <div className="space-y-1.5 max-h-[500px] overflow-y-auto">
                     {players.filter(p => !positions.some(pos => pos.player_id === p.id)).length === 0 ? (
@@ -760,7 +760,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                               handleAssignPlayer(emptyPos.id, player.id);
                             }
                           }}
-                          className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary hover:bg-gray-700 border border-gray-700/50 hover:border-orange-primary/50 transition-all text-left group cursor-grab active:cursor-grabbing select-none"
+                          className="w-full flex items-center gap-3 p-2.5  bg-dark-tertiary hover:bg-dark-tertiary border border-orion-line/50 hover:border-orion-accent/50 transition-all text-left group cursor-grab active:cursor-grabbing select-none"
                         >
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
                             player.position === 'GK' ? 'bg-yellow-500' :
@@ -777,7 +777,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                             </div>
                             <div className="text-[10px] text-gray-500">{player.position || 'N/A'}</div>
                           </div>
-                          <span className="text-[10px] text-gray-600 group-hover:text-orange-400 transition-colors">
+                          <span className="text-[10px] text-gray-600 group-hover:text-orion-accent transition-colors">
                             + Placer
                           </span>
                         </div>
@@ -787,7 +787,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
                   {positions.some(pos => pos.player_id !== null) && (
                     <>
-                      <div className="border-t border-gray-700 mt-4 pt-3">
+                      <div className="border-t border-orion-line mt-4 pt-3">
                         <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Sur le terrain</h3>
                         <div className="space-y-1.5">
                           {positions.filter(pos => pos.player_id !== null).map(pos => {
@@ -796,7 +796,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                             return (
                               <div
                                 key={pos.id}
-                                className="flex items-center gap-3 p-2.5 rounded-lg bg-dark-tertiary border border-gray-700/50"
+                                className="flex items-center gap-3 p-2.5  bg-dark-tertiary border border-orion-line/50"
                               >
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
                                   pos.role === 'GK' ? 'bg-yellow-500' :
@@ -829,12 +829,12 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               </div>
             </div>
           ) : activeTab === 'squad' ? (
-            <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6">
+            <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-white">Effectif</h2>
+                <h2 className="text-base font-medium text-orion-text">Effectif</h2>
                 <button
                   onClick={() => { setEditingPlayer(null); setShowPlayerForm(true); }}
-                  className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white rounded-lg hover-orange transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white  hover-orange transition-colors"
                 >
                   <UserPlus size={18} />
                   Ajouter
@@ -843,7 +843,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               {players.length === 0 ? (
                 <div className="text-center py-8">
                   <Users size={48} className="text-gray-600 mx-auto mb-3" />
-                  <p className="text-gray-400 text-sm">Aucun joueur dans l'effectif</p>
+                  <p className="text-xs text-orion-text-mute">Aucun joueur dans l'effectif</p>
                   <p className="text-gray-600 text-xs mt-1">Ajoutez vos premiers joueurs</p>
                 </div>
               ) : (
@@ -853,8 +853,8 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                     return (
                       <div
                         key={player.id}
-                        className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                          isAssigned ? 'bg-green-900/20 border-green-700' : 'bg-dark-tertiary border-gray-700'
+                        className={`flex items-center justify-between p-3 border  transition-colors ${
+                          isAssigned ? 'bg-green-900/20 border-green-700' : 'bg-dark-tertiary border-orion-line'
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
@@ -863,7 +863,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                               <img
                                 src={player.photo_url}
                                 alt={`${player.first_name} ${player.last_name}`}
-                                className="w-full h-full rounded-full object-cover border-2 border-gray-700 shadow"
+                                className="w-full h-full rounded-full object-cover border-2 border-orion-line shadow"
                               />
                               <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
                                 isAssigned ? 'bg-green-600' : 'bg-gray-600'
@@ -888,7 +888,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                         <div className="flex items-center gap-1 flex-shrink-0">
                           <button
                             onClick={() => { setEditingPlayer(player); setShowPlayerForm(true); }}
-                            className="p-2 text-orange-400 hover:bg-orange-900/30 rounded transition-colors"
+                            className="p-2 text-orion-accent hover:bg-orange-900/30 rounded transition-colors"
                           >
                             <Pencil size={16} />
                           </button>
@@ -906,9 +906,9 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               )}
             </div>
           ) : (
-            <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl p-6">
+            <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-white">Stats par joueurs</h2>
+                <h2 className="text-base font-medium text-orion-text">Stats par joueurs</h2>
                 <span className="text-xs text-gray-500 bg-dark-tertiary px-2.5 py-1 rounded-full">Saison complète</span>
               </div>
               <PlayerSeasonStats teamId={selectedTeam.id} teamName={selectedTeam.name} />
@@ -946,17 +946,17 @@ export default function MyTeam({ onBack }: MyTeamProps) {
           <div className="flex items-center gap-4 mb-2">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors"
+              className="o-btn o-btn--ghost o-btn--sm"
             >
               <ArrowLeft size={24} className="text-gray-300" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white">Mes Équipes</h1>
+              <h1 className="text-2xl font-medium text-orion-text">Mes Équipes</h1>
               <p className="text-gray-400">Gérez vos équipes, effectifs et compositions tactiques</p>
             </div>
             <button
               onClick={() => { setEditingTeamId(null); setShowTeamSettings(true); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
+              className="flex items-center gap-2 px-5 py-2.5 bg-orange-primary text-white  hover-orange transition-colors font-medium"
             >
               <Plus size={18} />
               Créer une équipe
@@ -970,14 +970,14 @@ export default function MyTeam({ onBack }: MyTeamProps) {
           </div>
         ) : teams.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-20 h-20 rounded-full bg-dark-secondary border-2 border-gray-700 flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-dark-secondary border-2 border-orion-line flex items-center justify-center mb-6">
               <Shield size={36} className="text-gray-500" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Aucune équipe créée</h2>
+            <h2 className="text-base font-medium text-orion-text mb-2">Aucune équipe créée</h2>
             <p className="text-gray-400 mb-8 max-w-xs">Commencez par créer votre première équipe pour gérer votre effectif et vos compositions.</p>
             <button
               onClick={() => { setEditingTeamId(null); setShowTeamSettings(true); }}
-              className="flex items-center gap-2 px-6 py-3 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
+              className="flex items-center gap-2 px-6 py-3 bg-orange-primary text-white  hover-orange transition-colors font-medium"
             >
               <Plus size={20} />
               Créer une équipe
@@ -988,7 +988,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
             {teams.map((team) => (
               <div
                 key={team.id}
-                className="bg-dark-secondary border border-gray-800 rounded-xl p-5 hover:border-gray-600 transition-all duration-200 group cursor-pointer"
+                className="bg-dark-secondary border border-orion-line  p-5 hover:border-gray-600 transition-all duration-200 group cursor-pointer"
                 onClick={() => handleSelectTeam(team)}
               >
                 <div className="flex items-center gap-4">
@@ -996,17 +996,17 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                     <img
                       src={team.logo_url}
                       alt={team.name}
-                      className="w-14 h-14 rounded-lg object-cover border-2 border-gray-700 flex-shrink-0"
+                      className="w-14 h-14  object-cover border-2 border-orion-line flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-14 h-14 rounded-lg bg-dark-tertiary border-2 border-gray-700 flex items-center justify-center flex-shrink-0">
+                    <div className="w-14 h-14  bg-dark-tertiary border-2 border-orion-line flex items-center justify-center flex-shrink-0">
                       <Shield size={24} className="text-gray-500" />
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-bold text-white truncate group-hover:text-orange-400 transition-colors">{team.name}</h3>
+                    <h3 className="text-sm font-medium text-orion-text truncate group-hover:text-orion-accent transition-colors">{team.name}</h3>
                     {team.category && (
-                      <span className="inline-block px-2 py-0.5 bg-orange-primary/20 text-orange-400 rounded-full text-xs font-medium mt-1">
+                      <span className="inline-block px-2 py-0.5 bg-orange-primary/20 text-orion-accent rounded-full text-xs font-medium mt-1">
                         {team.category}
                       </span>
                     )}
@@ -1017,13 +1017,13 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); setEditingTeamId(team.id); setShowTeamSettings(true); }}
-                      className="p-2 text-gray-400 hover:text-orange-400 hover:bg-orange-900/20 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-orion-accent hover:bg-orange-900/20  transition-colors"
                     >
                       <Pencil size={16} />
                     </button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleDeleteTeam(team.id); }}
-                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20 rounded-lg transition-colors"
+                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-900/20  transition-colors"
                     >
                       <Trash2 size={16} />
                     </button>

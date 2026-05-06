@@ -726,68 +726,56 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     .filter(et => et !== null && et !== undefined) as EventType[];
 
   return (
-    <div className="min-h-screen bg-dark p-4 text-white">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {onBack && (
-                <button
-                  onClick={onBack}
-                  className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors"
-                >
-                  <ArrowLeft size={24} className="text-gray-300" />
-                </button>
-              )}
-              <div>
-                <h1 className="text-3xl font-bold text-white">Codage Sportif Live</h1>
-                <p className="text-gray-400">Analysez votre match en temps réel</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <ExportButton
-                events={events}
-                teamAName={teamAName}
-                teamBName={teamBName}
-                teamAColor={teamAColor}
-                teamBColor="#f97316"
-                scoreA={teamAScore}
-                scoreB={teamBScore}
-                duration={currentTime}
-              />
-              <button
-                onClick={() => setIsMatchSheetOpen(true)}
-                className="px-4 py-2 bg-orange-primary text-white rounded-lg hover-orange transition-colors font-medium"
-              >
-                Fiche Match
-              </button>
-              <button
-                onClick={loadSavedCompositions}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  selectedCompoId
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-dark-tertiary hover:bg-gray-700 text-blue-400 border border-blue-800/50'
-                }`}
-              >
-                {selectedCompoId ? 'Compo liée' : 'Composition'}
-              </button>
-              <button
-                onClick={() => setShowHalftimeReport(true)}
-                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
-              >
-                📊 Mi-Temps
-              </button>
-              <button
-                onClick={handleEndMatch}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
-              >
-                Fin de match
-              </button>
-            </div>
+    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)' }}>
+      <div style={{ maxWidth:1400, margin:'0 auto' }}>
+
+        {/* TOP BAR */}
+        <header style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1px solid var(--orion-line)', position:'sticky', top:0, background:'var(--orion-bg)', zIndex:40 }}>
+          {onBack && (
+            <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'6px 8px' }}>
+              <ArrowLeft size={16} />
+            </button>
+          )}
+          <div style={{ width:'1px', background:'var(--orion-line)', alignSelf:'stretch' }} />
+          <div style={{ flex:1 }}>
+            <span style={{ fontSize:11, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--orion-text-mute)' }}>
+              Codage Live
+            </span>
+            {championship && (
+              <span style={{ fontSize:11, color:'var(--orion-text-mute)', marginLeft:12 }}>· {championship}</span>
+            )}
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <ExportButton
+              events={events}
+              teamAName={teamAName}
+              teamBName={teamBName}
+              teamAColor={teamAColor}
+              teamBColor="#f97316"
+              scoreA={teamAScore}
+              scoreB={teamBScore}
+              duration={currentTime}
+            />
+            <button onClick={() => setIsMatchSheetOpen(true)} className="o-btn o-btn--sm">
+              Fiche Match
+            </button>
+            <button
+              onClick={loadSavedCompositions}
+              className="o-btn o-btn--sm"
+              style={selectedCompoId ? { borderColor:'var(--orion-green)', color:'var(--orion-green)' } : {}}
+            >
+              {selectedCompoId ? '✓ Compo' : 'Compo'}
+            </button>
+            <button onClick={() => setShowHalftimeReport(true)} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-amber)', color:'var(--orion-amber)' }}>
+              Mi-Temps
+            </button>
+            <button onClick={handleEndMatch} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-red)', color:'var(--orion-red)' }}>
+              Fin de match
+            </button>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6" style={{ padding:'20px 24px' }}>
           <div className="lg:col-span-2 space-y-6">
             {(championship || matchday || location || matchDate) && (
               <div className="bg-dark-secondary border border-gray-800 rounded-xl p-4">

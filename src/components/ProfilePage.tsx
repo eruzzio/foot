@@ -158,23 +158,23 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-dark text-white">
+    <div style={{ minHeight:"100vh", background:"var(--orion-bg)", color:"var(--orion-text)" }}>
       <div className="max-w-2xl mx-auto px-4 py-6">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <button onClick={onBack} className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors">
+            <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm">
               <ArrowLeft size={20} className="text-gray-400" />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-white">Mon Compte</h1>
+              <h1 className="text-base font-medium text-orion-text">Mon Compte</h1>
               <p className="text-xs text-gray-500">{email}</p>
             </div>
           </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40 rounded-lg text-sm font-semibold transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40  text-sm font-semibold transition-colors"
           >
             <LogOut size={15} />
             Se déconnecter
@@ -182,12 +182,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         </div>
 
         {/* Avatar + résumé */}
-        <div className="flex items-center gap-4 bg-dark-secondary border border-gray-800 rounded-xl p-5 mb-6">
+        <div className="flex items-center gap-4 bg-dark-secondary border border-orion-line  p-5 mb-6">
           <div className="relative">
             {avatarPreview ? (
-              <img src={avatarPreview} className="w-16 h-16 rounded-full object-cover border-2 border-orange-primary" />
+              <img src={avatarPreview} className="w-16 h-16 rounded-full object-cover border-2 border-orion-accent" />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-orange-primary/20 border-2 border-orange-primary flex items-center justify-center text-xl font-black text-orange-400">
+              <div className="w-16 h-16 rounded-full bg-orange-primary/20 border-2 border-orion-accent flex items-center justify-center text-xl font-black text-orion-accent">
                 {initials || <User size={24} />}
               </div>
             )}
@@ -204,33 +204,33 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Utilisateur ORION'}
             </div>
             <div className="text-xs text-gray-400">{role || 'Rôle non défini'}</div>
-            {clubName && <div className="text-xs text-orange-400 mt-0.5">🏟️ {clubName}</div>}
+            {clubName && <div className="text-xs text-orion-accent mt-0.5">🏟️ {clubName}</div>}
             <div className="text-xs text-gray-600 mt-0.5">{email}</div>
           </div>
         </div>
 
         {/* Messages */}
         {error && (
-          <div className="flex items-start gap-3 bg-red-900/20 border border-red-800/50 rounded-lg p-3 mb-4">
+          <div className="flex items-start gap-3 bg-red-900/20 border border-red-800/50  p-3 mb-4">
             <AlertCircle size={16} className="text-red-400 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-red-300">{error}</p>
           </div>
         )}
         {success && (
-          <div className="flex items-start gap-3 bg-green-900/20 border border-green-800/50 rounded-lg p-3 mb-4">
+          <div className="flex items-start gap-3 bg-green-900/20 border border-green-800/50  p-3 mb-4">
             <Check size={16} className="text-green-400 flex-shrink-0 mt-0.5" />
             <p className="text-sm text-green-300">{success}</p>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-800 mb-6 overflow-x-auto">
+        <div className="flex border-b border-orion-line mb-6 overflow-x-auto">
           {TABS.map(t => {
             const Icon = t.icon;
             return (
               <button key={t.key} onClick={() => { setActiveTab(t.key as any); setError(''); setSuccess(''); }}
                 className={`flex items-center gap-1.5 px-4 py-3 text-xs font-semibold whitespace-nowrap transition-colors border-b-2 flex-shrink-0 ${
-                  activeTab === t.key ? 'text-orange-400 border-orange-400' : 'text-gray-500 border-transparent hover:text-gray-300'
+                  activeTab === t.key ? 'text-orion-accent border-orange-400' : 'text-gray-500 border-transparent hover:text-gray-300'
                 }`}
               >
                 <Icon size={13} />
@@ -243,20 +243,20 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {/* Tab Profil */}
         {activeTab === 'identity' && (
           <div className="space-y-5">
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Informations personnelles</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Prénom</label>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Lucas"
                     autoComplete="off"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Nom</label>
                   <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Giovenco"
                     autoComplete="off"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
               </div>
               <div>
@@ -264,8 +264,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <div className="flex flex-wrap gap-2">
                   {ROLES.map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                        role === r ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'
+                      className={`px-3 py-1.5  text-xs font-semibold transition-all ${
+                        role === r ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'
                       }`}
                     >{r}</button>
                   ))}
@@ -283,7 +283,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             />
 
             <button onClick={handleSaveIdentity} disabled={saving}
-              className={`w-full py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
+              className={`w-full py-3  font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
                 saved ? 'bg-green-600 text-white' : 'bg-orange-primary hover:bg-orange-600 text-white'
               }`}
             >
@@ -296,16 +296,16 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {activeTab === 'security' && (
           <div className="space-y-5">
             {/* Email */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Mail size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Adresse email</h3>
               </div>
               <div className="flex gap-2">
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                  className="flex-1 px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 <button onClick={handleUpdateEmail} disabled={newEmail === email || saving}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-lg text-sm font-semibold transition-colors">
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white  text-sm font-semibold transition-colors">
                   Modifier
                 </button>
               </div>
@@ -313,7 +313,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Mot de passe */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Lock size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mot de passe</h3>
@@ -324,7 +324,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   <div className="relative">
                     <input type={showPw ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                       placeholder="8 caractères minimum"
-                      className="w-full px-3 py-2 pr-10 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                      className="w-full px-3 py-2 pr-10 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                     <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
                       {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
@@ -333,24 +333,24 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Confirmer</label>
                   <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 </div>
                 {newPassword && confirmPassword && newPassword !== confirmPassword && <p className="text-xs text-red-400">Les mots de passe ne correspondent pas</p>}
                 {newPassword.length >= 8 && newPassword === confirmPassword && <p className="text-xs text-green-400">✓ Mot de passe valide</p>}
               </div>
               <button onClick={handleUpdatePassword} disabled={!newPassword || !confirmPassword || saving}
-                className="w-full mt-4 py-2.5 bg-orange-primary hover:bg-orange-600 disabled:opacity-40 text-white rounded-lg font-semibold text-sm transition-colors">
+                className="w-full mt-4 py-2.5 bg-orange-primary hover:bg-orange-600 disabled:opacity-40 text-white  font-semibold text-sm transition-colors">
                 Mettre à jour le mot de passe
               </button>
             </div>
 
             {/* Sessions */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Smartphone size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Session active</h3>
               </div>
-              <div className="flex items-center justify-between p-3 bg-dark-tertiary rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-dark-tertiary ">
                 <div>
                   <div className="text-sm text-white font-medium">Session actuelle</div>
                   <div className="text-xs text-gray-500">Navigateur web · {new Date().toLocaleDateString('fr-FR')}</div>
@@ -358,7 +358,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <span className="w-2 h-2 rounded-full bg-green-500" />
               </div>
               <button onClick={handleSignOut}
-                className="w-full mt-3 py-2.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                className="w-full mt-3 py-2.5 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40  text-sm font-semibold transition-colors flex items-center justify-center gap-2">
                 <LogOut size={14} /> Se déconnecter de cette session
               </button>
             </div>
@@ -369,7 +369,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {activeTab === 'preferences' && (
           <div className="space-y-5">
             {/* Notifications */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Bell size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Notifications</h3>
@@ -379,7 +379,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   { label: 'Rapports de match générés', value: notifMatchReport, set: setNotifMatchReport, desc: 'Recevoir une notification quand un rapport est prêt' },
                   { label: 'Demandes d\'adhésion club', value: notifClubRequests, set: setNotifClubRequests, desc: 'Être notifié quand quelqu\'un veut rejoindre votre club' },
                 ].map(n => (
-                  <div key={n.label} className="flex items-center justify-between p-3 bg-dark-tertiary rounded-lg">
+                  <div key={n.label} className="flex items-center justify-between p-3 bg-dark-tertiary ">
                     <div>
                       <div className="text-sm text-white font-medium">{n.label}</div>
                       <div className="text-xs text-gray-500">{n.desc}</div>
@@ -395,7 +395,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Langue */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Globe size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Langue</h3>
@@ -403,8 +403,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               <div className="flex gap-2">
                 {[{ code: 'fr', label: '🇫🇷 Français' }, { code: 'en', label: '🇬🇧 English' }, { code: 'es', label: '🇪🇸 Español' }].map(l => (
                   <button key={l.code} onClick={() => setLanguage(l.code)}
-                    className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
-                      language === l.code ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-gray-700 hover:text-white'
+                    className={`flex-1 py-2  text-sm font-semibold transition-all ${
+                      language === l.code ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'
                     }`}
                   >{l.label}</button>
                 ))}
@@ -412,7 +412,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             <button onClick={handleSavePreferences} disabled={saving}
-              className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+              className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white  font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
               <Save size={15} /> Sauvegarder les préférences
             </button>
           </div>
@@ -423,26 +423,26 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <div className="space-y-5">
 
             {/* Déconnexion rapide */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Session</h3>
               <p className="text-sm text-gray-400 mb-4">Vous êtes connecté en tant que <span className="text-white font-semibold">{email}</span></p>
               <button onClick={handleSignOut}
-                className="w-full py-3 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                className="w-full py-3 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40  font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
                 <LogOut size={15} /> Se déconnecter
               </button>
             </div>
 
             {/* Export données */}
-            <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+            <div className="bg-dark-secondary border border-orion-line  p-5">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Mes données</h3>
               <p className="text-sm text-gray-400 mb-4">Téléchargez toutes vos données ORION (matchs, stats, équipes) en format JSON.</p>
-              <button className="w-full py-2.5 bg-dark-tertiary hover:bg-gray-700 text-gray-300 border border-gray-700 rounded-xl text-sm font-semibold transition-colors">
+              <button className="w-full py-2.5 bg-dark-tertiary hover:bg-dark-tertiary text-gray-300 border border-orion-line  text-sm font-semibold transition-colors">
                 📦 Exporter mes données
               </button>
             </div>
 
             {/* Suppression compte */}
-            <div className="bg-red-950/20 border border-red-900/50 rounded-xl p-5">
+            <div className="bg-red-950/20 border border-red-900/50  p-5">
               <div className="flex items-center gap-2 mb-3">
                 <Trash2 size={15} className="text-red-500" />
                 <h3 className="text-xs font-bold text-red-400 uppercase tracking-wider">Zone dangereuse</h3>
@@ -452,10 +452,10 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <label className="block text-xs text-gray-500 mb-1.5">Confirmez en tapant votre email</label>
                 <input type="email" value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                   placeholder={email}
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-red-800/50 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+                  className="w-full px-3 py-2 bg-dark-tertiary border border-red-800/50 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
               </div>
               <button onClick={handleDeleteAccount} disabled={deleteConfirm !== email}
-                className="w-full py-2.5 bg-red-700/30 hover:bg-red-700/50 disabled:opacity-30 text-red-400 border border-red-700/50 rounded-xl text-sm font-semibold transition-colors">
+                className="w-full py-2.5 bg-red-700/30 hover:bg-red-700/50 disabled:opacity-30 text-red-400 border border-red-700/50  text-sm font-semibold transition-colors">
                 Supprimer définitivement mon compte
               </button>
             </div>
