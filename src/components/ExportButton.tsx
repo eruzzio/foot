@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, FileSpreadsheet, FileText, LayoutTemplate, Code, Monitor, Film } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, Code, Monitor, Film } from 'lucide-react';
 import { MatchEventWithDetails } from '../types/database';
 import { exportToCSV, exportToExcel } from '../utils/exportData';
 import { exportToPdf } from '../utils/exportPdf';
@@ -81,17 +81,6 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div style={{ position:'absolute', right:0, marginTop:4, width:220, background:'var(--orion-surface)', border:'1px solid var(--orion-line-strong)', zIndex:20 }}>
-            <button onClick={() => handleExport('pdf')}
-              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <LayoutTemplate size={15} style={{ color:'var(--orion-red)', flexShrink:0 }} />
-              <div>
-                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Fiche Stats PDF</div>
-                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>Rapport visuel staff</div>
-              </div>
-            </button>
             <button onClick={() => handleExport('excel')}
               style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
               onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
