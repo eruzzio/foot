@@ -66,84 +66,88 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled || events.length === 0}
-        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-          disabled || events.length === 0
-            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            : 'bg-green-500 text-white hover:bg-green-600'
-        }`}
+        className="o-btn o-btn--sm"
+        style={{
+          opacity: disabled || events.length === 0 ? 0.4 : 1,
+          cursor: disabled || events.length === 0 ? 'not-allowed' : 'pointer',
+          display: 'flex', alignItems: 'center', gap: 6,
+        }}
       >
-        <Download size={18} />
+        <Download size={14} />
         Exporter
       </button>
 
       {isOpen && !disabled && events.length > 0 && (
         <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border border-gray-200 z-20 text-gray-900">
-            <button
-              onClick={() => handleExport('pdf')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div style={{ position:'absolute', right:0, marginTop:4, width:220, background:'var(--orion-surface)', border:'1px solid var(--orion-line-strong)', zIndex:20 }}>
+            <button onClick={() => handleExport('pdf')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <LayoutTemplate size={18} className="text-red-500" />
+              <LayoutTemplate size={15} style={{ color:'var(--orion-red)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">Fiche Stats PDF</div>
-                <div className="text-xs text-gray-500">Rapport visuel staff</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Fiche Stats PDF</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>Rapport visuel staff</div>
               </div>
             </button>
-            <button
-              onClick={() => handleExport('excel')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+            <button onClick={() => handleExport('excel')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <FileSpreadsheet size={18} className="text-green-600" />
+              <FileSpreadsheet size={15} style={{ color:'var(--orion-green)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">Excel (.xlsx)</div>
-                <div className="text-xs text-gray-500">Avec statistiques</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Excel (.xlsx)</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>Avec statistiques</div>
               </div>
             </button>
-            <button
-              onClick={() => handleExport('csv')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+            <button onClick={() => handleExport('csv')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <FileText size={18} className="text-blue-600" />
+              <FileText size={15} style={{ color:'var(--orion-accent)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">CSV (.csv)</div>
-                <div className="text-xs text-gray-500">Données brutes</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>CSV (.csv)</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>Données brutes</div>
               </div>
             </button>
-            <div className="border-t border-gray-200 px-4 py-1.5">
-              <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">Logiciels pro</span>
+            <div style={{ borderTop:'1px solid var(--orion-line)', padding:'8px 16px 4px' }}>
+              <span className="o-eyebrow">Logiciels pro</span>
             </div>
-            <button
-              onClick={() => handleExport('sportscode')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+            <button onClick={() => handleExport('sportscode')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <Code size={18} className="text-purple-600" />
+              <Code size={15} style={{ color:'var(--orion-accent)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">Hudl SportsCode</div>
-                <div className="text-xs text-gray-500">XML compatible Hudl / Nacsport</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Hudl SportsCode</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>XML compatible Hudl / Nacsport</div>
               </div>
             </button>
-            <button
-              onClick={() => handleExport('dartfish')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left border-b border-gray-100"
+            <button onClick={() => handleExport('dartfish')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <Monitor size={18} className="text-cyan-600" />
+              <Monitor size={15} style={{ color:'var(--orion-green)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">Dartfish</div>
-                <div className="text-xs text-gray-500">CSV compatible Dartfish</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Dartfish</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>CSV compatible Dartfish</div>
               </div>
             </button>
-            <button
-              onClick={() => handleExport('longomatch')}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+            <button onClick={() => handleExport('longomatch')}
+              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', background:'none', cursor:'pointer', textAlign:'left' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
             >
-              <Film size={18} className="text-amber-600" />
+              <Film size={15} style={{ color:'var(--orion-amber)', flexShrink:0 }} />
               <div>
-                <div className="font-medium text-gray-800">LongoMatch</div>
-                <div className="text-xs text-gray-500">CSV compatible LongoMatch</div>
+                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>LongoMatch</div>
+                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>CSV compatible LongoMatch</div>
               </div>
             </button>
           </div>
