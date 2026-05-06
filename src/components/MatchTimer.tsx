@@ -75,7 +75,7 @@ export default function MatchTimer({
           onClick={() => inputRef.current?.click()}
           style={{ width:52, height:52, border:`1px solid ${isSelected ? color : 'var(--orion-line-strong)'}`, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', overflow:'hidden', transition:'border-color .15s' }}
         >
-          {logo ? <img src={logo} style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <Upload size={16} style={{ color:'var(--orion-text-mute)' }} />}
+          {logo ? <img src={logo} style={{ width:'100%', height:'100%', objectFit:'contain', padding:4 }} /> : <Upload size={16} style={{ color:'var(--orion-text-mute)' }} />}
         </div>
         <input ref={inputRef} type="file" accept="image/*" className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handleLogoUpload(team, f); e.target.value=''; }} />
