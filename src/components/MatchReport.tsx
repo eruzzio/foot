@@ -9,6 +9,7 @@ import PostMatchTab from './PostMatchTab';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
 import MatchTags from './MatchTags';
+import PdfConfigModal from './PdfConfigModal';
 
 interface MatchReportProps {
   matchId: string;
@@ -25,6 +26,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video' | 'tags'>('overview');
+  const [showPdfConfig, setShowPdfConfig] = useState(false);
 
   useEffect(() => {
     loadMatchData();
@@ -147,19 +149,28 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
                     {match.team_a_name} <span className="text-orange-primary">vs</span> {match.team_b_name}
                   </h1>
                 </div>
-                <ExportButton
-                  events={match.events}
-                  teamAName={match.team_a_name}
-                  teamBName={match.team_b_name}
-                  teamAColor={match.team_a_color || '#22c55e'}
-                  teamBColor={match.team_b_color || '#f97316'}
-                  matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
-                  scoreA={match.team_a_score}
-                  scoreB={match.team_b_score}
-                  duration={match.match_time}
-                  teamALogoUrl={teamALogoUrl}
-                  teamBLogoUrl={teamBLogoUrl}
-                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowPdfConfig(true)}
+                    className="o-btn o-btn--sm"
+                    style={{ display:'flex', alignItems:'center', gap:6 }}
+                  >
+                    📄 Rapport PDF
+                  </button>
+                  <ExportButton
+                    events={match.events}
+                    teamAName={match.team_a_name}
+                    teamBName={match.team_b_name}
+                    teamAColor={match.team_a_color || '#22c55e'}
+                    teamBColor={match.team_b_color || '#f97316'}
+                    matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
+                    scoreA={match.team_a_score}
+                    scoreB={match.team_b_score}
+                    duration={match.match_time}
+                    teamALogoUrl={teamALogoUrl}
+                    teamBLogoUrl={teamBLogoUrl}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-6 items-center mb-6">
@@ -350,6 +361,23 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
           />
         )}
       </div>
+
+      {showPdfConfig && (
+        <PdfConfigModal
+          events={match.events}
+          teamAName={match.team_a_name}
+          teamBName={match.team_b_name}
+          teamAColor={match.team_a_color || '#22c55e'}
+          teamBColor={match.team_b_color || '#f97316'}
+          matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
+          scoreA={match.team_a_score}
+          scoreB={match.team_b_score}
+          duration={match.match_time}
+          teamALogoUrl={teamALogoUrl}
+          teamBLogoUrl={teamBLogoUrl}
+          onClose={() => setShowPdfConfig(false)}
+        />
+      )}
     </div>
   );
 }
