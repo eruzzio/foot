@@ -622,6 +622,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       setMatchSheetPanelId(data.panelId);
       setSelectedPanelId(data.panelId);
       await loadEventTypes(data.panelId);
+    } else {
+      // Verrouiller le panneau actif par défaut
+      setMatchSheetPanelId(selectedPanelId);
     }
   };
 
