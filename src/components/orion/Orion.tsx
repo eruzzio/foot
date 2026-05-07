@@ -12,8 +12,8 @@ export const OrionMark = ({
   size = 24, color = 'currentColor', accent,
 }: { size?: number; color?: Color; accent?: Color }) => (
   <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
-    <circle cx="16" cy="16" r="14.5" stroke={color} strokeWidth="1" opacity="0.55" />
-    <path d="M16 1V5M16 27V31M1 16H5M27 16H31" stroke={color} strokeWidth="1" opacity="0.55" />
+    <circle cx="16" cy="16" r="14.5" stroke={color} strokeWidth="1" opacity="0.8" />
+    <path d="M16 1V5M16 27V31M1 16H5M27 16H31" stroke={color} strokeWidth="1" opacity="0.8" />
     <circle cx="9.5"  cy="18.2" r="1.4" fill={accent || color} />
     <circle cx="16"   cy="16"   r="1.4" fill={accent || color} />
     <circle cx="22.5" cy="13.8" r="1.4" fill={accent || color} />
@@ -29,8 +29,10 @@ export const OrionLogo = ({
   }}>
     <OrionMark size={height * 1.35} color={color || 'currentColor'} accent={accent || 'var(--orion-accent)'} />
     <span style={{
-      fontFamily: 'var(--orion-font-ui)', fontWeight: 500,
-      fontSize: height, letterSpacing: '0.18em', textTransform: 'uppercase',
+      fontFamily: 'var(--orion-font-ui)', fontWeight: 700,
+      fontSize: height, letterSpacing: '0.22em', textTransform: 'uppercase',
+      color: color || 'var(--orion-text)',
+      opacity: 1,
     }}>Orion</span>
   </span>
 );
@@ -142,9 +144,9 @@ export const Field: React.FC<{ label: string; children: React.ReactNode }> = ({ 
 export const TopBar: React.FC<{
   user?: string; tabs?: { id: string; label: string }[]; activeTab?: string;
   onTabChange?: (id: string) => void; right?: React.ReactNode;
-}> = ({ user, tabs, activeTab, onTabChange, right }) => (
+}> = ({ tabs, activeTab, onTabChange, right }) => (
   <header className="o-topbar">
-    <OrionLogo height={13} />
+    <OrionLogo height={15} />
     <span className="o-divider-v" />
     {tabs && (
       <nav style={{ display: 'flex', gap: 22 }}>
@@ -160,13 +162,5 @@ export const TopBar: React.FC<{
     )}
     <span style={{ flex: 1 }} />
     {right}
-    {user && (
-      <>
-        <span style={{ fontSize: 12, color: 'var(--orion-text-dim)' }}>
-          Bonjour, <span style={{ color: 'var(--orion-text)' }}>{user}</span>
-        </span>
-        <span className="o-avatar">{user[0]}</span>
-      </>
-    )}
   </header>
 );
