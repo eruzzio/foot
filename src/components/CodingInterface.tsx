@@ -367,7 +367,13 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     setShowEndMatchConfirm(true);
   };
 
-  const confirmEndMatch = async () => {
+  const handleBack = async () => {
+    // Si aucune action codée et match non terminé → supprimer le match fantôme
+    if (matchId && events.length === 0) {
+      await supabase.from('matches').delete().eq('id', matchId);
+    }
+    if (onBack) onBack();
+  };
     if (!matchId) return;
     setShowEndMatchConfirm(false);
     setIsRunning(false);
@@ -786,7 +792,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         {/* TOP BAR */}
         <header style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1px solid var(--orion-line)', position:'sticky', top:0, background:'var(--orion-bg)', zIndex:40 }}>
           {onBack && (
-            <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'6px 8px' }}>
+            <button onClick={handleBack} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'6px 8px' }}>
               <ArrowLeft size={16} />
             </button>
           )}
