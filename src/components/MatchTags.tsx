@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Tag, Save, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match } from '../types/database';
 
 interface MatchTagsProps {
-  matchId: string;
+  matchId?: string;
   match: Match;
   onUpdate: (updated: Partial<Match>) => void;
 }
@@ -35,7 +35,7 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
         tag_weather: tags.tag_weather || null,
         tag_notes: tags.tag_notes || null,
       })
-      .eq('id', matchId);
+      .eq('id', matchId || '');
 
     if (!error) {
       onUpdate(tags as any);

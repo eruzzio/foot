@@ -40,7 +40,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
       .from('matches')
       .select('*')
       .eq('status', 'completed')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('match_date', { ascending: true });
 
     if (matchesError || !matches) {
@@ -91,8 +91,8 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
 
     let totalGoalsFor = 0;
     let totalGoalsAgainst = 0;
-    let avgGoalsFor = 0;
-    let avgGoalsAgainst = 0;
+    let avgGoalsFor: number | string = 0;
+    let avgGoalsAgainst: number | string = 0;
 
     matchesStats.forEach(stat => {
       totalGoalsFor += stat.goalsFor;

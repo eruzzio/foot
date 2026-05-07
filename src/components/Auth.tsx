@@ -84,7 +84,7 @@ export default function Auth({ onAuthSuccess }: AuthProps) {
       <div style={{ width: '100%', maxWidth: 400, position: 'relative' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <OrionLogo size={64} style={{ margin: '0 auto 16px' }} />
+          <div style={{ display:"flex", justifyContent:"center", marginBottom:16 }}><OrionLogo size={64} /></div>
           <div style={{ fontSize: 20, fontWeight: 700, color: '#f0f0f2', letterSpacing: '0.2em' }}>ORION</div>
           <div style={{ fontSize: 11, color: '#4a4a58', marginTop: 4, fontFamily: 'monospace', letterSpacing: '0.15em' }}>SPORTS VIDEO ANALYTICS</div>
         </div>

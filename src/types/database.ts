@@ -6,8 +6,8 @@ export interface Team {
 
 export interface Player {
   id: string;
-  team_id: string;
-  name: string;
+  team_id?: string;
+  name?: string;
   first_name?: string;
   last_name?: string;
   number: number | null;
@@ -20,7 +20,7 @@ export interface Player {
   secondary_position?: string;
   nationality?: string;
   coach_notes?: string;
-  created_at: string;
+  created_at?: string;
 }
 
 export interface EventType {

@@ -75,7 +75,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
         match_id: string;
         event_type_id: string | null;
         label: string | null;
-        event_type?: { name: string } | null;
+        event_type?: { name: string } | { name: string }[] | null;
       }[] = [];
 
       if (matchIds.length > 0) {

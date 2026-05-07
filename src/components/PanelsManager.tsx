@@ -53,7 +53,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   const [buttonTeamAssociation, setButtonTeamAssociation] = useState<'A' | 'B' | null>(null);
   const [editingButtonId, setEditingButtonId] = useState<string | null>(null);
   const [isZone, setIsZone] = useState(false);
-  const [locationMode, setLocationMode] = useState<'none' | 'field' | 'field_and_goal'>('none');
+  const [locationMode, setLocationMode] = useState<'none' | 'field' | 'field_and_goal' | 'zones'>('none');
 
   useEffect(() => {
     loadData();

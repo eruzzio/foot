@@ -59,7 +59,7 @@ export function exportToExcel(data: ExportData): void {
   const teamASuccessRate = teamAEvents.length > 0 ? ((teamASuccess / teamAEvents.length) * 100).toFixed(1) + '%' : '-';
   const teamBSuccessRate = teamBEvents.length > 0 ? ((teamBSuccess / teamBEvents.length) * 100).toFixed(1) + '%' : '-';
 
-  const summaryData: (string | number)[][] = [
+  const summaryData: any[][] = [
     ['RAPPORT DE MATCH'],
     [],
     ['Match', `${data.matchInfo.teamA} vs ${data.matchInfo.teamB}`],
@@ -96,7 +96,7 @@ export function exportToExcel(data: ExportData): void {
   eventTypes.forEach(type => {
     const teamACount = teamAEvents.filter(e => e.event_type?.name === type).length;
     const teamBCount = teamBEvents.filter(e => e.event_type?.name === type).length;
-    summaryData.push([type, teamACount, teamBCount]);
+    summaryData.push([type ?? '', teamACount, teamBCount]);
   });
 
   const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
@@ -137,7 +137,7 @@ export function exportToExcel(data: ExportData): void {
   teamBSheet['!cols'] = [{ wch: 10 }, { wch: 10 }, { wch: 22 }, { wch: 22 }, { wch: 15 }, { wch: 30 }];
   XLSX.utils.book_append_sheet(workbook, teamBSheet, data.matchInfo.teamB);
 
-  const statsData = [
+  const statsData: any[][] = [
     ['STATISTIQUES COMPARÉES PAR TYPE D\'ÉVÉNEMENT'],
     [],
     ['Type d\'événement', data.matchInfo.teamA, '%', data.matchInfo.teamB, '%', 'Total'],
@@ -149,7 +149,7 @@ export function exportToExcel(data: ExportData): void {
     const total = teamACount + teamBCount;
     const teamAPercent = total > 0 ? ((teamACount / total) * 100).toFixed(1) + '%' : '0%';
     const teamBPercent = total > 0 ? ((teamBCount / total) * 100).toFixed(1) + '%' : '0%';
-    statsData.push([type, teamACount, teamAPercent, teamBCount, teamBPercent, total]);
+    statsData.push([type ?? '', teamACount, teamAPercent, teamBCount, teamBPercent, total]);
   });
 
   statsData.push([]);

@@ -1,4 +1,4 @@
-import { X, TrendingUp, TrendingDown, Minus, Target } from 'lucide-react';
+import { X, TrendingUp, Target } from 'lucide-react';
 import { MatchEventWithDetails } from '../types/database';
 import { calculateTeamXG, getShotEvents } from '../utils/xg';
 

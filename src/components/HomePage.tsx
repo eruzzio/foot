@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { ChevronRight, Activity, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ChevronRight, Activity, AlertTriangle, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { calculateTeamXG } from '../utils/xg';
 import { useT } from '../i18n/I18nContext';
-import { OrionLogo, KPI, TopBar, Result, Card, Eyebrow } from './orion/Orion';
+import { OrionLogo, KPI, TopBar, Result, Eyebrow } from './orion/Orion';
 
 interface HomePageProps { onNavigate: (page: string) => void; }
 
@@ -20,8 +20,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
-  const [clubLogo, setClubLogo] = useState<string | null>(null);
-  const [clubName, setClubName] = useState('');
+  const [_clubLogo, setClubLogo] = useState<string | null>(null);
+  const [_clubName, setClubName] = useState('');
 
   useEffect(() => { init(); }, []);
 
@@ -208,7 +208,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
 
             {/* TENDANCES */}
             {trends.length > 0 && (
-              <Card kicker="Tendances" style={{ marginTop:2 } as any}>
+              <div style={{ marginTop:2 }} className="o-card">
+              <div className="o-card__header"><span className="o-eyebrow">Tendances</span></div>
                 <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
                   {trends.map((a,i)=>(
                     <div key={i} style={{ display:'flex', alignItems:'center', gap:10, padding:'10px 12px', background:a.type==='good'?'rgba(123,224,168,0.06)':'rgba(255,138,138,0.06)', borderLeft:`2px solid ${a.type==='good'?'var(--orion-green)':'var(--orion-red)'}` }}>
@@ -219,19 +220,21 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                     </div>
                   ))}
                 </div>
-              </Card>
+              </div>
             )}
 
             {/* DERNIERS MATCHS */}
-            <Card kicker="Derniers matchs" right={
-              <button className="o-btn o-btn--ghost o-btn--sm" onClick={()=>onNavigate('stats')} style={{ display:'flex', alignItems:'center', gap:4 }}>
-                Voir tout <ChevronRight size={12}/>
-              </button>
-            } style={{ marginTop:2 } as any}>
+            <div className="o-card">
+              <div className="o-card__header">
+                <span className="o-eyebrow">Derniers matchs</span>
+                <button className="o-btn o-btn--ghost o-btn--sm" onClick={()=>onNavigate('stats')} style={{ display:'flex', alignItems:'center', gap:4 }}>
+                  Voir tout <ChevronRight size={12}/>
+                </button>
+              </div>
               <div style={{ display:'flex', flexDirection:'column' }}>
                 {matches.slice(-3).reverse().map((m,i)=>(
                   <button key={m.id} onClick={()=>onNavigate(`stats-${m.id}`)}
-                    style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 0', borderBottom:i<2?'1px solid var(--orion-line)':'none', background:'none', border_bottom:i<2?'1px solid var(--orion-line)':'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
+                    style={{ display:'flex', alignItems:'center', gap:14, padding:'14px 0', borderBottom:i<2?'1px solid var(--orion-line)':'none', background:'none', cursor:'pointer', textAlign:'left', width:'100%' }}>
                     <Result r={m.result} />
                     <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontSize:13, color:'var(--orion-text)' }}>
@@ -245,7 +248,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   </button>
                 ))}
               </div>
-            </Card>
+            </div>
 
           </div>
         )}

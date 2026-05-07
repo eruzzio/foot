@@ -6,7 +6,6 @@ import PlayerForm from './PlayerForm';
 import { exportTeamPdf } from '../utils/exportTeamPdf';
 import { useT } from '../i18n/I18nContext';
 import TeamSettings from './TeamSettings';
-import TeamMatchHistory from './TeamMatchHistory';
 import PlayerSeasonStats from './PlayerSeasonStats';
 
 interface MyTeamProps {
@@ -244,7 +243,6 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'composition' | 'squad' | 'stats'>('composition');
   const [showNewCompoForm, setShowNewCompoForm] = useState(false);
-  const { t } = useT();
   const [newCompoName, setNewCompoName] = useState('');
 
   useEffect(() => {
@@ -773,7 +771,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="text-sm font-medium text-white truncate">
-                              {player.first_name || ''} {player.last_name || player.name || ''}
+                              {player.first_name || ''} {player.last_name || (player as any).name || '' || ''}
                             </div>
                             <div className="text-[10px] text-gray-500">{player.position || 'N/A'}</div>
                           </div>
@@ -808,7 +806,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm font-medium text-white truncate">
-                                    {player.first_name || ''} {player.last_name || player.name || ''}
+                                    {player.first_name || ''} {player.last_name || (player as any).name || '' || ''}
                                   </div>
                                   <div className="text-[10px] text-gray-500">{pos.role}</div>
                                 </div>

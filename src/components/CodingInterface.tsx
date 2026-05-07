@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { EventType, MatchEvent, MatchEventWithDetails, PanelButtonWithEventType, Panel } from '../types/database';
+import { EventType, MatchEventWithDetails, PanelButtonWithEventType, Panel } from '../types/database';
 import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
 import Timeline from './Timeline';
@@ -15,7 +15,6 @@ import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
 import ZoneSelector from './ZoneSelector';
 import HalftimeReport from './HalftimeReport';
-import { useT } from '../i18n/I18nContext';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
@@ -43,7 +42,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showCompoSelector, setShowCompoSelector] = useState(false);
   const [savedCompositions, setSavedCompositions] = useState<any[]>([]);
   const [selectedCompoId, setSelectedCompoId] = useState<string | null>(null);
-  const { t } = useT();
+  
   const [showHalftimeReport, setShowHalftimeReport] = useState(false);
   const [lastEventId, setLastEventId] = useState<string | null>(null);
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
@@ -101,7 +100,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [pendingEventId, setPendingEventId] = useState<string | null>(null);
   const [kickoffRealTime, setKickoffRealTime] = useState<Date | null>(null);
   const [veoUrl, setVeoUrl] = useState<string>('');
-  const [veoOffsetSeconds, setVeoOffsetSeconds] = useState<number | null>(null);
+  const [, setVeoOffsetSeconds] = useState<number | null>(null);
   const [showVeoSync, setShowVeoSync] = useState(false);
   const [veoKickoffInput, setVeoKickoffInput] = useState<string>('');
   const [showFieldSelector, setShowFieldSelector] = useState(false);
@@ -490,7 +489,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     }
   };
 
-  const handleZoneSelected = async (zoneButtonId: string, zoneLabel: string) => {
+  const handleZoneSelected = async (zoneButtonId: string, _zoneLabel: string) => {
     if (pendingEventId) {
       await supabase
         .from('match_events')
@@ -782,10 +781,6 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       </div>
     );
   }
-
-  const eventTypes = panelButtons
-    .map(pb => pb.event_type)
-    .filter(et => et !== null && et !== undefined) as EventType[];
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)' }}>

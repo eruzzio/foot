@@ -108,7 +108,7 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
     }
   };
 
-  const [uploadError, setUploadError] = useState('');
+  const [_uploadError, setUploadError] = useState('');
 
   const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -189,7 +189,7 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
     setSaving(false);
   };
 
-  const handleApprove = async (memberId: string, memberUserId: string) => {
+  const handleApprove = async (memberId: string, _memberUserId: string) => {
     await supabase.from('club_members').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', memberId);
     if (club) await loadMembers(club.id);
   };

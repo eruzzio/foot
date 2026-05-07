@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Copy, Plus, Save, LayoutGrid as Layout, Users } from 'lucide-react';
+import { X, Copy, Plus, LayoutGrid as Layout, Users } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { TeamFormation, FormationPosition, Player } from '../types/database';
 import FieldVisualization from './FieldVisualization';

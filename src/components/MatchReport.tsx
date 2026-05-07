@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, BarChart3, Users, Video, Tag } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, TrendingUp, BarChart3, Users, Video, Tag } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
@@ -328,7 +328,6 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
               {match.events.some(e => e.field_x !== null && e.field_y !== null) && (
                 <Heatmap
                   events={match.events}
-                  matchId={match.id}
                   teamAName={match.team_a_name}
                   teamBName={match.team_b_name}
                 />
@@ -346,7 +345,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
         {activeTab === 'postmatch' && (
           <PostMatchTab
             match={{ ...match, events: match.events }}
-            onMatchUpdate={handleMatchUpdate}
+            onMatchUpdate={handleMatchUpdate as any}
           />
         )}
 
@@ -362,7 +361,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
           <MatchTags
             matchId={matchId}
             match={match}
-            onUpdate={(updated) => setMatch(prev => prev ? { ...prev, ...updated } : prev)}
+            onUpdate={(updated: any) => { setMatch((prev: any) => prev ? { ...prev, ...updated } : prev); }}
           />
         )}
       </div>

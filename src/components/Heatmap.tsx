@@ -5,13 +5,12 @@ import { getFootballFieldSVG } from '../utils/footballField';
 
 interface HeatmapProps {
   events: MatchEventWithDetails[];
-  matchId: string;
   teamAName: string;
   teamBName: string;
   halftimes?: number[];
 }
 
-export default function Heatmap({ events, matchId, teamAName, teamBName, halftimes = [] }: HeatmapProps) {
+export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }: HeatmapProps) {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
   const [filterHalf, setFilterHalf] = useState<'all' | '1' | '2'>('all');
@@ -121,14 +120,6 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
 
   const maxHeat = Math.max(1, ...heatGrid.flat());
 
-  const getHeatColor = (val: number): string => {
-    if (val === 0) return 'transparent';
-    const intensity = val / maxHeat;
-    if (intensity < 0.25) return 'rgba(59, 130, 246, 0.25)';
-    if (intensity < 0.5) return 'rgba(34, 197, 94, 0.35)';
-    if (intensity < 0.75) return 'rgba(250, 204, 21, 0.45)';
-    return 'rgba(239, 68, 68, 0.55)';
-  };
 
   const hasFieldData = fieldEvents.length > 0;
   const hasGoalData = goalEvents.length > 0;
@@ -410,7 +401,7 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
                 >
                   {/* Grille 3x3 */}
                   <div className="absolute inset-0 grid grid-cols-3 grid-rows-3">
-                    {Array.from({ length: 9 }).map((_, i) => (
+                    {Array.from({ length: 9 }).map((_item, i) => (
                       <div key={i} className="border border-white/10" />
                     ))}
                   </div>

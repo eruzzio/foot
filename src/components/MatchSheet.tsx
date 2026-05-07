@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, LayoutGrid as Layout, AlertCircle, CheckCircle } from 'lucide-react';
+import { X, LayoutGrid as Layout } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Panel } from '../types/database';
 import { parseVEOUrl } from '../utils/veoParser';
@@ -51,7 +51,7 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
   const [panels, setPanels] = useState<Panel[]>([]);
   const [loadingPanels, setLoadingPanels] = useState(true);
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>([]);
-  const [videoUrlError, setVideoUrlError] = useState<string>('');
+  const [_videoUrlError, setVideoUrlError] = useState<string>('');
 
   useEffect(() => {
     if (isOpen) {
@@ -108,7 +108,7 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleVideoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const _handleVideoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const url = e.target.value.trim();
     setFormData(prev => ({ ...prev, videoUrl: url }));
 
