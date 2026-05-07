@@ -157,8 +157,8 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white  p-6">
-          <div className="text-gray-600">Chargement...</div>
+        <div style={{ background:"var(--orion-surface)", padding:24 }}>
+          <div className="text-gray-400">Chargement...</div>
         </div>
       </div>
     );
@@ -166,23 +166,23 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white  shadow-xl max-w-2xl w-full p-6 my-8 text-gray-900">
+      <div className="bg-white  shadow-xl max-w-2xl w-full p-6 my-8 text-white">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-2xl font-bold text-gray-800">
+          <h3 className="text-2xl font-bold text-white">
             {teamId ? "Paramètres de l'équipe" : "Créer une équipe"}
           </h3>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-gray-400" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Nom de l'équipe *
               </label>
               <input
@@ -190,40 +190,40 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: FC Marseille"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-300 mb-1">
                 Catégorie
               </label>
               <input
                 type="text"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: U13, U15, Senior, Féminine"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="Description de votre équipe..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Couleur de l'équipe
             </label>
             <div className="flex items-center gap-3">
@@ -231,7 +231,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 type="color"
                 value={formData.color}
                 onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                className="w-10 h-10  border border-gray-300 cursor-pointer p-0.5"
+                className="w-10 h-10  border border-gray-700 cursor-pointer p-0.5"
               />
               <div className="flex flex-wrap gap-2">
                 {['#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#3b82f6','#06b6d4','#ec4899','#ffffff','#6b7280'].map(c => (
@@ -252,7 +252,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Logo de l'équipe
             </label>
 
@@ -270,10 +270,10 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               <div>
                 <label
                   htmlFor="logo-upload"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300  hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-700  hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
                 >
-                  <Upload size={20} className="text-gray-600" />
-                  <span className="text-sm text-gray-700">
+                  <Upload size={20} className="text-gray-400" />
+                  <span className="text-sm text-gray-300">
                     {selectedFile ? selectedFile.name : 'Choisir un logo'}
                   </span>
                 </label>
@@ -291,7 +291,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-300"></div>
+                  <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
                   <span className="px-2 bg-white text-gray-500">ou</span>
@@ -307,7 +307,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                     setPreviewUrl(e.target.value);
                     setSelectedFile(null);
                   }}
-                  className="w-full px-3 py-2 border border-gray-300  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -322,7 +322,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               type="button"
               onClick={onClose}
               disabled={uploading}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700  hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-2 border border-gray-700 text-gray-300  hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Annuler
             </button>

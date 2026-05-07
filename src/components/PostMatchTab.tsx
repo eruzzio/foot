@@ -122,13 +122,13 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div style={{ background:"var(--orion-surface)", border:"1px solid var(--orion-line)" }}>
       <div className="space-y-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          <h3 style={{ fontSize:14, fontWeight:600, color:"var(--orion-text)", marginBottom:12 }}>
             Ajouter une vidéo VEO
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p style={{ fontSize:12, color:"var(--orion-text-mute)", marginBottom:12 }}>
             Collez le lien de votre vidéo VEO pour synchroniser les événements
             du match avec la vidéo. Vous pourrez ensuite partager les
             événements avec les timestamps correspondants.
@@ -136,7 +136,7 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
         </div>
 
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-300">
             Lien vidéo VEO
           </label>
           <div className="flex gap-2">
@@ -146,12 +146,12 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
               onChange={handleVideoUrlChange}
               placeholder="https://veo.co/shared-videos/..."
               disabled={isLoading}
-              className={`flex-1 px-4 py-2 border rounded-lg text-gray-900 focus:outline-none focus:ring-2 transition-colors ${
+              className={`flex-1 px-4 py-2 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${
                 videoUrlError
                   ? 'border-red-300 focus:ring-red-400'
                   : match.video_share_id && videoUrl
                     ? 'border-green-300 focus:ring-green-400'
-                    : 'border-gray-300 focus:ring-blue-400'
+                    : 'border-gray-700 focus:ring-blue-400'
               } disabled:bg-gray-50 disabled:cursor-not-allowed`}
             />
             <button
@@ -223,7 +223,7 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
 
             {match.events && match.events.length > 0 && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+                <h4 className="font-medium text-white mb-4 flex items-center gap-2">
                   <LinkIcon size={18} />
                   Liens VEO avec timestamps
                 </h4>
@@ -240,13 +240,13 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
                     return (
                       <div
                         key={event.id}
-                        className="flex items-center justify-between gap-3 p-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12, padding:"10px 12px", background:"var(--orion-surface-2)", border:"1px solid var(--orion-line)", cursor:"pointer" }}
                       >
                         <div className="flex-1 min-w-0">
-                          <div className="font-mono text-sm text-gray-600 mb-1">
+                          <div className="font-mono text-sm text-gray-400 mb-1">
                             {timeStr}
                           </div>
-                          <div className="text-sm text-gray-800 truncate">
+                          <div className="text-sm text-white truncate">
                             {event.event_type?.name || event.label || 'Événement'}
                           </div>
                           <div className="text-xs text-gray-500 truncate">
@@ -283,10 +283,10 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
         )}
 
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <h4 className="font-medium text-gray-900 mb-3">
+          <h4 className="font-medium text-white mb-3">
             Comment ça marche ?
           </h4>
-          <ol className="space-y-2 text-sm text-gray-700">
+          <ol className="space-y-2 text-sm text-gray-300">
             <li className="flex gap-3">
               <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
                 1

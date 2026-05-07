@@ -299,8 +299,8 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 text-gray-900">
-          <div className="text-gray-600">Chargement...</div>
+        <div style={{ background:"var(--orion-surface)", padding:24, color:"var(--orion-text)" }}>
+          <div className="text-gray-400">Chargement...</div>
         </div>
       </div>
     );
@@ -308,13 +308,13 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full my-8 text-gray-900">
+      <div style={{ background:"var(--orion-surface)", maxWidth:900, width:"100%", margin:"32px auto", color:"var(--orion-text)" }}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">
+            <h3 className="text-2xl font-bold text-white">
               Composition Tactique - Équipe {team}
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Gérez la formation spécifique pour ce match
             </p>
           </div>
@@ -322,7 +322,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
           >
-            <X size={24} className="text-gray-600" />
+            <X size={24} className="text-gray-400" />
           </button>
         </div>
 
@@ -334,13 +334,13 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
                   <Layout className="text-green-600" size={20} />
                   <h4 className="font-semibold text-green-800">Formation enregistrée</h4>
                 </div>
-                <p className="text-gray-700">
+                <p className="text-gray-300">
                   Formation actuelle: <span className="font-bold">{currentFormation.name}</span>
                 </p>
               </div>
 
               <div className="border border-gray-200 rounded-lg p-4">
-                <h4 className="font-semibold text-gray-800 mb-3">Visualisation</h4>
+                <h4 className="font-semibold text-white mb-3">Visualisation</h4>
                 <FieldVisualization
                   players={players}
                   positions={positions}
@@ -356,13 +356,13 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
                   <Users className="text-blue-600" size={20} />
                   <h4 className="font-semibold text-blue-800">Aucune formation enregistrée</h4>
                 </div>
-                <p className="text-gray-700 text-sm">
+                <p className="text-gray-300 text-sm">
                   Créez une nouvelle formation pour ce match ou copiez votre formation active.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nom de la formation
                 </label>
                 <input
@@ -370,7 +370,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
                   value={formationName}
                   onChange={(e) => setFormationName(e.target.value)}
                   placeholder="Ex: 4-3-3 vs PSG"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -388,7 +388,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
                   <select
                     value={selectedFormationType}
                     onChange={(e) => setSelectedFormationType(e.target.value as keyof typeof FORMATIONS)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     {Object.keys(FORMATIONS).map(key => (
                       <option key={key} value={key}>{key}</option>
@@ -411,7 +411,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
         <div className="flex gap-3 p-6 border-t border-gray-200">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             Fermer
           </button>
