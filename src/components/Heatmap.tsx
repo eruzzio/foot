@@ -52,21 +52,44 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
   }, [fieldEvents]);
 
   // Détail par zone : quels types dans chaque zone
+  // Mots-clés pertinents par zone
+  const ZONE_KEYWORDS = {
+    defensive: ['récup', 'recup', 'tacle', 'tackle', 'faute', 'foul', 'duel', 'perte', 'interception', 'dégagement', 'arrêt', 'gardien', 'défens'],
+    mediane:   ['passe', 'pass', 'relance', 'duel', 'faute', 'foul', 'récup', 'recup', 'perte', 'centre', 'transition', 'conduite'],
+    offensive: ['tir', 'shot', 'frappe', 'but', 'penalty', 'coup franc', 'centre', 'dribble', 'faute', 'occasion', 'tête'],
+  };
+
   const zoneDetail = useMemo(() => {
-    const detail = (evts: MatchEventWithDetails[]) => {
+    const detail = (evts: MatchEventWithDetails[], keywords?: string[]) => {
       const byType: Record<string, { count: number; color: string }> = {};
       evts.forEach(e => {
         const name = e.event_type?.name || e.label || 'Autre';
         const color = e.event_type?.color || '#9CA3AF';
+        // Filtrer par pertinence si keywords fournis
+        if (keywords) {
+          const nameLower = name.toLowerCase();
+          const isRelevant = keywords.some(k => nameLower.includes(k));
+          if (!isRelevant) return;
+        }
         if (!byType[name]) byType[name] = { count: 0, color };
         byType[name].count++;
       });
-      return Object.entries(byType).sort((a, b) => b[1].count - a[1].count).slice(0, 3);
+      const sorted = Object.entries(byType).sort((a, b) => b[1].count - a[1].count).slice(0, 3);
+      // Si aucun tag pertinent, afficher quand même les 3 premiers sans filtre
+      if (sorted.length === 0 && keywords) {
+        return Object.entries(byType).sort((a, b) => b[1].count - a[1].count).slice(0, 3);
+      }
+      return sorted;
     };
+
+    const defEvts = fieldEvents.filter(e => (e.field_x ?? 0) < 33);
+    const medEvts = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+    const offEvts = fieldEvents.filter(e => (e.field_x ?? 0) > 66);
+
     return {
-      defensive: detail(fieldEvents.filter(e => (e.field_x ?? 0) < 33)),
-      mediane: detail(fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66)),
-      offensive: detail(fieldEvents.filter(e => (e.field_x ?? 0) > 66)),
+      defensive: detail(defEvts, ZONE_KEYWORDS.defensive),
+      mediane:   detail(medEvts, ZONE_KEYWORDS.mediane),
+      offensive: detail(offEvts, ZONE_KEYWORDS.offensive),
     };
   }, [fieldEvents]);
 
