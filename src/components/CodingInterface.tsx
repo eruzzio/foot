@@ -191,9 +191,13 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   }, [matchId]);
 
   const initializeMatch = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { data, error } = await supabase
       .from('matches')
       .insert({
+        user_id: user.id,
         status: 'setup',
         match_time: 0,
         match_date: new Date().toISOString(),

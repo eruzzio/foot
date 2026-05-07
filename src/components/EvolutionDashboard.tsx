@@ -40,6 +40,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
       .from('matches')
       .select('*')
       .eq('status', 'completed')
+      .eq('user_id', user.id)
       .order('match_date', { ascending: true });
 
     if (matchesError || !matches) {

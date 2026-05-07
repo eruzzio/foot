@@ -21,9 +21,13 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
   }, []);
 
   const loadCompletedMatches = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setLoading(false); return; }
+
     const { data: matchesData, error: matchesError } = await supabase
       .from('matches')
       .select('*')
+      .eq('user_id', user.id)
       .eq('status', 'completed')
       .order('match_date', { ascending: false });
 
