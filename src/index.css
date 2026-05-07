@@ -64,6 +64,11 @@
   .live-layout-landscape { grid-template-columns: 1fr 280px !important; }
 }
 
+@keyframes undoProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
 button { touch-action: manipulation; }
 .select-none { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 button:active { transition: transform 0.05s ease; }

@@ -131,10 +131,11 @@ export default function MatchTimer({
           {/* Contrôles */}
           <div style={{ display:'flex', gap:6 }}>
             <button onClick={onToggle} className="o-btn o-btn--sm"
+              title={isRunning ? 'Pause (Espace)' : 'Démarrer (Espace)'}
               style={{ borderColor: isRunning ? 'var(--orion-red)' : 'var(--orion-accent)', color: isRunning ? 'var(--orion-red)' : 'var(--orion-accent)' }}>
               {isRunning ? <Pause size={16} /> : <Play size={16} />}
             </button>
-            <button onClick={onReset} className="o-btn o-btn--ghost o-btn--sm">
+            <button onClick={onReset} className="o-btn o-btn--ghost o-btn--sm" title="Réinitialiser">
               <RotateCcw size={14} />
             </button>
           </div>

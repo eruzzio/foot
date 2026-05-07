@@ -28,6 +28,11 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video' | 'tags'>('overview');
   const [showPdfConfig, setShowPdfConfig] = useState(false);
 
+  const handleTabChange = (tab: typeof activeTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     loadMatchData();
   }, [matchId]);
@@ -202,7 +207,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
 
         <div className="mb-6 flex gap-3 border-b border-gray-800">
           <button
-            onClick={() => setActiveTab('overview')}
+            onClick={() => handleTabChange('overview')}
             className={`px-6 py-3 font-medium transition-all relative ${
               activeTab === 'overview'
                 ? 'text-orange-primary'
@@ -215,7 +220,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('postmatch')}
+            onClick={() => handleTabChange('postmatch')}
             className={`px-6 py-3 font-medium transition-all relative ${
               activeTab === 'postmatch'
                 ? 'text-orange-primary'
@@ -228,7 +233,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('video')}
+            onClick={() => handleTabChange('video')}
             className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
               activeTab === 'video'
                 ? 'text-yellow-400'
@@ -245,7 +250,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('tags')}
+            onClick={() => handleTabChange('tags')}
             className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
               activeTab === 'tags'
                 ? 'text-orange-primary'

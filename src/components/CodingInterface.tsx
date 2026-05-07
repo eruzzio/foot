@@ -115,6 +115,31 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     initializeData();
   }, []);
 
+  // Raccourcis clavier
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setIsRunning(prev => !prev);
+      }
+      if (e.code === 'Escape') {
+        setShowFieldSelector(false);
+        setShowZoneSelector(false);
+        setShowEndMatchConfirm(false);
+        setShowHalftimeReport(false);
+        setIsMatchSheetOpen(false);
+      }
+      if (e.code === 'KeyZ' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        if (undoEvent) handleUndo();
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isRunning, undoEvent]);
+
   const [backupToRestore, setBackupToRestore] = useState<any>(null);
 
   const initializeData = async () => {
@@ -759,12 +784,18 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
             </button>
           )}
           <div style={{ width:'1px', background:'var(--orion-line)', alignSelf:'stretch' }} />
-          <div style={{ flex:1 }}>
+          <div style={{ flex:1, display:'flex', alignItems:'center', gap:10 }}>
             <span style={{ fontSize:11, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.18em', textTransform:'uppercase', color:'var(--orion-text-mute)' }}>
               Codage Live
             </span>
+            {isRunning && (
+              <span style={{ display:'flex', alignItems:'center', gap:5, fontSize:10, color:'var(--orion-red)', fontFamily:'var(--orion-font-mono)' }}>
+                <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--orion-red)', animation:'pulse 1s infinite' }} />
+                EN DIRECT
+              </span>
+            )}
             {championship && (
-              <span style={{ fontSize:11, color:'var(--orion-text-mute)', marginLeft:12 }}>· {championship}</span>
+              <span style={{ fontSize:11, color:'var(--orion-text-mute)' }}>· {championship}</span>
             )}
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
@@ -856,20 +887,19 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
             {/* Barre Undo */}
             {showUndoBar && undoEvent && (
-              <div className="bg-yellow-900/30 border border-yellow-700/50 rounded-lg px-4 py-3 flex items-center justify-between animate-pulse">
-                <div className="flex items-center gap-3">
-                  <span className="text-yellow-400 text-sm font-medium">
-                    {undoEvent.event_type?.name || undoEvent.label || 'Action'} enregistré
+              <div style={{ position:'relative', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', overflow:'hidden' }}>
+                {/* Barre de progression */}
+                <div style={{ position:'absolute', bottom:0, left:0, height:2, background:'var(--orion-amber)', animation:'undoProgress 8s linear forwards' }} />
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  <span style={{ fontSize:12, color:'var(--orion-amber)', fontWeight:500 }}>
+                    ✓ {undoEvent.event_type?.name || undoEvent.label || 'Action'} enregistré
                   </span>
-                  <span className="text-yellow-600 text-xs">
-                    {Math.floor(undoEvent.timestamp / 60).toString().padStart(2, '0')}:{(undoEvent.timestamp % 60).toString().padStart(2, '0')}
+                  <span className="o-num" style={{ fontSize:10, color:'var(--orion-text-mute)' }}>
+                    {Math.floor(undoEvent.timestamp / 60).toString().padStart(2,'0')}:{(undoEvent.timestamp % 60).toString().padStart(2,'0')}
                   </span>
                 </div>
-                <button
-                  onClick={handleUndo}
-                  className="flex items-center gap-2 px-4 py-1.5 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-sm font-semibold transition-colors"
-                >
-                  Annuler
+                <button onClick={handleUndo} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-amber)', color:'var(--orion-amber)', fontSize:11 }}>
+                  ↩ Annuler (Ctrl+Z)
                 </button>
               </div>
             )}

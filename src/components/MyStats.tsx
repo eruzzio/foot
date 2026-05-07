@@ -71,8 +71,22 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark flex items-center justify-center">
-        <div className="text-gray-400">Chargement...</div>
+      <div style={{ minHeight:'100vh', background:'var(--orion-bg)' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1px solid var(--orion-line)' }}>
+          <div style={{ width:80, height:14, background:'var(--orion-surface-2)', borderRadius:3 }} />
+        </div>
+        <div style={{ maxWidth:800, margin:'0 auto', padding:'32px 24px' }}>
+          {[1,2,3,4].map(i => (
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:16, padding:'16px 0', borderBottom:'1px solid var(--orion-line)', opacity: 1 - i * 0.15 }}>
+              <div style={{ width:44, height:44, background:'var(--orion-surface-2)', flexShrink:0 }} />
+              <div style={{ flex:1, display:'flex', flexDirection:'column', gap:8 }}>
+                <div style={{ width:'55%', height:12, background:'var(--orion-surface-2)', borderRadius:2 }} />
+                <div style={{ width:'30%', height:9, background:'var(--orion-surface-2)', borderRadius:2 }} />
+              </div>
+              <div style={{ width:50, height:12, background:'var(--orion-surface-2)', borderRadius:2 }} />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

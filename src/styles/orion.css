@@ -265,3 +265,8 @@
 .orion ::-webkit-scrollbar { width: 8px; height: 8px; }
 .orion ::-webkit-scrollbar-thumb { background: var(--orion-surface-3); }
 .orion ::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
