@@ -316,15 +316,16 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     setIsRunning(false);
   };
 
+  const [showEndMatchConfirm, setShowEndMatchConfirm] = useState(false);
+
   const handleEndMatch = async () => {
     if (!matchId) return;
+    setShowEndMatchConfirm(true);
+  };
 
-    const confirmEnd = window.confirm(
-      'Voulez-vous terminer ce match ? Il sera enregistré dans vos statistiques.'
-    );
-
-    if (!confirmEnd) return;
-
+  const confirmEndMatch = async () => {
+    if (!matchId) return;
+    setShowEndMatchConfirm(false);
     setIsRunning(false);
 
     await supabase
@@ -337,12 +338,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       })
       .eq('id', matchId);
 
-    // Nettoyer le backup local
     localStorage.removeItem(`orion_backup_${matchId}`);
-
-    if (onBack) {
-      onBack();
-    }
+    if (onBack) onBack();
   };
 
   const handlePanelChange = (panelId: string) => {
@@ -991,6 +988,33 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           onSkip={handleSkipFieldSelector}
           eventName={fieldSelectorEventName}
         />
+      )}
+
+      {/* Modal confirmation fin de match */}
+      {showEndMatchConfirm && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.85)', backdropFilter:'blur(4px)', display:'grid', placeItems:'center', zIndex:200 }}>
+          <div style={{ width:'min(380px, 92vw)', background:'var(--orion-surface)', border:'1px solid var(--orion-line-strong)', padding:'28px 24px' }}>
+            <div style={{ fontSize:14, fontWeight:600, color:'var(--orion-text)', marginBottom:8 }}>Terminer le match ?</div>
+            <div style={{ fontSize:12, color:'var(--orion-text-mute)', marginBottom:24 }}>
+              Le match sera enregistré dans vos statistiques avec le score actuel&nbsp;
+              <span style={{ color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>
+                {teamAScore} – {teamBScore}
+              </span>
+              &nbsp;et la durée&nbsp;
+              <span style={{ color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>
+                {Math.floor(currentTime / 60)}'
+              </span>.
+            </div>
+            <div style={{ display:'flex', gap:10 }}>
+              <button onClick={() => setShowEndMatchConfirm(false)} className="o-btn o-btn--ghost" style={{ flex:1, justifyContent:'center' }}>
+                Annuler
+              </button>
+              <button onClick={confirmEndMatch} className="o-btn" style={{ flex:1, justifyContent:'center', borderColor:'var(--orion-red)', color:'var(--orion-red)' }}>
+                Terminer
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {showHalftimeReport && (

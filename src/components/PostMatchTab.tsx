@@ -73,12 +73,14 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
     setIsLoading(false);
   };
 
-  const handleRemoveVideo = async () => {
-    const confirmRemove = window.confirm(
-      'Êtes-vous sûr de vouloir supprimer le lien vidéo ?'
-    );
-    if (!confirmRemove) return;
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
 
+  const handleRemoveVideo = async () => {
+    setShowRemoveConfirm(true);
+  };
+
+  const confirmRemoveVideo = async () => {
+    setShowRemoveConfirm(false);
     setIsLoading(true);
 
     const { error } = await supabase
@@ -317,6 +319,19 @@ export default function PostMatchTab({ match, onMatchUpdate }: PostMatchTabProps
           </ol>
         </div>
       </div>
+
+      {showRemoveConfirm && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.85)', backdropFilter:'blur(4px)', display:'grid', placeItems:'center', zIndex:200 }}>
+          <div style={{ width:'min(340px, 92vw)', background:'var(--orion-surface)', border:'1px solid var(--orion-line-strong)', padding:'24px' }}>
+            <div style={{ fontSize:13, fontWeight:600, color:'var(--orion-text)', marginBottom:8 }}>Supprimer le lien vidéo ?</div>
+            <div style={{ fontSize:12, color:'var(--orion-text-mute)', marginBottom:20 }}>Cette action est irréversible.</div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setShowRemoveConfirm(false)} className="o-btn o-btn--ghost" style={{ flex:1, justifyContent:'center' }}>Annuler</button>
+              <button onClick={confirmRemoveVideo} className="o-btn" style={{ flex:1, justifyContent:'center', borderColor:'var(--orion-red)', color:'var(--orion-red)' }}>Supprimer</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
