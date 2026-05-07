@@ -230,6 +230,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [loadingTeams, setLoadingTeams] = useState(true);
+  const [error, setError] = useState('');
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [formation, setFormation] = useState<Formation | null>(null);
@@ -379,7 +380,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
   const handleExportTeamPdf = () => {
     if (!selectedTeam) {
-      alert('Aucune équipe sélectionnée');
+      setError('Aucune équipe sélectionnée');
       return;
     }
     try {
@@ -397,7 +398,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
         })),
       });
     } catch (err: any) {
-      alert('Erreur export PDF: ' + (err?.message || err));
+      setError('Erreur export PDF: ' + (err?.message || err));
     }
   };
 

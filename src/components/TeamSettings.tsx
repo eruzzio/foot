@@ -23,6 +23,7 @@ interface TeamSettingsProps {
 }
 
 export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: TeamSettingsProps) {
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     category: '',
@@ -81,7 +82,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('Le fichier est trop volumineux (max 5MB)');
+        setError('Le fichier est trop volumineux (max 5MB)');
         return;
       }
       setSelectedFile(file);
@@ -148,7 +149,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
       onClose();
     } catch (error) {
       console.error('Error saving team:', error);
-      alert('Erreur lors de la sauvegarde');
+      setError('Erreur lors de la sauvegarde');
     } finally {
       setUploading(false);
     }
@@ -166,7 +167,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white  shadow-xl max-w-2xl w-full p-6 my-8 text-white">
+      <div style={{ background:"var(--orion-surface)", border:"1px solid var(--orion-line)", maxWidth:640, width:"100%", padding:24, margin:"32px auto" }}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-white">
             {teamId ? "Paramètres de l'équipe" : "Créer une équipe"}
@@ -294,7 +295,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="px-2 bg-white text-gray-500">ou</span>
+                  <span style={{ padding:"0 8px", background:"var(--orion-bg)", color:"var(--orion-text-mute)", fontSize:11 }}>ou</span>
                 </div>
               </div>
 

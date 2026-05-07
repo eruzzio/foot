@@ -151,7 +151,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
         .single();
 
       if (!activeFormation) {
-        alert('Aucune formation active trouvée');
+        
         return;
       }
 
@@ -201,10 +201,10 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
       if (matchFormError) throw matchFormError;
 
       await loadData();
-      alert('Formation copiée et enregistrée pour ce match!');
+      
     } catch (error) {
       console.error('Error creating formation:', error);
-      alert('Erreur lors de la création de la formation');
+      
     } finally {
       setSaving(false);
     }
@@ -255,10 +255,10 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
       if (matchFormError) throw matchFormError;
 
       await loadData();
-      alert('Nouvelle formation créée pour ce match!');
+      
     } catch (error) {
       console.error('Error creating formation:', error);
-      alert('Erreur lors de la création de la formation');
+      
     } finally {
       setSaving(false);
     }

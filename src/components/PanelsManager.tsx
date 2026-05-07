@@ -230,7 +230,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
       await loadPanels();
       setView('list');
     } else {
-      alert('Erreur lors de la suppression du panneau');
+      setError('Erreur lors de la suppression du panneau');
     }
   };
 
