@@ -374,6 +374,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     }
     if (onBack) onBack();
   };
+
+  const confirmEndMatch = async () => {
     if (!matchId) return;
     setShowEndMatchConfirm(false);
     setIsRunning(false);
