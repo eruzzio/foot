@@ -45,9 +45,12 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
 
   // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
   const zoneEvents = useMemo(() => {
-    const offensive = fieldEvents.filter(e => (e.field_x ?? 0) > 66);
-    const mediane = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
-    const defensive = fieldEvents.filter(e => (e.field_x ?? 0) < 33);
+    // L'équipe A joue de gauche → droite (offensive = x élevé)
+    // L'équipe B joue de droite → gauche (offensive = x faible)
+    const isTeamB = filterTeam === 'B';
+    const offensive = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
+    const mediane   = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+    const defensive = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
     return { offensive, mediane, defensive };
   }, [fieldEvents]);
 
@@ -82,9 +85,10 @@ export default function Heatmap({ events, matchId, teamAName, teamBName, halftim
       return sorted;
     };
 
-    const defEvts = fieldEvents.filter(e => (e.field_x ?? 0) < 33);
+    const isTeamB = filterTeam === 'B';
+    const defEvts = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
     const medEvts = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
-    const offEvts = fieldEvents.filter(e => (e.field_x ?? 0) > 66);
+    const offEvts = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
 
     return {
       defensive: detail(defEvts, ZONE_KEYWORDS.defensive),
