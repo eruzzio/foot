@@ -515,14 +515,16 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   };
 
   const handleZoneSelectorSelected = async (zone: string, x: number, y: number) => {
+    // Pour l'équipe B (droite→gauche), inverser x pour que la zone défensive soit bien à droite
+    const adjustedX = selectedTeam === 'B' ? 100 - x : x;
     if (fieldSelectorEventId) {
       await supabase
         .from('match_events')
-        .update({ field_x: x, field_y: y, label: zone })
+        .update({ field_x: adjustedX, field_y: y, label: zone })
         .eq('id', fieldSelectorEventId);
 
       setEvents(prev =>
-        prev.map(e => e.id === fieldSelectorEventId ? { ...e, field_x: x, field_y: y } : e)
+        prev.map(e => e.id === fieldSelectorEventId ? { ...e, field_x: adjustedX, field_y: y } : e)
       );
     }
     setShowZoneSelector(false);
