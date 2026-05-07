@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Upload, User } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { uploadPlayerPhoto } from '../utils/uploadImage';
+import { uploadPlayerPhoto, validateImageFile } from '../utils/uploadImage';
 
 interface Player {
   id?: string;
@@ -56,9 +56,17 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
     }
   }, [player]);
 
+  const [uploadError, setUploadError] = useState('');
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { setSelectedFile(file); setPreviewUrl(URL.createObjectURL(file)); setFormData(f => ({ ...f, photo_url: '' })); }
+    if (!file) return;
+    const validation = validateImageFile(file);
+    if (!validation.valid) { setUploadError(validation.error || 'Fichier invalide'); e.target.value = ''; return; }
+    setUploadError('');
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setFormData(f => ({ ...f, photo_url: '' }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,6 +120,11 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
               <input id="photo-upload" type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
             </div>
             <div className="flex-1 space-y-2">
+              {uploadError && (
+                <div style={{ fontSize:11, color:'var(--orion-red)', padding:'4px 8px', background:'rgba(255,80,80,0.08)', borderLeft:'2px solid var(--orion-red)' }}>
+                  {uploadError}
+                </div>
+              )}
               <div className="flex gap-2">
                 <input type="text" required value={formData.first_name} onChange={e => setFormData(f => ({ ...f, first_name: e.target.value }))} placeholder="Prénom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 <input type="text" required value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} placeholder="Nom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />

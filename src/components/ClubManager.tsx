@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Building2, Plus, Copy, Check, Upload, X, LogIn, Clock, CheckCircle, XCircle, Bell, Users } from 'lucide-react';
+import { validateImageFile } from '../utils/uploadImage';
 import { supabase } from '../lib/supabase';
 
 interface Club {
@@ -107,9 +108,16 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
     }
   };
 
+  const [uploadError, setUploadError] = useState('');
+
   const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { setLogoFile(file); setLogoPreview(URL.createObjectURL(file)); }
+    if (!file) return;
+    const v = validateImageFile(file);
+    if (!v.valid) { setUploadError(v.error || 'Fichier invalide'); e.target.value = ''; return; }
+    setUploadError('');
+    setLogoFile(file);
+    setLogoPreview(URL.createObjectURL(file));
   };
 
   const uploadLogo = async (uid: string): Promise<string | null> => {

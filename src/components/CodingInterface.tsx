@@ -115,6 +115,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     initializeData();
   }, []);
 
+  const [backupToRestore, setBackupToRestore] = useState<any>(null);
+
   const initializeData = async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
@@ -124,6 +126,19 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     await loadAllPanels();
     setIsMatchSheetOpen(true);
   };
+
+  // Vérifier si un backup existe après la création du match
+  useEffect(() => {
+    if (!matchId) return;
+    // Chercher un backup pour ce match
+    const raw = localStorage.getItem(`orion_backup_${matchId}`);
+    if (raw) {
+      try {
+        const backup = JSON.parse(raw);
+        if (backup.events?.length > 0) setBackupToRestore(backup);
+      } catch {}
+    }
+  }, [matchId]);
 
   useEffect(() => {
     if (matchId) {
@@ -988,6 +1003,35 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           onSkip={handleSkipFieldSelector}
           eventName={fieldSelectorEventName}
         />
+      )}
+
+      {/* Banner restauration backup */}
+      {backupToRestore && (
+        <div style={{ padding:'10px 24px', background:'rgba(245,158,11,0.12)', borderBottom:'1px solid rgba(245,158,11,0.3)', display:'flex', alignItems:'center', gap:12 }}>
+          <span style={{ fontSize:12, color:'var(--orion-amber)', flex:1 }}>
+            ⚡ Backup trouvé — {backupToRestore.events.length} actions du {new Date(backupToRestore.savedAt).toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })}
+          </span>
+          <button
+            onClick={() => {
+              setEvents(backupToRestore.events);
+              setCurrentTime(backupToRestore.currentTime || 0);
+              setTeamAScore(backupToRestore.teamAScore || 0);
+              setTeamBScore(backupToRestore.teamBScore || 0);
+              setBackupToRestore(null);
+            }}
+            className="o-btn o-btn--sm"
+            style={{ borderColor:'var(--orion-amber)', color:'var(--orion-amber)', fontSize:11 }}
+          >
+            Restaurer
+          </button>
+          <button
+            onClick={() => { localStorage.removeItem(`orion_backup_${matchId}`); setBackupToRestore(null); }}
+            className="o-btn o-btn--ghost o-btn--sm"
+            style={{ fontSize:11 }}
+          >
+            Ignorer
+          </button>
+        </div>
       )}
 
       {/* Modal confirmation fin de match */}

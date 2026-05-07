@@ -3,6 +3,7 @@ import { ArrowLeft, User, Mail, Lock, Shield, Save, Check, Eye, EyeOff, AlertCir
 import { supabase } from '../lib/supabase';
 import ClubManager from './ClubManager';
 import { useT } from '../i18n/I18nContext';
+import { validateImageFile } from '../utils/uploadImage';
 
 interface ProfilePageProps {
   onBack: () => void;
@@ -69,9 +70,16 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
     setLoading(false);
   };
 
+  const [avatarUploadError, setAvatarUploadError] = useState('');
+
   const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) { setAvatarFile(file); setAvatarPreview(URL.createObjectURL(file)); }
+    if (!file) return;
+    const v = validateImageFile(file);
+    if (!v.valid) { setAvatarUploadError(v.error || 'Fichier invalide'); e.target.value = ''; return; }
+    setAvatarUploadError('');
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
   };
 
   const uploadAvatar = async (userId: string): Promise<string | null> => {
