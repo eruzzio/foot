@@ -74,7 +74,7 @@ export default function HalftimeReport({
       <div className="flex items-center gap-2">
         <span className="text-sm font-bold text-white w-6 text-right">{a}</span>
         <div className="flex-1">
-          <div className="text-[10px] text-gray-400 text-center mb-0.5">{label}</div>
+          <div className="text-[10px] text-white/50 text-center mb-0.5">{label}</div>
           <div className="flex h-2 rounded-full overflow-hidden bg-gray-800">
             <div className="h-full rounded-l-full transition-all" style={{ width: `${(a / total) * 100}%`, backgroundColor: teamAColor }} />
             <div className="h-full rounded-r-full transition-all" style={{ width: `${(b / total) * 100}%`, backgroundColor: teamBColor }} />
@@ -95,11 +95,11 @@ export default function HalftimeReport({
             <div className="w-2 h-6 bg-orange-primary rounded-full" />
             <div>
               <h2 className="text-base font-bold text-white">Rapport Mi-Temps</h2>
-              <p className="text-xs text-gray-400">{formatTime(currentTime)} · {events.length} actions codées</p>
+              <p className="text-xs text-white/50">{formatTime(currentTime)} · {events.length} actions codées</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-dark-tertiary  transition-colors">
-            <X size={18} className="text-gray-400" />
+            <X size={18} className="text-white/50" />
           </button>
         </div>
 
@@ -110,17 +110,17 @@ export default function HalftimeReport({
             <div className="grid grid-cols-3 items-center gap-3">
               <div className="text-center">
                 <div className="text-3xl font-black" style={{ color: teamAColor }}>{teamAScore}</div>
-                <div className="text-xs font-semibold text-gray-300 mt-1 truncate">{teamAName}</div>
-                <div className="text-[10px] text-gray-500">{teamAEvents.length} actions</div>
+                <div className="text-xs font-semibold text-white/80 mt-1 truncate">{teamAName}</div>
+                <div className="text-[10px] text-white/50">{teamAEvents.length} actions</div>
               </div>
               <div className="text-center">
-                <div className="text-lg text-gray-500 font-bold">—</div>
-                <div className="text-[10px] text-gray-600 mt-1">MI-TEMPS</div>
+                <div className="text-lg text-white/50 font-bold">—</div>
+                <div className="text-[10px] text-white/50 mt-1">MI-TEMPS</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-black" style={{ color: teamBColor }}>{teamBScore}</div>
-                <div className="text-xs font-semibold text-gray-300 mt-1 truncate">{teamBName}</div>
-                <div className="text-[10px] text-gray-500">{teamBEvents.length} actions</div>
+                <div className="text-xs font-semibold text-white/80 mt-1 truncate">{teamBName}</div>
+                <div className="text-[10px] text-white/50">{teamBEvents.length} actions</div>
               </div>
             </div>
           </div>
@@ -130,23 +130,23 @@ export default function HalftimeReport({
             <div className="bg-dark-tertiary  p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Target size={14} className="text-orange-primary" />
-                <span className="text-xs font-bold text-gray-300 uppercase tracking-wider">Expected Goals</span>
+                <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Expected Goals</span>
               </div>
               <div className="grid grid-cols-3 items-center gap-3">
                 <div className="text-center">
                   <div className="text-2xl font-black" style={{ color: teamAColor }}>{xgA.toFixed(2)}</div>
-                  <div className="text-[10px] text-gray-500">{shotsA} tir{shotsA > 1 ? 's' : ''}</div>
+                  <div className="text-[10px] text-white/50">{shotsA} tir{shotsA > 1 ? 's' : ''}</div>
                 </div>
                 <div>
                   <div className="flex h-2 rounded-full overflow-hidden bg-gray-800">
                     <div className="h-full" style={{ width: `${(xgA / (xgA + xgB)) * 100}%`, backgroundColor: teamAColor }} />
                     <div className="h-full flex-1" style={{ backgroundColor: teamBColor }} />
                   </div>
-                  <div className="text-center text-[9px] text-gray-600 mt-1">xG</div>
+                  <div className="text-center text-[9px] text-white/50 mt-1">xG</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-black" style={{ color: teamBColor }}>{xgB.toFixed(2)}</div>
-                  <div className="text-[10px] text-gray-500">{shotsB} tir{shotsB > 1 ? 's' : ''}</div>
+                  <div className="text-[10px] text-white/50">{shotsB} tir{shotsB > 1 ? 's' : ''}</div>
                 </div>
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function HalftimeReport({
 
           {/* Stats comparatives */}
           <div className="bg-dark-tertiary  p-4">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Comparatif</div>
+            <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">Comparatif</div>
             <div className="space-y-2.5">
               <StatBar a={teamAEvents.length} b={teamBEvents.length} label="Total actions" color={teamAColor} />
               {sortedTypes.map(t => (
@@ -166,7 +166,7 @@ export default function HalftimeReport({
           {/* Zones si données disponibles */}
           {fieldEvents.length > 0 && (
             <div className="bg-dark-tertiary  p-4">
-              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Répartition par zone</div>
+              <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">Répartition par zone</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 {[
                   { label: 'Défensif', aVal: zoneA.def, bVal: zoneB.def, color: '#3B82F6' },
@@ -177,13 +177,13 @@ export default function HalftimeReport({
                     <div className="text-[10px] font-semibold mb-1" style={{ color: z.color }}>{z.label}</div>
                     <div className="flex justify-around">
                       <span className="text-sm font-bold" style={{ color: teamAColor }}>{z.aVal}</span>
-                      <span className="text-gray-600">|</span>
+                      <span className="text-white/50">|</span>
                       <span className="text-sm font-bold" style={{ color: teamBColor }}>{z.bVal}</span>
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between text-[9px] text-gray-600 mt-1 px-1">
+              <div className="flex justify-between text-[9px] text-white/50 mt-1 px-1">
                 <span>{teamAName}</span>
                 <span>{teamBName}</span>
               </div>
