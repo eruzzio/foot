@@ -6,12 +6,13 @@ import MatchReport from './MatchReport';
 
 interface MyStatsProps {
   onBack: () => void;
+  initialMatchId?: string | null;
 }
 
-export default function MyStats({ onBack }: MyStatsProps) {
+export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(initialMatchId || null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 

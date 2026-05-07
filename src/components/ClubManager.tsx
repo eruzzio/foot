@@ -96,18 +96,14 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
       .order('requested_at', { ascending: false });
 
     if (data) {
-      // Enrichir avec les métadonnées utilisateur
-      const enriched = await Promise.all(data.map(async (m) => {
-        const { data: userData } = await supabase.auth.admin?.getUserById?.(m.user_id).catch(() => ({ data: null })) || { data: null };
-        return {
-          ...m,
-          email: userData?.user?.email || m.user_id.slice(0, 8) + '...',
-          first_name: userData?.user?.user_metadata?.first_name || '',
-          last_name: userData?.user?.user_metadata?.last_name || '',
-        };
+      const enriched = data.map(m => ({
+        ...m,
+        email: m.email || `Utilisateur ${m.user_id.slice(0, 6)}`,
+        first_name: m.first_name || '',
+        last_name: m.last_name || '',
       }));
-      setPendingMembers(enriched.filter(m => m.status === 'pending'));
-      setApprovedMembers(enriched.filter(m => m.status === 'approved'));
+      setPendingMembers(enriched.filter((m: any) => m.status === 'pending'));
+      setApprovedMembers(enriched.filter((m: any) => m.status === 'approved'));
     }
   };
 
@@ -161,17 +157,25 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
       const { data: clubData } = await supabase.from('clubs').select('*').eq('join_code', joinCode.trim().toUpperCase()).single();
       if (!clubData) { setError('Code invalide — club introuvable'); setSaving(false); return; }
 
-      // Insérer une demande en statut "pending"
-      const { error } = await supabase.from('club_members').insert({
-        club_id: clubData.id, user_id: userId, status: 'pending',
-      });
-      if (error && error.code !== '23505') throw error; // ignorer doublon
+      // Récupérer le profil utilisateur
+      const { data: { user } } = await supabase.auth.getUser();
+      const meta = user?.user_metadata || {};
 
-      // Sauvegarder le club en attente
+      // Insérer une demande en statut "pending" avec les infos de profil
+      const { error } = await supabase.from('club_members').insert({
+        club_id: clubData.id,
+        user_id: userId,
+        status: 'pending',
+        first_name: meta.first_name || null,
+        last_name: meta.last_name || null,
+        email: user?.email || null,
+      });
+      if (error && error.code !== '23505') throw error;
+
       await supabase.auth.updateUser({ data: { club_id: clubData.id, club_name: clubData.name, club_logo: clubData.logo_url } });
       setClub(clubData);
       setMyMembership({ id: '', user_id: userId, status: 'pending', requested_at: new Date().toISOString() });
-      onClubSelected(null); // pas encore approuvé
+      onClubSelected(null);
       setMode('view');
     } catch (err: any) { setError(err.message || 'Erreur'); }
     setSaving(false);

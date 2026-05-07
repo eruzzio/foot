@@ -329,8 +329,16 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
     await supabase
       .from('matches')
-      .update({ status: 'completed' })
+      .update({
+        status: 'completed',
+        match_time: currentTime,
+        team_a_score: teamAScore,
+        team_b_score: teamBScore,
+      })
       .eq('id', matchId);
+
+    // Nettoyer le backup local
+    localStorage.removeItem(`orion_backup_${matchId}`);
 
     if (onBack) {
       onBack();
