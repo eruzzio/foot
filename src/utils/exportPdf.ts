@@ -19,6 +19,11 @@ interface PdfExportData {
   };
   sections?: Record<string, boolean>;
   teamFilter?: 'A' | 'B' | 'both';
+  heatmapFilters?: {
+    field: string[] | null;
+    zones: string[] | null;
+    goal: string[] | null;
+  };
 }
 
 function formatTime(seconds: number): string {
@@ -33,8 +38,26 @@ export function exportToPdf(data: PdfExportData): void {
   const s = data.sections || {};
   const show = (id: string) => !data.sections || s[id] !== false;
   const teamFilter = data.teamFilter || 'both';
+  const hf = data.heatmapFilters;
+
+  // Helpers filtrage heatmap par type
+  const filterByType = (evts: MatchEventWithDetails[], types: string[] | null) => {
+    if (!types || types.length === 0) return evts;
+    return evts.filter(e => {
+      const name = e.event_type?.name || e.label || 'Autre';
+      return types.includes(name);
+    });
+  };
+
   const teamAEvents = data.events.filter(e => e.team === 'A');
   const teamBEvents = data.events.filter(e => e.team === 'B');
+
+  // Événements filtrés pour chaque heatmap
+  const fieldEventsRaw = data.events.filter(e => e.field_x !== null && e.field_y !== null);
+  const fieldEventsFiltered = filterByType(fieldEventsRaw, hf?.field || null);
+  const zonesEventsFiltered = filterByType(fieldEventsRaw, hf?.zones || null);
+  const goalEventsRaw = data.events.filter(e => e.goal_x !== null && e.goal_y !== null);
+  const goalEventsFiltered = filterByType(goalEventsRaw, hf?.goal || null);
 
   // xG
   const xgA = calculateTeamXG(data.events, 'A');
@@ -74,16 +97,17 @@ export function exportToPdf(data: PdfExportData): void {
   });
 
   // Heatmap terrain
-  const fieldEvents = data.events.filter(e => e.field_x !== null && e.field_y !== null);
-  const fieldPts = fieldEvents.map(e => {
+  const fieldEvents = fieldEventsFiltered;
+  const fieldPts = fieldEventsFiltered.map(e => {
     const c = e.event_type?.color || '#f97316';
     return `<circle cx="${(e.field_x! / 100) * 660 + 10}" cy="${(e.field_y! / 100) * 420 + 10}" r="6" fill="${c}" stroke="white" stroke-width="1.5" opacity="0.85"/>`;
   }).join('');
 
   // Zones
-  const zO = fieldEvents.filter(e => (e.field_y ?? 0) < 33).length;
-  const zM = fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66).length;
-  const zD = fieldEvents.filter(e => (e.field_y ?? 0) > 66).length;
+  const zoneEvents = zonesEventsFiltered;
+  const zO = zoneEvents.filter(e => (e.field_x ?? 0) > 66).length;
+  const zM = zoneEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66).length;
+  const zD = zoneEvents.filter(e => (e.field_x ?? 0) < 33).length;
   const zT = zO + zM + zD || 1;
 
   // Détail par zone : quels types d'événements dans chaque zone
@@ -95,13 +119,13 @@ export function exportToPdf(data: PdfExportData): void {
     });
     return Object.entries(byType).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `${n} ${c}`).join(' | ');
   };
-  const zoneOffDetail = zoneDetailFn(fieldEvents.filter(e => (e.field_y ?? 0) < 33));
-  const zoneMedDetail = zoneDetailFn(fieldEvents.filter(e => (e.field_y ?? 0) >= 33 && (e.field_y ?? 0) <= 66));
-  const zoneDefDetail = zoneDetailFn(fieldEvents.filter(e => (e.field_y ?? 0) > 66));
+  const zoneOffDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) > 66));
+  const zoneMedDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66));
+  const zoneDefDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) < 33));
 
   // But
-  const goalEvents = data.events.filter(e => e.goal_x !== null && e.goal_y !== null);
-  const goalPts = goalEvents.map(e => {
+  const goalEvents = goalEventsFiltered;
+  const goalPts = goalEventsFiltered.map(e => {
     const c = e.outcome === 'success' ? '#22c55e' : e.outcome === 'failure' ? '#ef4444' : '#facc15';
     return `<circle cx="${(e.goal_x! / 100) * 280 + 10}" cy="${(e.goal_y! / 100) * 90 + 5}" r="7" fill="${c}" stroke="white" stroke-width="2" opacity="0.9"/>`;
   }).join('');
