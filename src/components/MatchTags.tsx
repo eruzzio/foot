@@ -23,8 +23,14 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const [saveError, setSaveError] = useState('');
+
   const handleSave = async () => {
     setSaving(true);
+    setSaveError('');
+
+    const { data: { user } } = await supabase.auth.getUser();
+
     const { error } = await supabase
       .from('matches')
       .update({
@@ -35,12 +41,15 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
         tag_weather: tags.tag_weather || null,
         tag_notes: tags.tag_notes || null,
       })
-      .eq('id', matchId || '');
+      .eq('id', matchId || '')
+      .eq('user_id', user?.id || '');
 
     if (!error) {
       onUpdate(tags as any);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
+    } else {
+      setSaveError('Erreur : ' + error.message);
     }
     setSaving(false);
   };
@@ -80,6 +89,12 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
           {saved ? <><Check size={14} /> Sauvegardé</> : <><Save size={14} /> {saving ? 'Sauvegarde...' : 'Sauvegarder'}</>}
         </button>
       </div>
+
+      {saveError && (
+        <div style={{ padding:'8px 12px', background:'rgba(231,76,60,0.1)', border:'1px solid rgba(231,76,60,0.3)', borderRadius:4, fontSize:12, color:'var(--orion-red)' }}>
+          {saveError}
+        </div>
+      )}
 
       {/* Compétition */}
       <div>
