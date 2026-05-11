@@ -598,13 +598,6 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 <Plus size={18} />
                 Nouveau panneau
               </button>
-              <button
-                onClick={handleCreateProPanel}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white  transition-colors font-medium shadow"
-              >
-                <Plus size={18} />
-                Football Pro
-              </button>
             </div>
 
             <div className="space-y-3">
