@@ -50,6 +50,7 @@ export default function ActionButtons({
   const [activePage, setActivePage] = useState(1);
   const [flashingButton, setFlashingButton] = useState<string | null>(null);
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
+  const [activeSubTeam, setActiveSubTeam] = useState<'A' | 'B' | null>(null);
   const subPanelRef = useRef<HTMLDivElement>(null);
 
   const rootButtons = panelButtons.filter((b) => !b.parent_button_id && (!b.team_association || b.team_association === selectedTeam));
@@ -82,6 +83,7 @@ export default function ActionButtons({
       flash(btn.id);
       const subs = panelButtons.filter((b) => b.parent_button_id === btn.id && (!b.team_association || b.team_association === selectedTeam));
       setActiveParentId(subs.length > 0 ? btn.id : null);
+      setActiveSubTeam(subs.length > 0 ? selectedTeam : null);
       onActionClick(btn.event_type ?? null, undefined, 'event', btn.label, btn.id, btn.label);
     },
     [onActionClick, panelButtons, flash, selectedTeam]
@@ -400,8 +402,8 @@ export default function ActionButtons({
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: teamColor }}>{team}</span>
           </div>
 
-          {/* Sous-boutons actifs si applicable */}
-          {activeParentId && teamActiveSubs.length > 0 && (
+          {/* Sous-boutons actifs uniquement pour l'équipe qui a cliqué */}
+          {activeParentId && activeSubTeam === team && teamActiveSubs.length > 0 && (
             <div className="px-2 pt-2">
               <div className="flex flex-wrap gap-1.5 mb-2">
                 {teamActiveSubs.map(sub => {
@@ -441,8 +443,10 @@ export default function ActionButtons({
                     onSelectTeam?.(team);
                     if (hasSubs) {
                       setActiveParentId(isActive ? null : btn.id);
+                      setActiveSubTeam(isActive ? null : team);
                     } else {
                       setActiveParentId(null);
+                      setActiveSubTeam(null);
                     }
                     if (btn.button_type === 'event') {
                       onActionClick(btn.event_type ?? null, undefined, 'event', undefined, btn.id, btn.label);
