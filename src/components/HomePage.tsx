@@ -155,82 +155,54 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               </div>
             </div>
 
-            {/* GRAPHIQUE */}
+            {/* MATCHS CARDS */}
             <div className="o-card" style={{ marginTop:2 }}>
               <div className="o-card__header">
-                <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                  <span className="o-eyebrow">Évolution</span>
-                  <span style={{ fontSize:13, fontWeight:600, color:'var(--orion-text-dim)' }}>{matches.length} matchs</span>
-                </div>
-                <div style={{ display:'flex', gap:20 }}>
-                  {[
-                    { color:'var(--orion-accent)', label:'BUTS' },
-                    { color:'var(--orion-red)', label:'ENCAISSÉS' },
-                  ].map(l => (
-                    <div key={l.label} style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <span style={{ width:10, height:10, borderRadius:2, background:l.color, display:'inline-block' }} />
-                      <span style={{ fontSize:11, fontWeight:600, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>{l.label}</span>
-                    </div>
-                  ))}
-                </div>
+                <span className="o-eyebrow">Derniers matchs</span>
+                <span style={{ fontSize:12, color:'var(--orion-text-mute)' }}>{matches.length} matchs codés</span>
               </div>
-              <div style={{ padding:'32px 24px 0', overflowX:'auto' }}>
-                {/* Barres par match */}
-                <div style={{ display:'flex', gap:8, alignItems:'flex-end', height:180, minWidth: matches.length * 80 }}>
-                  {matches.map((m, i) => {
-                    const barH = Math.max((m.team_a_score / maxG) * 120, 4);
-                    const barHA = Math.max((m.team_b_score / maxG) * 120, 4);
-                    const isLast = i === matches.length - 1;
-                    return (
-                      <button key={m.id} onClick={() => onNavigate(`stats-${m.id}`)}
-                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:5, background:'none', border:'none', cursor:'pointer', padding:0, minWidth:60 }}>
-                        {/* Barres côte à côte */}
-                        <div style={{ display:'flex', gap:3, alignItems:'flex-end', width:'100%', justifyContent:'center', position:'relative' }}>
-                          {/* Score flottant au-dessus des barres */}
-                          <span style={{ position:'absolute', top: -24, left:'50%', transform:'translateX(-50%)', fontSize:12, fontWeight:800, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)', whiteSpace:'nowrap' }}>
-                            {m.team_a_score}–{m.team_b_score}
-                          </span>
-                          <div style={{ width:28, height:barH, background: isLast ? 'var(--orion-accent)' : 'rgba(61,128,224,0.5)', borderRadius:'3px 3px 0 0' }} />
-                          <div style={{ width:28, height:barHA > 0 ? barHA : 0, background: isLast ? 'rgba(231,76,60,0.8)' : 'rgba(231,76,60,0.4)', borderRadius:'3px 3px 0 0' }} />
+              <div style={{ display:'flex', gap:0 }}>
+                {matches.map((m, i) => {
+                  const resultColor = m.result === 'W' ? 'var(--orion-green)' : m.result === 'D' ? 'var(--orion-amber)' : 'var(--orion-red)';
+                  const resultBg = m.result === 'W' ? 'var(--orion-green-dim)' : m.result === 'D' ? 'var(--orion-amber-dim)' : 'var(--orion-red-dim)';
+                  return (
+                    <button key={m.id} onClick={() => onNavigate(`stats-${m.id}`)}
+                      style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', background:'none', border:'none', borderRight: i < matches.length-1 ? '1px solid var(--orion-line)' : 'none', cursor:'pointer', padding:'20px 12px', textAlign:'center', transition:'background .15s', borderTop:`3px solid ${resultColor}` }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                    >
+                      {/* Score */}
+                      <span style={{ fontSize:32, fontWeight:800, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)', letterSpacing:'-0.02em', lineHeight:1 }}>
+                        {m.team_a_score}–{m.team_b_score}
+                      </span>
+                      {/* Badge résultat */}
+                      <span style={{ display:'inline-block', marginTop:8, padding:'2px 10px', borderRadius:3, background:resultBg, border:`1px solid ${resultColor}`, color:resultColor, fontSize:11, fontWeight:800, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>
+                        {m.result === 'W' ? 'VICTOIRE' : m.result === 'D' ? 'NUL' : 'DÉFAITE'}
+                      </span>
+                      {/* Adversaire */}
+                      <span style={{ fontSize:13, fontWeight:700, color:'var(--orion-text-dim)', marginTop:10 }}>
+                        vs {m.team_b_name}
+                      </span>
+                      {/* Date */}
+                      <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginTop:3 }}>
+                        {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})}
+                      </span>
+                      {/* xG + actions */}
+                      <div style={{ display:'flex', gap:16, marginTop:14, paddingTop:12, borderTop:'1px solid var(--orion-line)', width:'100%', justifyContent:'center' }}>
+                        <div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginBottom:2 }}>xG</div>
+                          <div style={{ fontSize:14, fontWeight:700, color:'var(--orion-green)' }}>{m.xg_for.toFixed(1)}</div>
                         </div>
-                        {/* Ligne de base */}
-                        <div style={{ width:'100%', height:1, background:'var(--orion-line-strong)' }} />
-                        {/* Adversaire + date */}
-                        <div style={{ textAlign:'center' }}>
-                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-text-dim)' }}>
-                            {m.team_b_name.split(' ')[0]}
-                          </div>
-                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginTop:2 }}>
-                            {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
-                          </div>
-                        </div>
-                        {/* Badge résultat */}
-                        <Result r={m.result} />
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              {/* xG bar en bas */}
-              {matches.some(m => m.xg_for > 0) && (
-                <div style={{ padding:'12px 24px 16px', borderTop:'1px solid var(--orion-line)', marginTop:12 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
-                    <span className="o-eyebrow">xG par match</span>
-                  </div>
-                  <div style={{ display:'flex', gap:8 }}>
-                    {matches.map(m => (
-                      <div key={m.id} style={{ flex:1, display:'flex', flexDirection:'column', gap:4, alignItems:'center' }}>
-                        <span style={{ fontSize:11, fontWeight:700, color:'var(--orion-green)', fontFamily:'var(--orion-font-mono)' }}>
-                          {m.xg_for.toFixed(1)}
-                        </span>
-                        <div style={{ width:'100%', height:6, background:'var(--orion-surface-3)', borderRadius:3 }}>
-                          <div style={{ width:`${Math.min((m.xg_for / maxXG) * 100, 100)}%`, height:'100%', background:'var(--orion-green)', borderRadius:3, transition:'width .3s' }} />
+                        <div style={{ width:1, background:'var(--orion-line)' }} />
+                        <div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginBottom:2 }}>ACTIONS</div>
+                          <div style={{ fontSize:14, fontWeight:700, color:'var(--orion-text-dim)' }}>{m.events_count}</div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* TENDANCES */}
