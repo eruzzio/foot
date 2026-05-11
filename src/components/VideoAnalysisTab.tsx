@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ExternalLink, Copy, CheckCircle, Video, Clock, ChevronRight, Filter } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, X, Link } from 'lucide-react';
 import { Match, MatchEventWithDetails } from '../types/database';
 import { buildVeoTimestampUrl } from '../utils/veoParser';
 
@@ -9,42 +9,73 @@ interface VideoAnalysisTabProps {
   teamBName: string;
 }
 
+type VideoSource = { type: 'veo'; url: string } | { type: 'local'; url: string; name: string } | null;
+
 export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoAnalysisTabProps) {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [videoSource, setVideoSource] = useState<VideoSource>(
+    match.video_url ? { type: 'veo', url: match.video_url } : null
+  );
+  const [urlInput, setUrlInput] = useState(match.video_url || '');
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
   const [filterType, setFilterType] = useState<string>('all');
+  const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [offset, setOffset] = useState(0); // décalage entre chrono ORION et vidéo
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const hasVideo = !!match.video_url;
+  const formatTime = (s: number) =>
+    `${Math.floor(s / 60).toString().padStart(2, '0')}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  // Charger un fichier local
+  const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setVideoSource({ type: 'local', url, name: file.name });
   };
 
-  const buildVeoLink = (event: MatchEventWithDetails): string => {
-    if (!match.video_url) return '';
-    // Utiliser le video_timestamp synchronisé si disponible, sinon le timestamp ORION
-    const ts = event.video_timestamp != null ? event.video_timestamp : event.timestamp;
-    return buildVeoTimestampUrl(match.video_url, ts);
+  // Sauter au timestamp d'un événement
+  const seekToEvent = (event: MatchEventWithDetails) => {
+    const ts = event.video_timestamp ?? event.timestamp;
+    const videoTs = ts + offset;
+    setActiveEventId(event.id);
+
+    if (videoSource?.type === 'local' && videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, videoTs - 3); // 3s avant
+      videoRef.current.play();
+      setIsPlaying(true);
+    } else if (videoSource?.type === 'veo' && match.video_url) {
+      const link = buildVeoTimestampUrl(match.video_url, videoTs);
+      window.open(link, '_blank');
+    }
   };
 
-  const handleCopy = async (url: string, id: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setCopiedId(id);
-      setTimeout(() => setCopiedId(null), 2000);
-    } catch {}
-  };
+  // Sync currentTime pour la vidéo locale
+  const handleTimeUpdate = useCallback(() => {
+    if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
+  }, []);
 
-  const handleOpenVeo = (url: string) => {
-    window.open(url, '_blank');
-  };
+  // Mettre en surbrillance l'événement le plus proche du currentTime
+  useEffect(() => {
+    if (!videoRef.current) return;
+    const closest = match.events
+      .filter(e => {
+        const ts = (e.video_timestamp ?? e.timestamp) + offset;
+        return ts >= currentTime - 2 && ts <= currentTime + 2;
+      })
+      .sort((a, b) => {
+        const ta = Math.abs((a.video_timestamp ?? a.timestamp) + offset - currentTime);
+        const tb = Math.abs((b.video_timestamp ?? b.timestamp) + offset - currentTime);
+        return ta - tb;
+      })[0];
+    if (closest) setActiveEventId(closest.id);
+  }, [currentTime, match.events, offset]);
 
   const eventTypes = Array.from(new Set(
-    match.events
-      .map(e => e.event_type?.name || e.label)
-      .filter(Boolean)
+    match.events.map(e => e.event_type?.name || e.label).filter(Boolean)
   )) as string[];
 
   const filteredEvents = match.events
@@ -52,217 +83,196 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     .filter(e => filterType === 'all' || (e.event_type?.name || e.label) === filterType)
     .sort((a, b) => a.timestamp - b.timestamp);
 
-  if (!hasVideo) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-16 h-16 bg-yellow-900/30 border border-yellow-800/50 rounded-full flex items-center justify-center mb-6">
-          <Video size={28} className="text-yellow-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-white mb-2">Aucune vidéo synchronisée</h3>
-        <p className="text-gray-400 text-sm max-w-md mb-6">
-          Pour accéder à l&apos;analyse vidéo, synchronisez ce match avec votre vidéo VEO depuis l&apos;onglet &quot;Post Match&quot;.
-        </p>
-        <div className="bg-dark-secondary border border-gray-800 rounded-xl p-6 max-w-sm text-left space-y-3">
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-wide">Comment faire</p>
-          {['Aller dans l\'onglet "Post Match"', 'Coller votre lien VEO', 'Saisir le timecode du coup d\'envoi', 'Cliquer sur "Synchroniser"'].map((step, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <span className="w-5 h-5 bg-yellow-600 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0 mt-0.5">{i + 1}</span>
-              <span className="text-sm text-gray-300">{step}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-      {/* Bandeau VEO synchronisé */}
-      <div className="bg-yellow-900/20 border border-yellow-800/40 rounded-xl p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
-            <Video size={16} className="text-white" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-yellow-300">VEO synchronisé</p>
-            <p className="text-xs text-yellow-600 truncate max-w-xs">{match.video_url}</p>
-          </div>
-        </div>
-        <button
-          onClick={() => handleOpenVeo(match.video_url!)}
-          className="flex items-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-sm font-medium transition-colors"
-        >
-          Ouvrir VEO
-          <ExternalLink size={14} />
-        </button>
-      </div>
+      {/* LECTEUR VIDÉO */}
+      <div style={{ background: '#0a0f18', border: '1.5px solid var(--orion-line-strong)', borderRadius: 6, overflow: 'hidden', marginBottom: 12 }}>
 
-      {/* Filtres */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-2 text-gray-400">
-          <Filter size={14} />
-          <span className="text-xs uppercase tracking-wide">Filtres</span>
-        </div>
-        <div className="flex gap-2">
-          {(['all', 'A', 'B'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setFilterTeam(t)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                filterTeam === t
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-dark-secondary border border-gray-700 text-gray-400 hover:text-white'
-              }`}
-            >
-              {t === 'all' ? 'Toutes les équipes' : t === 'A' ? teamAName : teamBName}
+        {/* Zone vidéo */}
+        {videoSource?.type === 'local' ? (
+          <div style={{ position: 'relative', background: '#000' }}>
+            <video
+              ref={videoRef}
+              src={videoSource.url}
+              style={{ width: '100%', maxHeight: 400, display: 'block' }}
+              onTimeUpdate={handleTimeUpdate}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              controls
+            />
+            <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '3px 8px', borderRadius: 4, fontSize: 11, color: '#7ab4f0', fontFamily: 'var(--orion-font-mono)' }}>
+              {formatTime(currentTime)}
+            </div>
+          </div>
+        ) : videoSource?.type === 'veo' ? (
+          <div style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 4, background: 'rgba(61,128,224,0.15)', border: '1px solid rgba(61,128,224,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Video size={16} style={{ color: 'var(--orion-accent)' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--orion-text)' }}>VEO synchronisé</div>
+                <div style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)', marginTop: 2, maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{videoSource.url}</div>
+              </div>
+            </div>
+            <button onClick={() => window.open(videoSource.url, '_blank')} className="o-btn o-btn--sm" style={{ gap: 6 }}>
+              Ouvrir VEO <ExternalLink size={13} />
             </button>
-          ))}
-        </div>
-        <select
-          value={filterType}
-          onChange={e => setFilterType(e.target.value)}
-          className="bg-dark-secondary border border-gray-700 text-gray-300 text-xs rounded-lg px-3 py-1.5 focus:outline-none focus:border-yellow-600"
-        >
-          <option value="all">Tous les événements</option>
-          {eventTypes.map(t => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-        <span className="text-xs text-gray-500 ml-auto">
-          {filteredEvents.length} événement{filteredEvents.length > 1 ? 's' : ''}
-        </span>
-      </div>
-
-      {/* Timeline vidéo */}
-      <div className="space-y-2">
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 text-sm">
-            Aucun événement pour ces filtres
           </div>
         ) : (
-          filteredEvents.map(event => {
-            const veoLink = buildVeoLink(event);
-            const hasLink = !!veoLink;
-            const videoTs = event.video_timestamp;
+          // Pas de source — zone de chargement
+          <div style={{ padding: '32px 24px', textAlign: 'center' }}>
+            <Video size={32} style={{ color: 'var(--orion-text-faint)', margin: '0 auto 12px' }} />
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--orion-text-dim)', marginBottom: 6 }}>Aucune vidéo chargée</div>
+            <div style={{ fontSize: 12, color: 'var(--orion-text-mute)', marginBottom: 20 }}>Charge un fichier local ou colle un lien VEO</div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <button onClick={() => fileInputRef.current?.click()} className="o-btn o-btn--sm">
+                <Upload size={13} /> Fichier local
+              </button>
+              <button onClick={() => setShowUrlInput(true)} className="o-btn o-btn--sm">
+                <Link size={13} /> Lien VEO
+              </button>
+            </div>
+          </div>
+        )}
 
-            return (
-              <div
-                key={event.id}
-                className="bg-dark-secondary border border-gray-800 rounded-xl p-4 hover:border-yellow-800/50 transition-colors group"
-              >
-                <div className="flex items-center gap-4">
+        {/* Barre d'actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderTop: '1px solid var(--orion-line)', flexWrap: 'wrap' }}>
+          <button onClick={() => fileInputRef.current?.click()} className="o-btn o-btn--ghost o-btn--sm">
+            <Upload size={12} /> Fichier local
+          </button>
+          <button onClick={() => setShowUrlInput(!showUrlInput)} className="o-btn o-btn--ghost o-btn--sm">
+            <Link size={12} /> Lien VEO
+          </button>
+          {videoSource && (
+            <button onClick={() => setVideoSource(null)} className="o-btn o-btn--ghost o-btn--sm" style={{ color: 'var(--orion-red)' }}>
+              <X size={12} /> Retirer
+            </button>
+          )}
 
-                  {/* Timecode ORION */}
-                  <div className="flex flex-col items-center min-w-[52px]">
-                    <span className="font-mono text-sm font-bold text-white">
-                      {formatTime(event.timestamp)}
-                    </span>
-                    <span className="text-[10px] text-gray-600">ORION</span>
-                  </div>
+          {/* Décalage offset */}
+          {videoSource?.type === 'local' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
+              <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>Décalage</span>
+              <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 8px' }}>−</button>
+              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--orion-accent)', fontFamily: 'var(--orion-font-mono)', minWidth: 36, textAlign: 'center' }}>
+                {offset >= 0 ? '+' : ''}{offset}s
+              </span>
+              <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 8px' }}>+</button>
+              <button onClick={() => setOffset(0)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize: 10 }}>Reset</button>
+            </div>
+          )}
+        </div>
 
-                  {/* Séparateur */}
-                  <ChevronRight size={14} className="text-gray-600 flex-shrink-0" />
-
-                  {/* Timecode VEO */}
-                  {videoTs != null ? (
-                    <div className="flex flex-col items-center min-w-[52px]">
-                      <span className="font-mono text-sm font-bold text-yellow-400">
-                        {formatTime(videoTs)}
-                      </span>
-                      <span className="text-[10px] text-yellow-700">VEO</span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center min-w-[52px]">
-                      <span className="font-mono text-sm text-gray-600">--:--</span>
-                      <span className="text-[10px] text-gray-700">VEO</span>
-                    </div>
-                  )}
-
-                  {/* Dot couleur */}
-                  <span
-                    className="w-3 h-3 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: event.event_type?.color || '#6B7280' }}
-                  />
-
-                  {/* Infos événement */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-white text-sm truncate">
-                        {event.event_type?.name
-                          ? event.label && event.label !== event.event_type.name
-                            ? `${event.event_type.name} › ${event.label}`
-                            : event.event_type.name
-                          : event.label || 'Événement'}
-                      </span>
-                      {event.outcome === 'success' && (
-                        <span className="text-[10px] bg-green-900/40 text-green-400 border border-green-800/40 px-1.5 py-0.5 rounded">OK</span>
-                      )}
-                      {event.outcome === 'failure' && (
-                        <span className="text-[10px] bg-red-900/40 text-red-400 border border-red-800/40 px-1.5 py-0.5 rounded">Raté</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500">
-                        {event.team === 'A' ? teamAName : teamBName}
-                      </span>
-                      {event.player && (
-                        <span className="text-xs text-gray-600">
-                          · #{event.player.number} {event.player.name}
-                        </span>
-                      )}
-                      {event.keywords && event.keywords.length > 0 && (
-                        <span className="text-xs text-blue-400">
-                          · {event.keywords.join(', ')}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {hasLink && (
-                      <>
-                        <button
-                          onClick={() => handleCopy(veoLink, event.id)}
-                          className="p-2 rounded-lg bg-dark-tertiary hover:bg-gray-700 text-gray-400 hover:text-white transition-colors"
-                          title="Copier le lien VEO"
-                        >
-                          {copiedId === event.id
-                            ? <CheckCircle size={16} className="text-green-400" />
-                            : <Copy size={16} />
-                          }
-                        </button>
-                        <button
-                          onClick={() => handleOpenVeo(veoLink)}
-                          className="flex items-center gap-2 px-3 py-2 bg-yellow-600 hover:bg-yellow-500 text-white rounded-lg text-xs font-medium transition-colors"
-                          title="Voir sur VEO"
-                        >
-                          <Clock size={13} />
-                          Voir
-                          <ExternalLink size={12} />
-                        </button>
-                      </>
-                    )}
-                    {!hasLink && (
-                      <span className="text-xs text-gray-600 italic">Non synchronisé</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })
+        {/* Input URL VEO */}
+        {showUrlInput && (
+          <div style={{ padding: '10px 14px', borderTop: '1px solid var(--orion-line)', display: 'flex', gap: 8 }}>
+            <input
+              type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
+              placeholder="https://veo.co/shared-videos/..."
+              style={{ flex: 1, padding: '7px 10px', background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 4, color: 'var(--orion-text)', fontSize: 12, outline: 'none', fontFamily: 'var(--orion-font-mono)' }}
+              onKeyDown={e => { if (e.key === 'Enter' && urlInput) { setVideoSource({ type: 'veo', url: urlInput }); setShowUrlInput(false); } }}
+            />
+            <button onClick={() => { if (urlInput) { setVideoSource({ type: 'veo', url: urlInput }); setShowUrlInput(false); } }} className="o-btn o-btn--primary o-btn--sm">
+              Charger
+            </button>
+            <button onClick={() => setShowUrlInput(false)} className="o-btn o-btn--ghost o-btn--sm"><X size={13} /></button>
+          </div>
         )}
       </div>
 
-      {/* Note de bas de page */}
-      <div className="bg-dark-secondary border border-gray-800 rounded-xl p-4 text-xs text-gray-500 flex items-start gap-3">
-        <ExternalLink size={14} className="flex-shrink-0 mt-0.5 text-gray-600" />
-        <p>
-          Chaque bouton &quot;Voir&quot; ouvre VEO directement au bon moment du match dans un nouvel onglet.
-          Le bouton copier vous permet de partager le lien exact avec vos joueurs ou votre staff via WhatsApp.
-        </p>
+      <input ref={fileInputRef} type="file" accept="video/*" className="hidden" onChange={handleFileLoad} />
+
+      {/* FILTRES */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+        <Filter size={13} style={{ color: 'var(--orion-text-mute)' }} />
+        {(['all', 'A', 'B'] as const).map(t => (
+          <button key={t} onClick={() => setFilterTeam(t)}
+            className={`o-btn o-btn--sm ${filterTeam === t ? 'o-btn--primary' : 'o-btn--ghost'}`}>
+            {t === 'all' ? 'Tous' : t === 'A' ? teamAName : teamBName}
+          </button>
+        ))}
+        <select value={filterType} onChange={e => setFilterType(e.target.value)}
+          style={{ padding: '5px 10px', background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 4, color: 'var(--orion-text)', fontSize: 12, outline: 'none' }}>
+          <option value="all">Tous les types</option>
+          {eventTypes.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', marginLeft: 'auto' }}>
+          {filteredEvents.length} action{filteredEvents.length > 1 ? 's' : ''}
+        </span>
       </div>
+
+      {/* LISTE DES ÉVÉNEMENTS */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {filteredEvents.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '32px', color: 'var(--orion-text-mute)', fontSize: 13 }}>
+            Aucun événement
+          </div>
+        ) : filteredEvents.map(event => {
+          const ts = event.video_timestamp ?? event.timestamp;
+          const videoTs = ts + offset;
+          const isActive = activeEventId === event.id;
+          const color = event.event_type?.color || '#6B7280';
+          const teamColor = event.team === 'A' ? 'var(--orion-accent)' : 'var(--orion-amber)';
+
+          return (
+            <button key={event.id} onClick={() => seekToEvent(event)}
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', background: isActive ? 'var(--orion-surface-2)' : 'transparent', border: `1.5px solid ${isActive ? 'var(--orion-accent)' : 'var(--orion-line)'}`, borderRadius: 4, cursor: 'pointer', textAlign: 'left', transition: 'all .12s' }}
+              onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--orion-surface)'; }}
+              onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+            >
+              {/* Timestamp ORION */}
+              <span style={{ fontFamily: 'var(--orion-font-mono)', fontSize: 13, fontWeight: 700, color: 'var(--orion-text)', minWidth: 42 }}>
+                {formatTime(event.timestamp)}
+              </span>
+
+              {/* Flèche */}
+              <ChevronRight size={12} style={{ color: 'var(--orion-text-faint)', flexShrink: 0 }} />
+
+              {/* Timestamp vidéo */}
+              <span style={{ fontFamily: 'var(--orion-font-mono)', fontSize: 12, fontWeight: 600, color: isActive ? 'var(--orion-accent)' : 'var(--orion-text-mute)', minWidth: 42 }}>
+                {videoSource ? formatTime(Math.max(0, videoTs - 3)) : '--:--'}
+              </span>
+
+              {/* Point couleur */}
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, flexShrink: 0 }} />
+
+              {/* Nom action */}
+              <span style={{ flex: 1, fontSize: 13, fontWeight: 600, color: 'var(--orion-text)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {event.event_type?.name && event.label && event.label !== event.event_type.name
+                  ? `${event.event_type.name} · ${event.label}`
+                  : event.event_type?.name || event.label || 'Action'}
+              </span>
+
+              {/* Équipe */}
+              <span style={{ fontSize: 11, fontWeight: 600, color: teamColor, fontFamily: 'var(--orion-font-mono)', flexShrink: 0 }}>
+                {event.team === 'A' ? teamAName : teamBName}
+              </span>
+
+              {/* Outcome */}
+              {event.outcome === 'success' && (
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orion-green)', background: 'var(--orion-green-dim)', padding: '2px 7px', borderRadius: 3, flexShrink: 0 }}>OK</span>
+              )}
+              {event.outcome === 'failure' && (
+                <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orion-red)', background: 'var(--orion-red-dim)', padding: '2px 7px', borderRadius: 3, flexShrink: 0 }}>RATÉ</span>
+              )}
+
+              {/* Icône play si vidéo */}
+              {videoSource && (
+                <Play size={12} style={{ color: isActive ? 'var(--orion-accent)' : 'var(--orion-text-faint)', flexShrink: 0 }} />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Aide offset */}
+      {videoSource?.type === 'local' && (
+        <div style={{ marginTop: 12, padding: '10px 14px', background: 'var(--orion-surface)', border: '1px solid var(--orion-line)', borderRadius: 4, fontSize: 11, color: 'var(--orion-text-mute)' }}>
+          💡 <strong style={{ color: 'var(--orion-text-dim)' }}>Décalage</strong> — si la vidéo commence avant le coup d'envoi, ajuste le décalage pour synchroniser les timestamps ORION avec la vidéo.
+        </div>
+      )}
     </div>
   );
 }
