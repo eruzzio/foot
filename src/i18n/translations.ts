@@ -5,7 +5,7 @@ export const translations = {
     // Navigation
     nav: {
       live: 'Codage Live',
-      panels: 'Mon Panneau',
+      panels: 'Mes Panneaux',
       stats: 'Mes Stats',
       evolution: 'Évolution',
       team: 'Mes Équipes',
