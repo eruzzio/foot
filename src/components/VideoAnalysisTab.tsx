@@ -22,11 +22,26 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [offset, setOffset] = useState(0); // décalage entre chrono ORION et vidéo
+  const [clipBefore, setClipBefore] = useState(3);  // secondes avant
+  const [clipAfter, setClipAfter] = useState(5);   // secondes après
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const formatTime = (s: number) =>
+  // Arrêt automatique après clipAfter secondes
+  useEffect(() => {
+    if (!videoRef.current || !activeEventId) return;
+    const event = match.events.find(e => e.id === activeEventId);
+    if (!event) return;
+    const endTime = (event.video_timestamp ?? event.timestamp) + offset + clipAfter;
+    const check = () => {
+      if (videoRef.current && videoRef.current.currentTime >= endTime) {
+        videoRef.current.pause();
+        setIsPlaying(false);
+      }
+    };
+    videoRef.current.addEventListener('timeupdate', check);
+    return () => videoRef.current?.removeEventListener('timeupdate', check);
+  }, [activeEventId, offset, clipAfter, match.events]);
     `${Math.floor(s / 60).toString().padStart(2, '0')}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
   // Charger un fichier local
@@ -44,7 +59,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     setActiveEventId(event.id);
 
     if (videoSource?.type === 'local' && videoRef.current) {
-      videoRef.current.currentTime = Math.max(0, videoTs - 3); // 3s avant
+      videoRef.current.currentTime = Math.max(0, videoTs - clipBefore);
       videoRef.current.play();
       setIsPlaying(true);
     } else if (videoSource?.type === 'veo' && match.video_url) {
@@ -153,14 +168,36 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
 
           {/* Décalage offset */}
           {videoSource?.type === 'local' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginLeft: 'auto' }}>
-              <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>Décalage</span>
-              <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 8px' }}>−</button>
-              <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--orion-accent)', fontFamily: 'var(--orion-font-mono)', minWidth: 36, textAlign: 'center' }}>
-                {offset >= 0 ? '+' : ''}{offset}s
-              </span>
-              <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 8px' }}>+</button>
-              <button onClick={() => setOffset(0)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize: 10 }}>Reset</button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginLeft: 'auto', flexWrap: 'wrap' }}>
+              {/* Clip avant/après */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>CLIP</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button onClick={() => setClipBefore(b => Math.max(0, b - 1))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 28, textAlign: 'center' }}>−{clipBefore}s</span>
+                  <button onClick={() => setClipBefore(b => b + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
+                </div>
+                <span style={{ fontSize: 11, color: 'var(--orion-text-faint)', fontFamily: 'var(--orion-font-mono)' }}>●</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button onClick={() => setClipAfter(a => Math.max(0, a - 1))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 28, textAlign: 'center' }}>+{clipAfter}s</span>
+                  <button onClick={() => setClipAfter(a => a + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
+                </div>
+              </div>
+
+              {/* Séparateur */}
+              <div style={{ width: 1, height: 16, background: 'var(--orion-line)' }} />
+
+              {/* Décalage sync */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>SYNC</span>
+                <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
+                <span style={{ fontSize: 11, fontWeight: 700, color: offset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 36, textAlign: 'center' }}>
+                  {offset >= 0 ? '+' : ''}{offset}s
+                </span>
+                <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
+                <button onClick={() => setOffset(0)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize: 10, padding: '3px 7px' }}>Reset</button>
+              </div>
             </div>
           )}
         </div>
@@ -232,7 +269,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
 
               {/* Timestamp vidéo */}
               <span style={{ fontFamily: 'var(--orion-font-mono)', fontSize: 12, fontWeight: 600, color: isActive ? 'var(--orion-accent)' : 'var(--orion-text-mute)', minWidth: 42 }}>
-                {videoSource ? formatTime(Math.max(0, videoTs - 3)) : '--:--'}
+                {videoSource ? formatTime(Math.max(0, videoTs - clipBefore)) : '--:--'}
               </span>
 
               {/* Point couleur */}
