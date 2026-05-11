@@ -65,9 +65,9 @@ export const KPI: React.FC<{
   label: string; value: React.ReactNode; sub?: React.ReactNode; accent?: boolean;
 }> = ({ label, value, sub, accent }) => (
   <div className="o-kpi">
-    <span className="o-kpi__label">{label}</span>
-    <span className={'o-kpi__value' + (accent ? ' o-kpi__value--accent' : '')}>{value}</span>
-    {sub && <span className="o-kpi__sub">{sub}</span>}
+    <div className="o-kpi__label">{label}</div>
+    <div className={'o-kpi__value' + (accent ? ' o-kpi--accent' : '')}>{value}</div>
+    {sub && <div className="o-kpi__sub">{sub}</div>}
   </div>
 );
 

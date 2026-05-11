@@ -292,29 +292,34 @@
 
 /* ── KPI Block ───────────────────────────────────────────── */
 .o-kpi {
-  padding: 16px 20px;
-}
-.o-kpi__value {
-  font-size: 32px;
-  font-weight: 800;
-  line-height: 1;
-  color: var(--orion-text);
-  font-family: var(--orion-font-ui);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .o-kpi__label {
-  font-size: 11px;
+  font-family: var(--orion-font-mono);
+  font-size: 10px;
   font-weight: 600;
   color: var(--orion-text-mute);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-top: 4px;
+  letter-spacing: 0.14em;
 }
-.o-kpi__sub {
-  font-size: 11px;
-  color: var(--orion-text-mute);
-  margin-top: 2px;
+.o-kpi__value {
+  font-family: var(--orion-font-ui);
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--orion-text);
+  letter-spacing: -0.02em;
+  display: block;
 }
 .o-kpi--accent .o-kpi__value { color: var(--orion-accent); }
+.o-kpi__sub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--orion-text-mute);
+}
 
 /* ── Scrollbar ───────────────────────────────────────────── */
 .orion ::-webkit-scrollbar { width: 6px; height: 6px; }
