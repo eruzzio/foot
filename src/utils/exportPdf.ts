@@ -105,9 +105,10 @@ export function exportToPdf(data: PdfExportData): void {
 
   // Zones
   const zoneEvents = zonesEventsFiltered;
-  const zO = zoneEvents.filter(e => (e.field_x ?? 0) > 66).length;
-  const zM = zoneEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66).length;
-  const zD = zoneEvents.filter(e => (e.field_x ?? 0) < 33).length;
+  const zoneOnlyCounts = zonesEventsFiltered.filter(e => e.label === 'Zone Défensive' || e.label === 'Zone Médiane' || e.label === 'Zone Offensive');
+  const zO = zoneOnlyCounts.filter(e => (e.field_x ?? 0) > 66).length;
+  const zM = zoneOnlyCounts.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66).length;
+  const zD = zoneOnlyCounts.filter(e => (e.field_x ?? 0) < 33).length;
   const zT = zO + zM + zD || 1;
 
   // Détail par zone : quels types d'événements dans chaque zone
@@ -138,9 +139,10 @@ export function exportToPdf(data: PdfExportData): void {
     return sorted.map(([n, c]) => `${n} ${c}`).join(' | ');
   };
 
-  const defEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) < 33);
-  const medEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
-  const offEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) > 66);
+  const zoneOnlyPdf = zonesEventsFiltered.filter(e => e.label === 'Zone Défensive' || e.label === 'Zone Médiane' || e.label === 'Zone Offensive');
+  const defEvts = zoneOnlyPdf.filter(e => (e.field_x ?? 0) < 33);
+  const medEvts = zoneOnlyPdf.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+  const offEvts = zoneOnlyPdf.filter(e => (e.field_x ?? 0) > 66);
 
   const zoneOffDetail = zoneDetailFn(offEvts, ZONE_KEYWORDS.offensive);
   const zoneMedDetail = zoneDetailFn(medEvts, ZONE_KEYWORDS.mediane);

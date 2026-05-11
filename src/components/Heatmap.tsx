@@ -44,12 +44,12 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
 
   // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
   const zoneEvents = useMemo(() => {
-    // L'équipe A joue de gauche → droite (offensive = x élevé)
-    // L'équipe B joue de droite → gauche (offensive = x faible)
+    // Uniquement les événements codés via ZoneSelector
+    const zoneOnly = fieldEvents.filter(e => e.label === 'Zone Défensive' || e.label === 'Zone Médiane' || e.label === 'Zone Offensive');
     const isTeamB = filterTeam === 'B';
-    const offensive = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
-    const mediane   = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
-    const defensive = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
+    const offensive = zoneOnly.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
+    const mediane   = zoneOnly.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+    const defensive = zoneOnly.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
     return { offensive, mediane, defensive };
   }, [fieldEvents]);
 
@@ -85,9 +85,10 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
     };
 
     const isTeamB = filterTeam === 'B';
-    const defEvts = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
-    const medEvts = fieldEvents.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
-    const offEvts = fieldEvents.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
+    const zoneOnly2 = fieldEvents.filter(e => e.label === 'Zone Défensive' || e.label === 'Zone Médiane' || e.label === 'Zone Offensive');
+    const defEvts = zoneOnly2.filter(e => isTeamB ? (e.field_x ?? 0) > 66 : (e.field_x ?? 0) < 33);
+    const medEvts = zoneOnly2.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+    const offEvts = zoneOnly2.filter(e => isTeamB ? (e.field_x ?? 0) < 33 : (e.field_x ?? 0) > 66);
 
     return {
       defensive: detail(defEvts, ZONE_KEYWORDS.defensive),
