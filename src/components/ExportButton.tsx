@@ -103,42 +103,6 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
                 <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>Données brutes</div>
               </div>
             </button>
-            <div style={{ borderTop:'1px solid var(--orion-line)', padding:'8px 16px 4px' }}>
-              <span className="o-eyebrow">Logiciels pro</span>
-            </div>
-            <button onClick={() => handleExport('sportscode')}
-              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <Code size={15} style={{ color:'var(--orion-accent)', flexShrink:0 }} />
-              <div>
-                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Hudl SportsCode</div>
-                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>XML compatible Hudl / Nacsport</div>
-              </div>
-            </button>
-            <button onClick={() => handleExport('dartfish')}
-              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom:'1px solid var(--orion-line)', background:'none', cursor:'pointer', textAlign:'left' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <Monitor size={15} style={{ color:'var(--orion-green)', flexShrink:0 }} />
-              <div>
-                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>Dartfish</div>
-                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>CSV compatible Dartfish</div>
-              </div>
-            </button>
-            <button onClick={() => handleExport('longomatch')}
-              style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', background:'none', cursor:'pointer', textAlign:'left' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <Film size={15} style={{ color:'var(--orion-amber)', flexShrink:0 }} />
-              <div>
-                <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:500 }}>LongoMatch</div>
-                <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>CSV compatible LongoMatch</div>
-              </div>
-            </button>
           </div>
         </>
       )}
