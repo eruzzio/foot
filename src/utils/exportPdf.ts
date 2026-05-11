@@ -141,7 +141,71 @@ export function exportToPdf(data: PdfExportData): void {
     return `<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;border-bottom:1px solid #f1f5f9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${t.color};margin-right:5px;vertical-align:middle;"></span>${t.name}</td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorA};border-bottom:1px solid #f1f5f9;">${t.teamA}</td><td style="padding:5px 6px;border-bottom:1px solid #f1f5f9;"><div style="display:flex;height:8px;overflow:hidden;background:#e2e8f0;"><div style="width:${aW}%;background:${colorA};"></div><div style="width:${100 - aW}%;background:${colorB};"></div></div></td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorB};border-bottom:1px solid #f1f5f9;">${t.teamB}</td></tr>`;
   }).join('');
 
-  // Period rows condensees
+  // Tableau croisé : périodes (lignes) × types (colonnes) × équipes
+  const topTypes = sortedTypes.slice(0, 6); // max 6 types pour tenir en A4
+
+  const crossTableHeader = `
+    <tr style="background:#f1f5f9;">
+      <th style="padding:5px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;min-width:55px;">Période</th>
+      ${topTypes.map(t => `
+        <th colspan="2" style="padding:5px 6px;text-align:center;font-size:9px;font-weight:700;color:${t.color};border-left:1px solid #e2e8f0;">
+          <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${t.color};margin-right:3px;vertical-align:middle;"></span>${t.name}
+        </th>`).join('')}
+      <th colspan="2" style="padding:5px 6px;text-align:center;font-size:9px;font-weight:700;color:#64748b;border-left:2px solid #cbd5e1;">TOTAL</th>
+    </tr>
+    <tr style="background:#f8fafc;">
+      <th style="padding:3px 8px;font-size:8px;color:#94a3b8;"></th>
+      ${topTypes.map(() => `
+        <th style="padding:3px 4px;text-align:center;font-size:8px;font-weight:700;color:${colorA};border-left:1px solid #e2e8f0;width:22px;">${data.matchInfo.teamA.substring(0,3).toUpperCase()}</th>
+        <th style="padding:3px 4px;text-align:center;font-size:8px;font-weight:700;color:${colorB};width:22px;">${data.matchInfo.teamB.substring(0,3).toUpperCase()}</th>`).join('')}
+      <th style="padding:3px 4px;text-align:center;font-size:8px;font-weight:700;color:${colorA};border-left:2px solid #cbd5e1;width:22px;">${data.matchInfo.teamA.substring(0,3).toUpperCase()}</th>
+      <th style="padding:3px 4px;text-align:center;font-size:8px;font-weight:700;color:${colorB};width:22px;">${data.matchInfo.teamB.substring(0,3).toUpperCase()}</th>
+    </tr>`;
+
+  const crossTableRows = periodData.filter(p => p.total > 0).map((p, idx) => {
+    const bg = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+    const cells = topTypes.map(t => {
+      const aCount = data.events.filter(e => {
+        const mins = Math.floor(e.timestamp / 60);
+        const i = periods.indexOf(p.label);
+        const minStart = i * 15;
+        return (e.event_type?.name || e.label || 'Autre') === t.name &&
+          e.team === 'A' && mins >= minStart && (i < 5 ? mins < minStart + 15 : true);
+      }).length;
+      const bCount = data.events.filter(e => {
+        const mins = Math.floor(e.timestamp / 60);
+        const i = periods.indexOf(p.label);
+        const minStart = i * 15;
+        return (e.event_type?.name || e.label || 'Autre') === t.name &&
+          e.team === 'B' && mins >= minStart && (i < 5 ? mins < minStart + 15 : true);
+      }).length;
+      return `
+        <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:${aCount > 0 ? '700' : '400'};color:${aCount > 0 ? colorA : '#94a3b8'};border-left:1px solid #e2e8f0;background:${bg};">${aCount > 0 ? aCount : '—'}</td>
+        <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:${bCount > 0 ? '700' : '400'};color:${bCount > 0 ? colorB : '#94a3b8'};background:${bg};">${bCount > 0 ? bCount : '—'}</td>`;
+    }).join('');
+    return `<tr>
+      <td style="padding:5px 8px;font-weight:700;font-size:11px;background:${bg};color:#374151;">${p.label}</td>
+      ${cells}
+      <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:700;color:${colorA};border-left:2px solid #cbd5e1;background:${bg};">${p.teamA || '—'}</td>
+      <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:700;color:${colorB};background:${bg};">${p.teamB || '—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Ligne totaux
+  const crossTotalRow = `<tr style="background:#f1f5f9;border-top:2px solid #cbd5e1;">
+    <td style="padding:5px 8px;font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:#374151;">Total</td>
+    ${topTypes.map(t => {
+      const aT = teamAEvents.filter(e => (e.event_type?.name || e.label || 'Autre') === t.name).length;
+      const bT = teamBEvents.filter(e => (e.event_type?.name || e.label || 'Autre') === t.name).length;
+      return `
+        <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:800;color:${colorA};border-left:1px solid #e2e8f0;">${aT || '—'}</td>
+        <td style="padding:5px 4px;text-align:center;font-size:11px;font-weight:800;color:${colorB};">${bT || '—'}</td>`;
+    }).join('')}
+    <td style="padding:5px 4px;text-align:center;font-size:12px;font-weight:800;color:${colorA};border-left:2px solid #cbd5e1;">${teamAEvents.length}</td>
+    <td style="padding:5px 4px;text-align:center;font-size:12px;font-weight:800;color:${colorB};">${teamBEvents.length}</td>
+  </tr>`;
+
+  // Period rows condensees (conservé pour compatibilité)
   const periodRows = periodData.filter(p => p.total > 0).map(p => {
     const tags = Object.entries(p.byType).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([n, c]) => {
       const col = typeMap[n]?.color || '#6B7280';
@@ -186,7 +250,7 @@ ${show('heatmap_goal') && goalEvents.length > 0 ? `<div><h2>Zones de frappe</h2>
 
 <div style="display:grid;grid-template-columns:${show('stats_types') && show('timeline') ? '1fr 1fr' : '1fr'};gap:10px;margin-bottom:12px;">
 ${show('stats_types') ? `<div><h2>Actions par type</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Type</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorA};width:30px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;min-width:60px;"></th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorB};width:30px;">${data.matchInfo.teamB}</th></tr></thead><tbody>${typeRows}</tbody></table></div></div>` : ''}
-${show('timeline') ? `<div><h2>Activité par période</h2><div class="card" style="padding:0;overflow:hidden;"><table><thead><tr style="background:#f1f5f9;"><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Période</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorA};width:25px;">${data.matchInfo.teamA}</th><th style="padding:4px 6px;text-align:center;font-size:9px;font-weight:700;color:${colorB};width:25px;">${data.matchInfo.teamB}</th><th style="padding:4px 8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;color:#64748b;">Détail</th></tr></thead><tbody>${periodRows}</tbody></table></div></div>` : ''}
+${show('timeline') ? `<div style="margin-bottom:12px;"><h2>Activité par période et par type</h2><div class="card" style="padding:0;overflow:hidden;"><table style="width:100%;border-collapse:collapse;"><thead>${crossTableHeader}</thead><tbody>${crossTableRows}${crossTotalRow}</tbody></table></div></div>` : ''}
 </div>
 
 <div style="padding-top:6px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;"><span style="font-size:8px;color:#94a3b8;">ORION — Sports Video Analytics & Coding</span><span style="font-size:8px;color:#94a3b8;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span></div>
