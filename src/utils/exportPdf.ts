@@ -138,7 +138,7 @@ export function exportToPdf(data: PdfExportData): void {
   // Type rows
   const typeRows = sortedTypes.map(t => {
     const aW = t.total > 0 ? (t.teamA / t.total) * 100 : 50;
-    return `<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;border-bottom:1px solid #f1f5f9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${t.color};margin-right:5px;vertical-align:middle;"></span>${t.name}</td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorA};border-bottom:1px solid #f1f5f9;">${t.teamA}</td><td style="padding:5px 6px;border-bottom:1px solid #f1f5f9;"><div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;"><div style="width:${aW}%;background:${colorA};"></div><div style="width:${100 - aW}%;background:${colorB};"></div></div></td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorB};border-bottom:1px solid #f1f5f9;">${t.teamB}</td></tr>`;
+    return `<tr><td style="padding:5px 8px;font-size:11px;font-weight:600;border-bottom:1px solid #f1f5f9;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${t.color};margin-right:5px;vertical-align:middle;"></span>${t.name}</td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorA};border-bottom:1px solid #f1f5f9;">${t.teamA}</td><td style="padding:5px 6px;border-bottom:1px solid #f1f5f9;"><div style="display:flex;height:8px;overflow:hidden;background:#e2e8f0;"><div style="width:${aW}%;background:${colorA};"></div><div style="width:${100 - aW}%;background:${colorB};"></div></div></td><td style="padding:5px 6px;text-align:center;font-weight:700;font-size:13px;color:${colorB};border-bottom:1px solid #f1f5f9;">${t.teamB}</td></tr>`;
   }).join('');
 
   // Period rows condensees
@@ -154,7 +154,7 @@ export function exportToPdf(data: PdfExportData): void {
 <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#fff;color:#1e293b;}@media print{@page{size:A4;margin:6mm 8mm;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}.page{max-width:900px;margin:0 auto;padding:12px;}h2{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:6px;}table{width:100%;border-collapse:collapse;}.card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px;}</style>
 </head><body><div class="page">
 
-${show('score') ? `<div style="background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:10px;padding:16px 20px;margin-bottom:12px;color:white;">
+${show('score') ? `<div style="background:#1a2332;border-radius:10px;padding:16px 20px;margin-bottom:12px;color:white;">
 ${data.matchInfo.competition ? `<div style="text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:#94a3b8;margin-bottom:8px;">${data.matchInfo.competition}</div>` : ''}
 <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;">
 <div style="display:flex;align-items:center;gap:8px;">${mkLogo(data.matchInfo.teamALogoUrl, data.matchInfo.teamA, '#22c55e')}<div style="font-size:14px;font-weight:800;color:${colorA};">${data.matchInfo.teamA}</div></div>
@@ -162,18 +162,18 @@ ${data.matchInfo.competition ? `<div style="text-align:center;font-size:9px;font
 <div style="display:flex;align-items:center;gap:8px;flex-direction:row-reverse;text-align:right;">${mkLogo(data.matchInfo.teamBLogoUrl, data.matchInfo.teamB, '#f97316')}<div style="font-size:14px;font-weight:800;color:${colorB};">${data.matchInfo.teamB}</div></div>
 </div></div>` : ''}
 
-${show('kpi') ? `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+${show('kpi') ? `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;">
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:${colorA};">${teamAEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamA}</div></div>
 <div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:${colorB};">${teamBEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">${data.matchInfo.teamB}</div></div>
-<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#0ea5e9;">${data.events.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Total</div></div>
-<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#8b5cf6;">${fieldEvents.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Localisées</div></div>
+<div class="card" style="text-align:center;"><div style="font-size:20px;font-weight:800;color:#334155;">${data.events.length}</div><div style="font-size:9px;color:#64748b;font-weight:600;">Total</div></div>
+
 </div>` : ''}
 
 ${show('xg') && xgA + xgB > 0 ? `<div class="card" style="margin-bottom:12px;padding:10px 16px;">
   <div style="text-align:center;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#64748b;margin-bottom:8px;">⚽ Expected Goals (xG)</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:8px;">
     <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:${colorA};">${xgA.toFixed(2)}</div><div style="font-size:9px;color:#64748b;">${data.matchInfo.teamA}</div><div style="font-size:8px;color:#94a3b8;">${shotsA} tir${shotsA > 1 ? 's' : ''}</div></div>
-    <div><div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:#f1f5f9;"><div style="width:${xgBarA}%;background:${colorA};"></div><div style="flex:1;background:${colorB};"></div></div><div style="text-align:center;font-size:8px;color:#94a3b8;margin-top:3px;">Position · Angle · Type</div></div>
+    <div><div style="display:flex;height:8px;overflow:hidden;background:#e2e8f0;"><div style="width:${xgBarA}%;background:${colorA};"></div><div style="flex:1;background:${colorB};"></div></div></div>
     <div style="text-align:center;"><div style="font-size:28px;font-weight:900;color:${colorB};">${xgB.toFixed(2)}</div><div style="font-size:9px;color:#64748b;">${data.matchInfo.teamB}</div><div style="font-size:8px;color:#94a3b8;">${shotsB} tir${shotsB > 1 ? 's' : ''}</div></div>
   </div>
 </div>` : ''}
