@@ -142,15 +142,15 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
 
             {/* KPIs — border-y strip */}
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', borderTop:'1px solid var(--orion-line)', borderBottom:'1px solid var(--orion-line)' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', borderTop:'1.5px solid var(--orion-line-strong)', borderBottom:'1.5px solid var(--orion-line-strong)', background:'var(--orion-surface)' }}>
               <KPI label="Matchs" value={matches.length} sub={`${stats.wins}V · ${stats.draws}N · ${stats.losses}D`} />
-              <div style={{ borderLeft:'1px solid var(--orion-line)' }}>
+              <div style={{ borderLeft:'1.5px solid var(--orion-line-strong)' }}>
                 <KPI label="Buts" value={stats.goalsFor} sub={`${stats.goalsAgainst} encaissés`} accent />
               </div>
-              <div style={{ borderLeft:'1px solid var(--orion-line)' }}>
+              <div style={{ borderLeft:'1.5px solid var(--orion-line-strong)' }}>
                 <KPI label="xG saison" value={stats.xgFor.toFixed(1)} sub="expected goals" />
               </div>
-              <div style={{ borderLeft:'1px solid var(--orion-line)' }}>
+              <div style={{ borderLeft:'1.5px solid var(--orion-line-strong)' }}>
                 <KPI label="Actions codées" value={stats.events} sub={`${Math.round(stats.events/matches.length)}/match`} />
               </div>
             </div>

@@ -1,67 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    background-color: #111118;
-    color: #f0f0f2;
-    font-family: 'Inter', sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  * { box-sizing: border-box; }
+/* Force la lisibilité sur tous les textes */
+body {
+  background: #0d1117;
+  color: #eef2f8;
 }
 
-@layer utilities {
-  /* === CARBON BACKGROUNDS === */
-  .bg-dark        { background-color: #111118; }
-  .bg-orion-dark  { background-color: #111118; }
-  .bg-dark-secondary { background-color: #18181f; }
-  .bg-dark-tertiary  { background-color: #1f1f28; }
-  .bg-dark-card      { background-color: #1a1a22; }
+/* Renforcer les textes Tailwind sur fond sombre */
+.text-white { color: #eef2f8 !important; }
+.text-gray-100 { color: #dde6f2 !important; }
+.text-gray-200 { color: #c8d4e4 !important; }
+.text-gray-300 { color: #b0c0d8 !important; }
+.text-gray-400 { color: #7a92b0 !important; }
 
-  /* === ORANGE ACCENT === */
-  .text-orange-primary   { color: #f97316; }
-  .bg-orange-primary     { background-color: #f97316; }
-  .border-orange-primary { border-color: #f97316; }
-  .hover-orange:hover    { background-color: #ea580c; }
+/* Fonds Tailwind hérités */
+.bg-dark { background: #0d1117; }
+.bg-dark-secondary { background: #161c26; }
+.bg-dark-tertiary { background: #1e2736; }
 
-  /* === TEXTES === */
-  .text-muted  { color: #6b6b7a; }
-  .text-subtle { color: #4a4a58; }
-
-  /* === BORDERS === */
-  .border-subtle  { border-color: #2a2a35; }
-  .border-light   { border-color: #333342; }
-
-  /* === CARDS avec accent gauche === */
-  .card-accent-orange { border-left: 2px solid #f97316; }
-  .card-accent-green  { border-left: 2px solid #22c55e; }
-  .card-accent-blue   { border-left: 2px solid #3b82f6; }
-  .card-accent-red    { border-left: 2px solid #ef4444; }
-
-  /* === LEGACY COMPAT === */
-  .bg-orion-blue       { background-color: #f97316; }
-  .text-orion-blue     { color: #f97316; }
-  .text-orion-blue-light { color: #fb923c; }
-  .border-orion-blue   { border-color: #f97316; }
-  .hover-orion-blue:hover { background-color: #ea580c; }
-  .orion-glow    { box-shadow: 0 0 24px rgba(249,115,22,0.2); }
-  .orion-glow-sm { box-shadow: 0 0 12px rgba(249,115,22,0.15); }
-  .orion-text-glow { text-shadow: 0 0 16px rgba(249,115,22,0.4); }
-  .orion-gradient { background-color: #111118; }
-  .orion-card-gradient { background-color: #1a1a22; }
-  .orion-blue-gradient { background: linear-gradient(135deg, #c2410c, #f97316); }
-  .orion-bg-pattern { background-color: #111118; }
+/* Inputs lisibles */
+input, textarea, select {
+  background: #1e2736;
+  color: #eef2f8;
+  border-color: #2a3a50;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: #3d80e0;
+  outline: none;
+}
+input::placeholder, textarea::placeholder {
+  color: #3d5570;
 }
 
-/* === MOBILE === */
-@media (max-width: 768px) {
-  .btn-grid-mobile { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-}
-@media (orientation: landscape) and (max-height: 600px) {
-  .live-layout-landscape { grid-template-columns: 1fr 280px !important; }
+/* Borders lisibles */
+.border-gray-700 { border-color: #2a3a50 !important; }
+.border-gray-800 { border-color: #2a3a50 !important; }
+.border-dark-secondary { border-color: #2a3a50 !important; }
+
+/* Orange accent conservé pour les boutons hérités */
+.bg-orange-primary, .hover-orange:hover { background: #3d80e0 !important; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 @keyframes undoProgress {
@@ -70,11 +53,3 @@
 }
 
 button { touch-action: manipulation; }
-.select-none { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-button:active { transition: transform 0.05s ease; }
-
-/* === SCROLLBAR === */
-::-webkit-scrollbar { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a35; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a48; }

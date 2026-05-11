@@ -1,272 +1,342 @@
-/* =========================================================================
-   Orion — Design Tokens (CSS variables)
-   Drop this file into your app and import it once at the root (e.g. main.tsx,
-   layout.tsx, App.tsx):  import './orion.css';
-   Then tag your root with class="orion" or set [data-theme="orion-dark"].
-   ========================================================================= */
+/* ═══════════════════════════════════════════════════════════
+   ORION — Design System v2 — Wyscout-inspired
+   Bleu nuit · Données denses · Professionnel UEFA
+   ═══════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-:root,
-.orion,
-[data-theme="orion-dark"] {
-  /* Surfaces — near-black, blue-tinted, no pure black */
-  --orion-bg:         #0b0d10;
-  --orion-surface:    #11141a;
-  --orion-surface-2:  #161a21;
-  --orion-surface-3:  #1d222b;
-  --orion-line:       rgba(255,255,255,0.07);
-  --orion-line-strong:rgba(255,255,255,0.14);
+/* ── Tokens ─────────────────────────────────────────────── */
+[data-theme="orion-dark"], .orion {
+
+  /* Backgrounds */
+  --orion-bg:          #0d1117;   /* noir bleuté profond */
+  --orion-surface:     #161c26;   /* card principale */
+  --orion-surface-2:   #1e2736;   /* card secondaire / hover */
+  --orion-surface-3:   #253144;   /* élément actif */
+
+  /* Borders */
+  --orion-line:        #2a3a50;   /* séparateur standard */
+  --orion-line-strong: #3a5070;   /* bordure visible */
+  --orion-line-focus:  #4a80c4;   /* focus / sélection */
 
   /* Text */
-  --orion-text:       #e8ecf2;
-  --orion-text-dim:   #9aa3b2;
-  --orion-text-mute:  #5b6472;
-  --orion-text-faint: #363c47;
+  --orion-text:        #eef2f8;   /* blanc chaud — texte principal */
+  --orion-text-dim:    #c8d4e4;   /* texte secondaire */
+  --orion-text-mute:   #7a92b0;   /* labels / metadata */
+  --orion-text-faint:  #3d5570;   /* placeholders */
 
-  /* Accent — cyan électrique, used surgically */
-  --orion-accent:      #5BE3FF;
-  --orion-accent-dim:  rgba(91,227,255,0.15);
-  --orion-accent-line: rgba(91,227,255,0.35);
-  --orion-accent-ink:  #0b0d10;       /* foreground on accent fills */
-
-  /* Functional (events) */
-  --orion-green: #7BE0A8;             /* pass / success */
-  --orion-amber: #FFD27A;             /* shot / warning */
-  --orion-red:   #FF8A8A;             /* loss / error */
-
-  /* Type */
-  --orion-font-ui:    'Geist', system-ui, -apple-system, sans-serif;
-  --orion-font-mono:  'Geist Mono', ui-monospace, monospace;
-  --orion-font-disp:  'Instrument Serif', Georgia, serif;
-
-  /* Spacing rhythm — 4px base, generous */
-  --orion-space-1: 4px;
-  --orion-space-2: 8px;
-  --orion-space-3: 12px;
-  --orion-space-4: 16px;
-  --orion-space-6: 24px;
-  --orion-space-8: 32px;
-  --orion-space-12: 48px;
-
-  /* Radii — keep edges sharp; only use on inputs */
-  --orion-radius-0: 0;
-  --orion-radius-1: 2px;
-}
-
-[data-theme="orion-light"] {
-  --orion-bg:         #f6f7f9;
-  --orion-surface:    #ffffff;
-  --orion-surface-2:  #fbfbfd;
-  --orion-surface-3:  #eef0f4;
-  --orion-line:       rgba(11,13,16,0.08);
-  --orion-line-strong:rgba(11,13,16,0.18);
-  --orion-text:       #0b0d10;
-  --orion-text-dim:   #4a5260;
-  --orion-text-mute:  #7a8290;
-  --orion-text-faint: #c8ccd3;
-  --orion-accent:      #0099b8;
-  --orion-accent-dim:  rgba(0,153,184,0.10);
-  --orion-accent-line: rgba(0,153,184,0.40);
+  /* Accent — bleu UEFA */
+  --orion-accent:      #3d80e0;
+  --orion-accent-dim:  rgba(61,128,224,0.15);
+  --orion-accent-line: rgba(61,128,224,0.35);
+  --orion-accent-hover:#5596f0;
   --orion-accent-ink:  #ffffff;
+
+  /* Functional */
+  --orion-green:       #2ecc71;
+  --orion-green-dim:   rgba(46,204,113,0.12);
+  --orion-amber:       #f39c12;
+  --orion-amber-dim:   rgba(243,156,18,0.12);
+  --orion-red:         #e74c3c;
+  --orion-red-dim:     rgba(231,76,60,0.12);
+
+  /* Typography */
+  --orion-font-ui:     'Inter', system-ui, sans-serif;
+  --orion-font-mono:   'JetBrains Mono', 'Fira Code', monospace;
+  --orion-font-disp:   'Inter', system-ui, sans-serif;
+
+  /* Radius — léger, pas zéro */
+  --orion-radius:      6px;
+  --orion-radius-sm:   4px;
+  --orion-radius-lg:   8px;
+
+  /* Shadows */
+  --orion-shadow:      0 2px 8px rgba(0,0,0,0.4);
+  --orion-shadow-lg:   0 4px 24px rgba(0,0,0,0.5);
 }
 
-/* ─── Base ────────────────────────────────────────────────────────────── */
-.orion, [data-theme^="orion"] {
+/* ── Reset & Base ────────────────────────────────────────── */
+.orion *, .orion *::before, .orion *::after { box-sizing: border-box; }
+
+.orion body,
+[data-theme="orion-dark"] {
   background: var(--orion-bg);
   color: var(--orion-text);
   font-family: var(--orion-font-ui);
+  font-size: 14px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  letter-spacing: -0.003em;
 }
 
-.orion *, .orion *::before, .orion *::after { box-sizing: border-box; }
+/* ── Typography ─────────────────────────────────────────── */
+.o-display {
+  font-family: var(--orion-font-ui);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--orion-text);
+}
 
-/* ─── Type utilities ──────────────────────────────────────────────────── */
-.o-display      { font-family: var(--orion-font-disp); font-style: italic; letter-spacing: -0.015em; line-height: 1; }
-.o-mono         { font-family: var(--orion-font-mono); letter-spacing: 0.04em; }
-.o-eyebrow      { font-family: var(--orion-font-mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--orion-text-mute); }
-.o-label        { font-family: var(--orion-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orion-text-mute); }
-.o-num          { font-family: var(--orion-font-mono); font-variant-numeric: tabular-nums; }
+.o-eyebrow {
+  font-family: var(--orion-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orion-text-mute);
+}
 
-/* ─── Surfaces & lines ────────────────────────────────────────────────── */
-.o-surface      { background: var(--orion-surface); }
-.o-surface-2    { background: var(--orion-surface-2); }
-.o-line         { border: 1px solid var(--orion-line); }
-.o-line-strong  { border: 1px solid var(--orion-line-strong); }
-.o-divider      { background: var(--orion-line); height: 1px; width: 100%; }
-.o-divider-v    { background: var(--orion-line); width: 1px; align-self: stretch; }
+.o-num {
+  font-family: var(--orion-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
 
-/* ─── Buttons ─────────────────────────────────────────────────────────── */
+.o-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orion-text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
 .o-btn {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 14px;
-  font: 500 12px/1 var(--orion-font-ui);
-  letter-spacing: -0.003em;
-  background: transparent;
-  color: var(--orion-text);
-  border: 1px solid var(--orion-line-strong);
-  border-radius: 0;
-  cursor: pointer;
-  transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
-.o-btn:hover    { background: var(--orion-surface-3); }
-.o-btn--primary { background: var(--orion-accent); color: var(--orion-accent-ink); border-color: var(--orion-accent); }
-.o-btn--primary:hover { filter: brightness(1.08); background: var(--orion-accent); }
-.o-btn--ghost   { border-color: transparent; color: var(--orion-text-dim); }
-.o-btn--ghost:hover { color: var(--orion-text); background: var(--orion-surface); }
-.o-btn--sm      { padding: 6px 10px; font-size: 11px; }
-
-/* ─── Chips / pills ───────────────────────────────────────────────────── */
-.o-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 4px 10px; font-size: 11px;
-  border: 1px solid var(--orion-line);
+  font-family: var(--orion-font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
   color: var(--orion-text-dim);
-  cursor: pointer;
-  letter-spacing: -0.003em;
-}
-.o-chip[aria-pressed="true"], .o-chip.is-active {
-  border-color: var(--orion-accent-line);
-  background: var(--orion-accent-dim);
-  color: var(--orion-accent);
-}
-
-/* ─── Inputs ──────────────────────────────────────────────────────────── */
-.o-input, .o-select, .o-textarea {
-  width: 100%;
-  padding: 9px 12px;
   background: var(--orion-surface-2);
-  border: 1px solid var(--orion-line);
+  border: 1.5px solid var(--orion-line-strong);
+  border-radius: var(--orion-radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.o-btn:hover {
+  background: var(--orion-surface-3);
+  border-color: var(--orion-accent);
   color: var(--orion-text);
-  font: 400 13px/1.4 var(--orion-font-ui);
-  border-radius: 0;
-  transition: border-color .15s, background .15s;
 }
-.o-input::placeholder, .o-textarea::placeholder { color: var(--orion-text-mute); }
-.o-input:focus, .o-select:focus, .o-textarea:focus {
-  outline: none;
-  border-color: var(--orion-accent-line);
-  background: var(--orion-surface);
+.o-btn:active { transform: scale(0.98); }
+
+.o-btn--primary {
+  background: var(--orion-accent);
+  color: var(--orion-accent-ink);
+  border-color: var(--orion-accent);
 }
-.o-field-label {
-  font-family: var(--orion-font-mono); font-size: 10px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--orion-text-mute);
-  display: block; margin-bottom: 6px;
+.o-btn--primary:hover {
+  background: var(--orion-accent-hover);
+  border-color: var(--orion-accent-hover);
+  color: white;
 }
 
-/* ─── Cards / panels (no rounded corners by default) ──────────────────── */
+.o-btn--ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--orion-text-mute);
+}
+.o-btn--ghost:hover {
+  background: var(--orion-surface-2);
+  border-color: var(--orion-line);
+  color: var(--orion-text);
+}
+
+.o-btn--sm {
+  padding: 5px 10px;
+  font-size: 11px;
+  gap: 4px;
+  border-radius: var(--orion-radius-sm);
+}
+
+.o-btn--lg {
+  padding: 12px 20px;
+  font-size: 14px;
+}
+
+.o-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
 .o-card {
   background: var(--orion-surface);
-  border: 1px solid var(--orion-line);
-  padding: 22px 24px;
+  border: 1.5px solid var(--orion-line);
+  border-radius: var(--orion-radius);
+  overflow: hidden;
 }
+
 .o-card__header {
-  display: flex; align-items: baseline; justify-content: space-between;
-  margin-bottom: 14px;
-}
-
-/* ─── KPI ─────────────────────────────────────────────────────────────── */
-.o-kpi { display: flex; flex-direction: column; gap: 8px; padding: 22px 24px; }
-.o-kpi__label { font-family: var(--orion-font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--orion-text-mute); }
-.o-kpi__value { font-family: var(--orion-font-disp); font-style: italic; font-size: 40px; line-height: 1; letter-spacing: -0.02em; }
-.o-kpi__value--accent { color: var(--orion-accent); }
-.o-kpi__sub   { font-family: var(--orion-font-mono); font-size: 10px; color: var(--orion-text-dim); letter-spacing: 0.04em; }
-
-/* ─── Tables ──────────────────────────────────────────────────────────── */
-.o-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.o-table th {
-  text-align: left; padding: 10px 14px;
-  font-family: var(--orion-font-mono); font-size: 10px; font-weight: 400;
-  letter-spacing: 0.14em; text-transform: uppercase; color: var(--orion-text-mute);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
   border-bottom: 1px solid var(--orion-line);
 }
-.o-table td { padding: 12px 14px; border-bottom: 1px solid var(--orion-line); }
-.o-table tr.is-active td { background: var(--orion-accent-dim); }
 
-/* ─── Tabs ────────────────────────────────────────────────────────────── */
-.o-tabs { display: flex; gap: 28px; border-bottom: 1px solid var(--orion-line); }
-.o-tab {
-  padding: 14px 0; font-size: 12px; color: var(--orion-text-mute);
-  border-bottom: 1px solid transparent;
-  cursor: pointer;
+.o-card__body {
+  padding: 16px 18px;
 }
-.o-tab[aria-selected="true"], .o-tab.is-active {
+
+/* ── TopBar ──────────────────────────────────────────────── */
+.o-topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  padding: 0 20px;
+  background: var(--orion-surface);
+  border-bottom: 1.5px solid var(--orion-line-strong);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+.o-tab {
+  font-family: var(--orion-font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--orion-text-mute);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 2px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.o-tab:hover { color: var(--orion-text-dim); }
+.o-tab.is-active {
   color: var(--orion-text);
   border-bottom-color: var(--orion-accent);
 }
 
-/* ─── Status dots / pills (W/D/L, event types) ────────────────────────── */
-.o-dot { display: inline-block; width: 5px; height: 5px; }
-.o-dot--green { background: var(--orion-green); }
-.o-dot--amber { background: var(--orion-amber); }
-.o-dot--red   { background: var(--orion-red); }
-.o-dot--accent{ background: var(--orion-accent); }
+/* ── Divider ─────────────────────────────────────────────── */
+.o-divider-v {
+  width: 1.5px;
+  height: 20px;
+  background: var(--orion-line-strong);
+  flex-shrink: 0;
+}
 
-.o-result {
-  display: inline-grid; place-items: center;
-  width: 22px; height: 22px;
-  font: 400 10px/1 var(--orion-font-mono);
-}
-.o-result--w { border: 1px solid var(--orion-green); color: var(--orion-green); }
-.o-result--d { border: 1px solid var(--orion-amber); color: var(--orion-amber); }
-.o-result--l { border: 1px solid var(--orion-red);   color: var(--orion-red); }
-
-/* ─── Modal / dialog ──────────────────────────────────────────────────── */
-.o-modal-overlay {
-  position: fixed; inset: 0; background: rgba(5,7,10,0.7);
-  backdrop-filter: blur(6px);
-  display: grid; place-items: center; z-index: 100;
-}
-.o-modal {
-  width: min(560px, 92vw);
-  background: var(--orion-surface);
-  border: 1px solid var(--orion-line-strong);
-  display: flex; flex-direction: column;
-}
-.o-modal__header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 22px; border-bottom: 1px solid var(--orion-line);
-}
-.o-modal__title { font-size: 14px; }
-.o-modal__body  { padding: 22px; display: flex; flex-direction: column; gap: 16px; }
-.o-modal__footer{ padding: 16px 22px; border-top: 1px solid var(--orion-line); display: flex; justify-content: flex-end; gap: 8px; }
-
-/* ─── Avatar ──────────────────────────────────────────────────────────── */
+/* ── Avatar ──────────────────────────────────────────────── */
 .o-avatar {
-  width: 28px; height: 28px; border-radius: 50%;
-  background: var(--orion-surface-3); border: 1px solid var(--orion-line);
-  display: grid; place-items: center;
-  font-size: 11px; color: var(--orion-text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--orion-accent-dim);
+  border: 1.5px solid var(--orion-accent-line);
+  color: var(--orion-accent);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-/* ─── Top bar / nav ───────────────────────────────────────────────────── */
-.o-topbar {
-  display: flex; align-items: center; gap: 18px;
-  height: 56px; padding: 0 24px;
-  border-bottom: 1px solid var(--orion-line);
+/* ── Inputs ──────────────────────────────────────────────── */
+.o-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--orion-surface-2);
+  border: 1.5px solid var(--orion-line-strong);
+  border-radius: var(--orion-radius-sm);
+  color: var(--orion-text);
+  font-family: var(--orion-font-ui);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.o-input:focus { border-color: var(--orion-accent); }
+.o-input::placeholder { color: var(--orion-text-faint); }
+
+/* ── Badge / Chip ────────────────────────────────────────── */
+.o-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--orion-surface-3);
+  color: var(--orion-text-dim);
+  border: 1px solid var(--orion-line-strong);
 }
 
-/* ─── Misc ────────────────────────────────────────────────────────────── */
-.o-hairline { background: var(--orion-line); }
-.o-glow { box-shadow: 0 0 24px -6px var(--orion-accent); }
-.o-corner-ticks { position: relative; }
-.o-corner-ticks::before, .o-corner-ticks::after,
-.o-corner-ticks > i::before, .o-corner-ticks > i::after {
-  content: ""; position: absolute; width: 10px; height: 10px;
+/* ── Result W/D/L ────────────────────────────────────────── */
+.o-result {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
 }
-.o-corner-ticks::before { top: 8px; left: 8px;   border-top: 1px solid var(--orion-line-strong); border-left:  1px solid var(--orion-line-strong); }
-.o-corner-ticks::after  { top: 8px; right: 8px;  border-top: 1px solid var(--orion-line-strong); border-right: 1px solid var(--orion-line-strong); }
-.o-corner-ticks > i::before { content:""; position:absolute; bottom:8px; left:8px;  width:10px; height:10px; border-bottom: 1px solid var(--orion-line-strong); border-left:  1px solid var(--orion-line-strong); }
-.o-corner-ticks > i::after  { content:""; position:absolute; bottom:8px; right:8px; width:10px; height:10px; border-bottom: 1px solid var(--orion-line-strong); border-right: 1px solid var(--orion-line-strong); }
+.o-result--W { background: var(--orion-green-dim); color: var(--orion-green); border: 1px solid rgba(46,204,113,0.3); }
+.o-result--D { background: var(--orion-amber-dim); color: var(--orion-amber); border: 1px solid rgba(243,156,18,0.3); }
+.o-result--L { background: var(--orion-red-dim);   color: var(--orion-red);   border: 1px solid rgba(231,76,60,0.3); }
 
-/* ─── Scrollbars (subtle) ─────────────────────────────────────────────── */
-.orion ::-webkit-scrollbar { width: 8px; height: 8px; }
-.orion ::-webkit-scrollbar-thumb { background: var(--orion-surface-3); }
-.orion ::-webkit-scrollbar-track { background: transparent; }
+/* ── KPI Block ───────────────────────────────────────────── */
+.o-kpi {
+  padding: 16px 20px;
+}
+.o-kpi__value {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--orion-text);
+  font-family: var(--orion-font-ui);
+}
+.o-kpi__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--orion-text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+.o-kpi__sub {
+  font-size: 11px;
+  color: var(--orion-text-mute);
+  margin-top: 2px;
+}
+.o-kpi--accent .o-kpi__value { color: var(--orion-accent); }
 
+/* ── Scrollbar ───────────────────────────────────────────── */
+.orion ::-webkit-scrollbar { width: 6px; height: 6px; }
+.orion ::-webkit-scrollbar-track { background: var(--orion-bg); }
+.orion ::-webkit-scrollbar-thumb { background: var(--orion-line-strong); border-radius: 3px; }
+.orion ::-webkit-scrollbar-thumb:hover { background: var(--orion-text-faint); }
+
+/* ── Animations ──────────────────────────────────────────── */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50% { opacity: 0.5; }
 }
+
+@keyframes undoProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utility ─────────────────────────────────────────────── */
+button { touch-action: manipulation; }

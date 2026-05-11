@@ -787,7 +787,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
       <div style={{ maxWidth:1400, margin:'0 auto' }}>
 
         {/* TOP BAR */}
-        <header style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1px solid var(--orion-line)', position:'sticky', top:0, background:'var(--orion-bg)', zIndex:40 }}>
+        <header style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1.5px solid var(--orion-line-strong)', position:'sticky', top:0, background:'var(--orion-bg)', zIndex:40 }}>
           {onBack && (
             <button onClick={handleBack} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'6px 8px' }}>
               <ArrowLeft size={16} />

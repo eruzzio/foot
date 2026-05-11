@@ -12,11 +12,11 @@ export const OrionMark = ({
   size = 24, color = 'currentColor', accent,
 }: { size?: number; color?: Color; accent?: Color }) => (
   <svg width={size} height={size} viewBox="0 0 32 32" fill="none" aria-hidden>
-    <circle cx="16" cy="16" r="14.5" stroke={color} strokeWidth="1" opacity="0.8" />
-    <path d="M16 1V5M16 27V31M1 16H5M27 16H31" stroke={color} strokeWidth="1" opacity="0.8" />
-    <circle cx="9.5"  cy="18.2" r="1.4" fill={accent || color} />
-    <circle cx="16"   cy="16"   r="1.4" fill={accent || color} />
-    <circle cx="22.5" cy="13.8" r="1.4" fill={accent || color} />
+    <circle cx="16" cy="16" r="14.5" stroke={color} strokeWidth="1.5" opacity="1" />
+    <path d="M16 1V5M16 27V31M1 16H5M27 16H31" stroke={color} strokeWidth="1.5" opacity="1" />
+    <circle cx="9.5"  cy="18.2" r="2" fill={accent || color} />
+    <circle cx="16"   cy="16"   r="2" fill={accent || color} />
+    <circle cx="22.5" cy="13.8" r="2" fill={accent || color} />
   </svg>
 );
 
@@ -24,15 +24,14 @@ export const OrionLogo = ({
   height = 16, color, accent,
 }: { height?: number; color?: Color; accent?: Color }) => (
   <span style={{
-    display: 'inline-flex', alignItems: 'center', gap: height * 0.55,
+    display: 'inline-flex', alignItems: 'center', gap: height * 0.6,
     color: color || 'var(--orion-text)', lineHeight: 1,
   }}>
-    <OrionMark size={height * 1.35} color={color || 'currentColor'} accent={accent || 'var(--orion-accent)'} />
+    <OrionMark size={height * 1.4} color={color || 'currentColor'} accent={accent || 'var(--orion-accent)'} />
     <span style={{
-      fontFamily: 'var(--orion-font-ui)', fontWeight: 700,
-      fontSize: height, letterSpacing: '0.22em', textTransform: 'uppercase',
+      fontFamily: 'var(--orion-font-ui)', fontWeight: 800,
+      fontSize: height, letterSpacing: '0.2em', textTransform: 'uppercase',
       color: color || 'var(--orion-text)',
-      opacity: 1,
     }}>Orion</span>
   </span>
 );
