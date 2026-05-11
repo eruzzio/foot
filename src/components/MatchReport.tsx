@@ -201,6 +201,42 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
                   <p className="text-gray-400">Buts</p>
                 </div>
               </div>
+
+              {/* Tags contextuels */}
+              {(match.tag_competition || match.tag_venue || match.tag_stake || match.tag_surface || match.tag_weather) && (
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+                  {match.tag_competition && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(61,128,224,0.12)', border:'1px solid rgba(61,128,224,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#7ab4f0', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
+                      🏆 {match.tag_competition}
+                    </span>
+                  )}
+                  {match.tag_venue && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
+                      📍 {match.tag_venue === 'home' ? 'Domicile' : match.tag_venue === 'away' ? 'Extérieur' : 'Terrain neutre'}
+                    </span>
+                  )}
+                  {match.tag_stake && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(243,156,18,0.1)', border:'1px solid rgba(243,156,18,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#f39c12', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
+                      🎯 {match.tag_stake === 'decisive' ? 'Match décisif' : match.tag_stake === 'friendly' ? 'Amical' : 'Match normal'}
+                    </span>
+                  )}
+                  {match.tag_surface && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(46,204,113,0.08)', border:'1px solid rgba(46,204,113,0.25)', borderRadius:4, fontSize:11, fontWeight:600, color:'#2ecc71', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
+                      🌱 {match.tag_surface === 'grass' ? 'Pelouse naturelle' : 'Synthétique'}
+                    </span>
+                  )}
+                  {match.tag_weather && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
+                      {match.tag_weather === 'sun' ? '☀️ Beau temps' : match.tag_weather === 'rain' ? '🌧️ Pluie' : match.tag_weather === 'wind' ? '💨 Vent' : '❄️ Neige/Froid'}
+                    </span>
+                  )}
+                  {match.tag_notes && (
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', fontStyle:'italic', maxWidth:300, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      📝 {match.tag_notes}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </header>
