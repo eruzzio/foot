@@ -160,96 +160,77 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               <div className="o-card__header">
                 <div style={{ display:'flex', alignItems:'center', gap:12 }}>
                   <span className="o-eyebrow">Évolution</span>
-                  <span style={{ fontSize:13, fontWeight:600, color:'var(--orion-text-dim)' }}>{matches.length} derniers matchs</span>
+                  <span style={{ fontSize:13, fontWeight:600, color:'var(--orion-text-dim)' }}>{matches.length} matchs</span>
                 </div>
                 <div style={{ display:'flex', gap:20 }}>
                   {[
-                    { color:'var(--orion-accent)', label:'BUTS', dash:false },
-                    { color:'var(--orion-green)', label:'xG', dash:false },
-                    { color:'var(--orion-red)', label:'ENCAISSÉS', dash:true },
+                    { color:'var(--orion-accent)', label:'BUTS' },
+                    { color:'var(--orion-red)', label:'ENCAISSÉS' },
                   ].map(l => (
                     <div key={l.label} style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      <svg width={l.dash ? 20 : 16} height={3}>
-                        <line x1="0" y1="1.5" x2={l.dash ? 20 : 16} y2="1.5"
-                          stroke={l.color} strokeWidth="2.5"
-                          strokeDasharray={l.dash ? '4,3' : 'none'} />
-                      </svg>
+                      <span style={{ width:10, height:10, borderRadius:2, background:l.color, display:'inline-block' }} />
                       <span style={{ fontSize:11, fontWeight:600, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>{l.label}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div style={{ padding:'20px 24px 16px' }}>
-                <svg width="100%" height="200" viewBox={`0 0 ${W} 220`} preserveAspectRatio="xMidYMid meet">
-                  {/* Grille */}
-                  {[0,1,2,3,4].map(i => (
-                    <g key={i}>
-                      <line x1="30" y1={i*45+10} x2={W-10} y2={i*45+10} stroke="rgba(42,58,80,0.8)" strokeWidth="1"/>
-                      <text x="22" y={i*45+14} textAnchor="end" fontSize="10" fill="#7a92b0" fontFamily="'JetBrains Mono', monospace">
-                        {Math.round(maxG - (i/4)*maxG)}
-                      </text>
-                    </g>
-                  ))}
-                  {/* Zone colorée sous la courbe buts */}
-                  <defs>
-                    <linearGradient id="gradButs" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--orion-accent)" stopOpacity="0.2"/>
-                      <stop offset="100%" stopColor="var(--orion-accent)" stopOpacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <polygon
-                    fill="url(#gradButs)"
-                    points={[
-                      `30,${190}`,
-                      ...matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_a_score/maxG)*160}`),
-                      `${W-30},${190}`,
-                    ].join(' ')}
-                  />
-                  {/* Ligne encaissés */}
-                  <polyline fill="none" stroke="var(--orion-red)" strokeWidth="2" strokeDasharray="6,4" opacity="0.6"
-                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_b_score/maxG)*160}`).join(' ')} />
-                  {/* Ligne xG */}
-                  <polyline fill="none" stroke="var(--orion-green)" strokeWidth="2.5" opacity="0.85"
-                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.xg_for/maxXG)*160}`).join(' ')} />
-                  {/* Ligne buts */}
-                  <polyline fill="none" stroke="var(--orion-accent)" strokeWidth="3"
-                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_a_score/maxG)*160}`).join(' ')} />
-                  {/* Points et labels */}
-                  {matches.map((m,i) => {
-                    const x = i*(W-60)/(matches.length-1||1)+30;
-                    const y = 190-(m.team_a_score/maxG)*160;
+              <div style={{ padding:'20px 24px 0' }}>
+                {/* Barres par match */}
+                <div style={{ display:'flex', gap:8, alignItems:'flex-end', height:160 }}>
+                  {matches.map((m, i) => {
+                    const barH = Math.max((m.team_a_score / maxG) * 130, 4);
+                    const barHA = Math.max((m.team_b_score / maxG) * 130, 4);
+                    const isLast = i === matches.length - 1;
                     return (
-                      <g key={m.id}>
-                        {/* Point */}
-                        <circle cx={x} cy={y} r="5" fill="var(--orion-accent)" stroke="var(--orion-surface)" strokeWidth="2.5"/>
-                        {/* Score */}
-                        <text x={x} y={y-14} textAnchor="middle" fontSize="12" fontWeight="700" fill="#eef2f8" fontFamily="'JetBrains Mono', monospace">
+                      <button key={m.id} onClick={() => onNavigate(`stats-${m.id}`)}
+                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, background:'none', border:'none', cursor:'pointer', padding:0, minWidth:60 }}>
+                        {/* Score au-dessus */}
+                        <span style={{ fontSize:13, fontWeight:800, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>
                           {m.team_a_score}–{m.team_b_score}
-                        </text>
-                        {/* Date */}
-                        <text x={x} y="212" textAnchor="middle" fontSize="11" fontWeight="600" fill="#7a92b0" fontFamily="'JetBrains Mono', monospace">
-                          {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
-                        </text>
-                      </g>
+                        </span>
+                        {/* Barres côte à côte */}
+                        <div style={{ display:'flex', gap:3, alignItems:'flex-end', width:'100%', justifyContent:'center' }}>
+                          <div style={{ width:28, height:barH, background: isLast ? 'var(--orion-accent)' : 'rgba(61,128,224,0.5)', borderRadius:'3px 3px 0 0', transition:'height .3s' }} />
+                          <div style={{ width:28, height:barHA, background: isLast ? 'rgba(231,76,60,0.7)' : 'rgba(231,76,60,0.35)', borderRadius:'3px 3px 0 0', transition:'height .3s' }} />
+                        </div>
+                        {/* Ligne de base */}
+                        <div style={{ width:'100%', height:1, background:'var(--orion-line-strong)' }} />
+                        {/* Adversaire + date */}
+                        <div style={{ textAlign:'center' }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-text-dim)' }}>
+                            {m.team_b_name.split(' ')[0]}
+                          </div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginTop:2 }}>
+                            {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
+                          </div>
+                        </div>
+                        {/* Badge résultat */}
+                        <Result r={m.result} />
+                      </button>
                     );
                   })}
-                </svg>
+                </div>
               </div>
-              {/* Résultats cliquables */}
-              <div style={{ display:'flex', gap:8, padding:'0 24px 16px', flexWrap:'wrap' }}>
-                {matches.slice(-5).reverse().map(m=>(
-                  <button key={m.id} onClick={()=>onNavigate(`stats-${m.id}`)}
-                    style={{ display:'flex', alignItems:'center', gap:8, background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:4, cursor:'pointer', padding:'6px 12px' }}>
-                    <Result r={m.result} />
-                    <span style={{ fontSize:12, fontWeight:600, color:'var(--orion-text-dim)' }}>
-                      {m.team_b_name.split(' ')[0]}
-                    </span>
-                    <span style={{ fontSize:11, fontFamily:'var(--orion-font-mono)', color:'var(--orion-text-mute)' }}>
-                      {m.team_a_score}–{m.team_b_score}
-                    </span>
-                  </button>
-                ))}
-              </div>
+              {/* xG bar en bas */}
+              {matches.some(m => m.xg_for > 0) && (
+                <div style={{ padding:'12px 24px 16px', borderTop:'1px solid var(--orion-line)', marginTop:12 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:8 }}>
+                    <span className="o-eyebrow">xG par match</span>
+                  </div>
+                  <div style={{ display:'flex', gap:8 }}>
+                    {matches.map(m => (
+                      <div key={m.id} style={{ flex:1, display:'flex', flexDirection:'column', gap:4, alignItems:'center' }}>
+                        <span style={{ fontSize:11, fontWeight:700, color:'var(--orion-green)', fontFamily:'var(--orion-font-mono)' }}>
+                          {m.xg_for.toFixed(1)}
+                        </span>
+                        <div style={{ width:'100%', height:6, background:'var(--orion-surface-3)', borderRadius:3 }}>
+                          <div style={{ width:`${Math.min((m.xg_for / maxXG) * 100, 100)}%`, height:'100%', background:'var(--orion-green)', borderRadius:3, transition:'width .3s' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* TENDANCES */}
