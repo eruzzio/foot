@@ -174,24 +174,24 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                   ))}
                 </div>
               </div>
-              <div style={{ padding:'20px 24px 0' }}>
+              <div style={{ padding:'32px 24px 0', overflowX:'auto' }}>
                 {/* Barres par match */}
-                <div style={{ display:'flex', gap:8, alignItems:'flex-end', height:160 }}>
+                <div style={{ display:'flex', gap:8, alignItems:'flex-end', height:180, minWidth: matches.length * 80 }}>
                   {matches.map((m, i) => {
-                    const barH = Math.max((m.team_a_score / maxG) * 130, 4);
-                    const barHA = Math.max((m.team_b_score / maxG) * 130, 4);
+                    const barH = Math.max((m.team_a_score / maxG) * 120, 4);
+                    const barHA = Math.max((m.team_b_score / maxG) * 120, 4);
                     const isLast = i === matches.length - 1;
                     return (
                       <button key={m.id} onClick={() => onNavigate(`stats-${m.id}`)}
-                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6, background:'none', border:'none', cursor:'pointer', padding:0, minWidth:60 }}>
-                        {/* Score au-dessus */}
-                        <span style={{ fontSize:13, fontWeight:800, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>
-                          {m.team_a_score}–{m.team_b_score}
-                        </span>
+                        style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:5, background:'none', border:'none', cursor:'pointer', padding:0, minWidth:60 }}>
                         {/* Barres côte à côte */}
-                        <div style={{ display:'flex', gap:3, alignItems:'flex-end', width:'100%', justifyContent:'center' }}>
-                          <div style={{ width:28, height:barH, background: isLast ? 'var(--orion-accent)' : 'rgba(61,128,224,0.5)', borderRadius:'3px 3px 0 0', transition:'height .3s' }} />
-                          <div style={{ width:28, height:barHA, background: isLast ? 'rgba(231,76,60,0.7)' : 'rgba(231,76,60,0.35)', borderRadius:'3px 3px 0 0', transition:'height .3s' }} />
+                        <div style={{ display:'flex', gap:3, alignItems:'flex-end', width:'100%', justifyContent:'center', position:'relative' }}>
+                          {/* Score flottant au-dessus des barres */}
+                          <span style={{ position:'absolute', top: -24, left:'50%', transform:'translateX(-50%)', fontSize:12, fontWeight:800, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)', whiteSpace:'nowrap' }}>
+                            {m.team_a_score}–{m.team_b_score}
+                          </span>
+                          <div style={{ width:28, height:barH, background: isLast ? 'var(--orion-accent)' : 'rgba(61,128,224,0.5)', borderRadius:'3px 3px 0 0' }} />
+                          <div style={{ width:28, height:barHA > 0 ? barHA : 0, background: isLast ? 'rgba(231,76,60,0.8)' : 'rgba(231,76,60,0.4)', borderRadius:'3px 3px 0 0' }} />
                         </div>
                         {/* Ligne de base */}
                         <div style={{ width:'100%', height:1, background:'var(--orion-line-strong)' }} />
