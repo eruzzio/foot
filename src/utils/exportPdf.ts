@@ -111,17 +111,40 @@ export function exportToPdf(data: PdfExportData): void {
   const zT = zO + zM + zD || 1;
 
   // Détail par zone : quels types d'événements dans chaque zone
-  const zoneDetailFn = (evts: MatchEventWithDetails[]) => {
+  // Mots-clés pertinents par zone (identiques à Heatmap.tsx)
+  const ZONE_KEYWORDS = {
+    defensive: ['récup', 'recup', 'tacle', 'tackle', 'faute', 'foul', 'duel', 'perte', 'interception', 'dégagement', 'arrêt', 'gardien', 'défens'],
+    mediane:   ['passe', 'pass', 'relance', 'duel', 'faute', 'foul', 'récup', 'recup', 'perte', 'centre', 'transition', 'conduite'],
+    offensive: ['tir', 'shot', 'frappe', 'but', 'penalty', 'coup franc', 'centre', 'dribble', 'faute', 'occasion', 'tête'],
+  };
+
+  const zoneDetailFn = (evts: MatchEventWithDetails[], keywords?: string[]) => {
     const byType: Record<string, number> = {};
     evts.forEach(e => {
       const n = e.event_type?.name || e.label || 'Autre';
+      if (keywords) {
+        const nameLower = n.toLowerCase();
+        if (!keywords.some(k => nameLower.includes(k))) return;
+      }
       byType[n] = (byType[n] || 0) + 1;
     });
-    return Object.entries(byType).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `${n} ${c}`).join(' | ');
+    const sorted = Object.entries(byType).sort((a, b) => b[1] - a[1]).slice(0, 3);
+    // Fallback sans filtre si aucun résultat
+    if (sorted.length === 0 && keywords) {
+      const fallback: Record<string, number> = {};
+      evts.forEach(e => { const n = e.event_type?.name || e.label || 'Autre'; fallback[n] = (fallback[n] || 0) + 1; });
+      return Object.entries(fallback).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([n, c]) => `${n} ${c}`).join(' | ');
+    }
+    return sorted.map(([n, c]) => `${n} ${c}`).join(' | ');
   };
-  const zoneOffDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) > 66));
-  const zoneMedDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66));
-  const zoneDefDetail = zoneDetailFn(zonesEventsFiltered.filter(e => (e.field_x ?? 0) < 33));
+
+  const defEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) < 33);
+  const medEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) >= 33 && (e.field_x ?? 0) <= 66);
+  const offEvts = zonesEventsFiltered.filter(e => (e.field_x ?? 0) > 66);
+
+  const zoneOffDetail = zoneDetailFn(offEvts, ZONE_KEYWORDS.offensive);
+  const zoneMedDetail = zoneDetailFn(medEvts, ZONE_KEYWORDS.mediane);
+  const zoneDefDetail = zoneDetailFn(defEvts, ZONE_KEYWORDS.defensive);
 
   // But
   const goalEvents = goalEventsFiltered;
