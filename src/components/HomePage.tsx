@@ -156,50 +156,96 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             </div>
 
             {/* GRAPHIQUE */}
-            <div className="o-card" style={{ padding:'28px 24px', marginTop:2 }}>
+            <div className="o-card" style={{ marginTop:2 }}>
               <div className="o-card__header">
-                <div style={{ display:'flex', alignItems:'baseline', gap:12 }}>
-                  <Eyebrow>Évolution</Eyebrow>
-                  <span style={{ fontSize:13 }}>{matches.length} derniers matchs</span>
+                <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                  <span className="o-eyebrow">Évolution</span>
+                  <span style={{ fontSize:13, fontWeight:600, color:'var(--orion-text-dim)' }}>{matches.length} derniers matchs</span>
                 </div>
-                <div style={{ display:'flex', gap:16, fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.08em' }}>
-                  <span><span style={{ display:'inline-block', width:4, height:4, background:'var(--orion-accent)', marginRight:5, verticalAlign:'middle' }} />BUTS</span>
-                  <span><span style={{ display:'inline-block', width:4, height:4, background:'var(--orion-green)', marginRight:5, verticalAlign:'middle' }} />xG</span>
-                  <span><span style={{ display:'inline-block', width:4, height:4, background:'var(--orion-red)', marginRight:5, verticalAlign:'middle', opacity:0.6 }} />ENCAISSÉS</span>
+                <div style={{ display:'flex', gap:20 }}>
+                  {[
+                    { color:'var(--orion-accent)', label:'BUTS', dash:false },
+                    { color:'var(--orion-green)', label:'xG', dash:false },
+                    { color:'var(--orion-red)', label:'ENCAISSÉS', dash:true },
+                  ].map(l => (
+                    <div key={l.label} style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      <svg width={l.dash ? 20 : 16} height={3}>
+                        <line x1="0" y1="1.5" x2={l.dash ? 20 : 16} y2="1.5"
+                          stroke={l.color} strokeWidth="2.5"
+                          strokeDasharray={l.dash ? '4,3' : 'none'} />
+                      </svg>
+                      <span style={{ fontSize:11, fontWeight:600, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>{l.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div style={{ height:160, marginTop:8 }}>
-                <svg width="100%" height="100%" viewBox={`0 0 ${W} 200`} preserveAspectRatio="xMidYMid meet">
-                  {[0,1,2,3].map(i=><line key={i} x1="0" y1={i*50} x2={W} y2={i*50} stroke="rgba(255,255,255,0.05)" strokeWidth="1"/>)}
-                  <polyline fill="none" stroke="var(--orion-red)" strokeWidth="1" strokeDasharray="4,3" opacity="0.5"
-                    points={matches.map((m,i)=>`${i*80+40},${185-(m.team_b_score/maxG)*160}`).join(' ')} />
-                  <polyline fill="none" stroke="var(--orion-green)" strokeWidth="1.5" opacity="0.7"
-                    points={matches.map((m,i)=>`${i*80+40},${185-(m.xg_for/maxXG)*160}`).join(' ')} />
-                  <polyline fill="none" stroke="var(--orion-accent)" strokeWidth="2"
-                    points={matches.map((m,i)=>`${i*80+40},${185-(m.team_a_score/maxG)*160}`).join(' ')} />
-                  {matches.map((m,i)=>{
-                    const x=i*80+40, y=185-(m.team_a_score/maxG)*160;
+              <div style={{ padding:'20px 24px 16px' }}>
+                <svg width="100%" height="200" viewBox={`0 0 ${W} 220`} preserveAspectRatio="xMidYMid meet">
+                  {/* Grille */}
+                  {[0,1,2,3,4].map(i => (
+                    <g key={i}>
+                      <line x1="30" y1={i*45+10} x2={W-10} y2={i*45+10} stroke="rgba(42,58,80,0.8)" strokeWidth="1"/>
+                      <text x="22" y={i*45+14} textAnchor="end" fontSize="10" fill="#7a92b0" fontFamily="'JetBrains Mono', monospace">
+                        {Math.round(maxG - (i/4)*maxG)}
+                      </text>
+                    </g>
+                  ))}
+                  {/* Zone colorée sous la courbe buts */}
+                  <defs>
+                    <linearGradient id="gradButs" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--orion-accent)" stopOpacity="0.2"/>
+                      <stop offset="100%" stopColor="var(--orion-accent)" stopOpacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <polygon
+                    fill="url(#gradButs)"
+                    points={[
+                      `30,${190}`,
+                      ...matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_a_score/maxG)*160}`),
+                      `${W-30},${190}`,
+                    ].join(' ')}
+                  />
+                  {/* Ligne encaissés */}
+                  <polyline fill="none" stroke="var(--orion-red)" strokeWidth="2" strokeDasharray="6,4" opacity="0.6"
+                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_b_score/maxG)*160}`).join(' ')} />
+                  {/* Ligne xG */}
+                  <polyline fill="none" stroke="var(--orion-green)" strokeWidth="2.5" opacity="0.85"
+                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.xg_for/maxXG)*160}`).join(' ')} />
+                  {/* Ligne buts */}
+                  <polyline fill="none" stroke="var(--orion-accent)" strokeWidth="3"
+                    points={matches.map((m,i)=>`${i*(W-60)/(matches.length-1||1)+30},${190-(m.team_a_score/maxG)*160}`).join(' ')} />
+                  {/* Points et labels */}
+                  {matches.map((m,i) => {
+                    const x = i*(W-60)/(matches.length-1||1)+30;
+                    const y = 190-(m.team_a_score/maxG)*160;
                     return (
                       <g key={m.id}>
-                        <circle cx={x} cy={y} r="3.5" fill="var(--orion-accent)" stroke="var(--orion-bg)" strokeWidth="1.5"/>
-                        <text x={x} y="198" textAnchor="middle" fontSize="9" fill="var(--orion-text-mute)" fontFamily="var(--orion-font-mono)">
-                          {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
+                        {/* Point */}
+                        <circle cx={x} cy={y} r="5" fill="var(--orion-accent)" stroke="var(--orion-surface)" strokeWidth="2.5"/>
+                        {/* Score */}
+                        <text x={x} y={y-14} textAnchor="middle" fontSize="12" fontWeight="700" fill="#eef2f8" fontFamily="'JetBrains Mono', monospace">
+                          {m.team_a_score}–{m.team_b_score}
                         </text>
-                        <text x={x} y={y-10} textAnchor="middle" fontSize="10" fill="var(--orion-text)" fontFamily="var(--orion-font-mono)">
-                          {m.team_a_score}-{m.team_b_score}
+                        {/* Date */}
+                        <text x={x} y="212" textAnchor="middle" fontSize="11" fontWeight="600" fill="#7a92b0" fontFamily="'JetBrains Mono', monospace">
+                          {new Date(m.match_date).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}
                         </text>
                       </g>
                     );
                   })}
                 </svg>
               </div>
-              <div style={{ display:'flex', gap:10, marginTop:16, flexWrap:'wrap' }}>
+              {/* Résultats cliquables */}
+              <div style={{ display:'flex', gap:8, padding:'0 24px 16px', flexWrap:'wrap' }}>
                 {matches.slice(-5).reverse().map(m=>(
                   <button key={m.id} onClick={()=>onNavigate(`stats-${m.id}`)}
-                    style={{ display:'flex', alignItems:'center', gap:7, background:'none', border:'none', cursor:'pointer', padding:0 }}>
+                    style={{ display:'flex', alignItems:'center', gap:8, background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:4, cursor:'pointer', padding:'6px 12px' }}>
                     <Result r={m.result} />
-                    <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>
+                    <span style={{ fontSize:12, fontWeight:600, color:'var(--orion-text-dim)' }}>
                       {m.team_b_name.split(' ')[0]}
+                    </span>
+                    <span style={{ fontSize:11, fontFamily:'var(--orion-font-mono)', color:'var(--orion-text-mute)' }}>
+                      {m.team_a_score}–{m.team_b_score}
                     </span>
                   </button>
                 ))}
