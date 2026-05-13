@@ -24,6 +24,11 @@ interface PdfExportData {
     zones: string[] | null;
     goal: string[] | null;
   };
+  heatmapTeams?: {
+    heatmap_field?: 'A' | 'B' | 'both';
+    heatmap_zones?: 'A' | 'B' | 'both';
+    heatmap_goal?:  'A' | 'B' | 'both';
+  };
 }
 
 function formatTime(seconds: number): string {
@@ -39,6 +44,13 @@ export function exportToPdf(data: PdfExportData): void {
   const show = (id: string) => !data.sections || s[id] !== false;
   const teamFilter = data.teamFilter || 'both';
   const hf = data.heatmapFilters;
+  const ht = data.heatmapTeams || {};
+
+  // Filtrer les événements par équipe pour chaque heatmap
+  const filterByTeam = (evts: MatchEventWithDetails[], team?: 'A' | 'B' | 'both') => {
+    if (!team || team === 'both') return evts;
+    return evts.filter(e => e.team === team);
+  };
 
   // Helpers filtrage heatmap par type
   const filterByType = (evts: MatchEventWithDetails[], types: string[] | null) => {
@@ -53,10 +65,11 @@ export function exportToPdf(data: PdfExportData): void {
   const teamBEvents = data.events.filter(e => e.team === 'B');
 
   // Événements filtrés pour chaque heatmap
-  const fieldEventsRaw = data.events.filter(e => e.field_x !== null && e.field_y !== null);
+  const fieldEventsRaw = filterByTeam(data.events.filter(e => e.field_x !== null && e.field_y !== null), ht.heatmap_field);
   const fieldEventsFiltered = filterByType(fieldEventsRaw, hf?.field || null);
-  const zonesEventsFiltered = filterByType(fieldEventsRaw, hf?.zones || null);
-  const goalEventsRaw = data.events.filter(e => e.goal_x !== null && e.goal_y !== null);
+  const zonesEventsRaw = filterByTeam(data.events.filter(e => e.field_x !== null && e.field_y !== null), ht.heatmap_zones);
+  const zonesEventsFiltered = filterByType(zonesEventsRaw, hf?.zones || null);
+  const goalEventsRaw = filterByTeam(data.events.filter(e => e.goal_x !== null && e.goal_y !== null), ht.heatmap_goal);
   const goalEventsFiltered = filterByType(goalEventsRaw, hf?.goal || null);
 
   // xG
