@@ -214,8 +214,8 @@ export default function PdfConfigModal({
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
               <div className="o-eyebrow">Sections générales</div>
               <div style={{ display:'flex', gap:6 }}>
-                <button onClick={() => toggleAll(true)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize:10 }}>Tout</button>
-                <button onClick={() => toggleAll(false)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize:10 }}>Aucun</button>
+                <button onClick={() => toggleAll(true)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize:10 }}>Tout sélectionner</button>
+                <button onClick={() => toggleAll(false)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize:10 }}>Tout décocher</button>
               </div>
             </div>
             <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
