@@ -24,6 +24,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [currentTime, setCurrentTime] = useState(0);
   const [clipBefore, setClipBefore] = useState(3);  // secondes avant
   const [clipAfter, setClipAfter] = useState(5);   // secondes après
+  const [offset, setOffset] = useState(0);          // décalage sync vidéo
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
