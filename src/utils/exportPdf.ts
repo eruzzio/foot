@@ -40,8 +40,8 @@ function formatTime(seconds: number): string {
 export function exportToPdf(data: PdfExportData): void {
   const colorA = data.matchInfo.teamAColor || '#22c55e';
   const colorB = data.matchInfo.teamBColor || '#f97316';
-  const s = data.sections || {};
-  const show = (id: string) => !data.sections || s[id] !== false;
+  const sections = data.sections || {};
+  const show = (id: string) => !data.sections || sections[id] !== false;
   const teamFilter = data.teamFilter || 'both';
   const hf = data.heatmapFilters;
   const ht = data.heatmapTeams || {};
