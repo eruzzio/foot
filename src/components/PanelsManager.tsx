@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
-import {, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { createProFootballPanel } from '../utils/createProPanel';
 import FreeLayoutEditor from './FreeLayoutEditor';
