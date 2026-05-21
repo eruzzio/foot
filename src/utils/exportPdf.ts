@@ -306,3 +306,4 @@ ${show('timeline') ? `<div style="margin-bottom:12px;"><h2>Activité par périod
   document.body.removeChild(link);
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
+// rebuild Thu May 21 07:12:36 UTC 2026
