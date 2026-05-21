@@ -173,7 +173,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm">
-              < size={20} className="text-gray-400" />
+              ←
             </button>
             <div>
               <h1 className="text-base font-medium text-orion-text">Mon Compte</h1>

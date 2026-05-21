@@ -579,7 +579,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             onClick={handleBack}
             className="flex items-center gap-2 px-4 py-2 bg-dark-secondary text-gray-300 hover:bg-dark-tertiary  border border-orion-line transition-colors font-medium"
           >
-            < size={18} />
+            ←
             {view === 'list' ? "Retour à l'accueil" : 'Retour'}
           </button>
           {view !== 'list' && selectedPanel && (

@@ -575,7 +575,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 onClick={() => { setView('list'); setSelectedTeam(null); }}
                 className="o-btn o-btn--ghost o-btn--sm"
               >
-                < size={24} className="text-gray-300" />
+                ←
               </button>
               <div className="flex-1">
                 <h1 className="text-2xl font-medium text-orion-text">{selectedTeam.name}</h1>
@@ -947,7 +947,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               onClick={onBack}
               className="o-btn o-btn--ghost o-btn--sm"
             >
-              < size={24} className="text-gray-300" />
+              ←
             </button>
             <div className="flex-1">
               <h1 className="text-2xl font-medium text-orion-text">Mes Équipes</h1>
