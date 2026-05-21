@@ -5,7 +5,6 @@ import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
 import Timeline from './Timeline';
 import ExportButton from './ExportButton';
-import PostMatchTab from './PostMatchTab';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
 import MatchTags from './MatchTags';
@@ -25,7 +24,7 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [loading, setLoading] = useState(true);
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState<'overview' | 'postmatch' | 'video' | 'tags'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'video' | 'tags'>('overview');
   const [showPdfConfig, setShowPdfConfig] = useState(false);
 
   const handleTabChange = (tab: typeof activeTab) => {
@@ -256,19 +255,6 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
             )}
           </button>
           <button
-            onClick={() => handleTabChange('postmatch')}
-            className={`px-6 py-3 font-medium transition-all relative ${
-              activeTab === 'postmatch'
-                ? 'text-orange-primary'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Post Match
-            {activeTab === 'postmatch' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-primary" />
-            )}
-          </button>
-          <button
             onClick={() => handleTabChange('video')}
             className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
               activeTab === 'video'
@@ -376,13 +362,6 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
               />
             </div>
           </>
-        )}
-
-        {activeTab === 'postmatch' && (
-          <PostMatchTab
-            match={{ ...match, events: match.events }}
-            onMatchUpdate={handleMatchUpdate as any}
-          />
         )}
 
         {activeTab === 'video' && (
