@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
+import {, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';
@@ -575,7 +575,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 onClick={() => { setView('list'); setSelectedTeam(null); }}
                 className="o-btn o-btn--ghost o-btn--sm"
               >
-                <ArrowLeft size={24} className="text-gray-300" />
+                < size={24} className="text-gray-300" />
               </button>
               <div className="flex-1">
                 <h1 className="text-2xl font-medium text-orion-text">{selectedTeam.name}</h1>
@@ -947,7 +947,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               onClick={onBack}
               className="o-btn o-btn--ghost o-btn--sm"
             >
-              <ArrowLeft size={24} className="text-gray-300" />
+              < size={24} className="text-gray-300" />
             </button>
             <div className="flex-1">
               <h1 className="text-2xl font-medium text-orion-text">Mes Équipes</h1>

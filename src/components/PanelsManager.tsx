@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
-import { ArrowLeft, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
+import {, Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { createProFootballPanel } from '../utils/createProPanel';
 import FreeLayoutEditor from './FreeLayoutEditor';
@@ -579,7 +579,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             onClick={handleBack}
             className="flex items-center gap-2 px-4 py-2 bg-dark-secondary text-gray-300 hover:bg-dark-tertiary  border border-orion-line transition-colors font-medium"
           >
-            <ArrowLeft size={18} />
+            < size={18} />
             {view === 'list' ? "Retour à l'accueil" : 'Retour'}
           </button>
           {view !== 'list' && selectedPanel && (

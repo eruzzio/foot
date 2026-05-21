@@ -8,6 +8,7 @@ import MyTeam from './components/MyTeam';
 import PanelsManager from './components/PanelsManager';
 import EvolutionDashboard from './components/EvolutionDashboard';
 import ProfilePage from './components/ProfilePage';
+import AppLayout from './components/AppLayout';
 import { I18nProvider } from './i18n/I18nContext';
 
 type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile';
@@ -17,11 +18,15 @@ function App() {
   const [initialMatchId, setInitialMatchId] = useState<string | null>(null);
   const [homeKey, setHomeKey] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     checkAuth();
     const { data: authListener } = supabase.auth.onAuthStateChange((_, session) => {
       setIsAuthenticated(!!session);
+      if (session?.user?.user_metadata?.first_name) {
+        setUserName(session.user.user_metadata.first_name);
+      }
     });
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
@@ -29,13 +34,14 @@ function App() {
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     setIsAuthenticated(!!session);
+    if (session?.user?.user_metadata?.first_name) {
+      setUserName(session.user.user_metadata.first_name);
+    }
   };
 
   const handleNavigate = (page: string) => {
-    // Format stats-{matchId} — ouvrir directement un match
     if (page.startsWith('stats-')) {
-      const matchId = page.replace('stats-', '');
-      setInitialMatchId(matchId);
+      setInitialMatchId(page.replace('stats-', ''));
       setCurrentPage('stats');
       return;
     }
@@ -51,7 +57,7 @@ function App() {
 
   if (isAuthenticated === null) {
     return (
-      <div style={{ minHeight:'100vh', background:'#111118', display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div style={{ minHeight:'100vh', background:'#0d1117', display:'flex', alignItems:'center', justifyContent:'center' }}>
         <div style={{ color:'#4a4a58', fontSize:13 }}>Chargement…</div>
       </div>
     );
@@ -61,10 +67,27 @@ function App() {
     return <Auth onAuthSuccess={checkAuth} />;
   }
 
-  const renderPage = () => {
+  // Pages sans layout (codage live plein écran)
+  if (currentPage === 'live') {
+    return (
+      <I18nProvider>
+        <CodingInterface onBack={handleBackToHome} />
+      </I18nProvider>
+    );
+  }
+
+  // HomePage a sa propre sidebar intégrée
+  if (currentPage === 'home') {
+    return (
+      <I18nProvider>
+        <HomePage key={homeKey} onNavigate={handleNavigate} />
+      </I18nProvider>
+    );
+  }
+
+  // Toutes les autres pages utilisent AppLayout
+  const renderContent = () => {
     switch (currentPage) {
-      case 'home':     return <HomePage key={homeKey} onNavigate={handleNavigate} />;
-      case 'live':     return <CodingInterface onBack={handleBackToHome} />;
       case 'stats':    return <MyStats onBack={handleBackToHome} initialMatchId={initialMatchId} />;
       case 'team':     return <MyTeam onBack={handleBackToHome} />;
       case 'panels':   return <PanelsManager onBack={handleBackToHome} />;
@@ -74,7 +97,13 @@ function App() {
     }
   };
 
-  return <I18nProvider>{renderPage()}</I18nProvider>;
+  return (
+    <I18nProvider>
+      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName}>
+        {renderContent()}
+      </AppLayout>
+    </I18nProvider>
+  );
 }
 
 export default App;

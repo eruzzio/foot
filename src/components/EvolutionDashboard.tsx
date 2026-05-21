@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, Calendar, Trophy, Target, Zap } from 'lucide-react';
+import {, TrendingUp, Calendar, Trophy, Target, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 
@@ -128,7 +128,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
             onClick={onBack}
             className="o-btn o-btn--ghost o-btn--sm"
           >
-            <ArrowLeft size={24} className="text-gray-300" />
+            < size={24} className="text-gray-300" />
           </button>
           <div>
             <h1 className="text-2xl font-medium text-orion-text">Évolution des Stats</h1>

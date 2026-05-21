@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, User, Mail, Lock, Shield, Save, Check, Eye, EyeOff, AlertCircle, LogOut, Trash2, Camera, Bell, Globe, Smartphone } from 'lucide-react';
+import { User, Mail, Lock, Shield, Save, Check, Eye, EyeOff, AlertCircle, LogOut, Trash2, Camera, Bell, Globe, Smartphone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import ClubManager from './ClubManager';
 import { useT } from '../i18n/I18nContext';
@@ -173,7 +173,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm">
-              <ArrowLeft size={20} className="text-gray-400" />
+              < size={20} className="text-gray-400" />
             </button>
             <div>
               <h1 className="text-base font-medium text-orion-text">Mon Compte</h1>

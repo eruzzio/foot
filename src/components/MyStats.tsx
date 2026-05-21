@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart3, ArrowLeft, Calendar, ChevronRight, Trash2 } from 'lucide-react';
+import { BarChart3, Calendar, ChevronRight, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match } from '../types/database';
 import MatchReport from './MatchReport';
@@ -103,7 +103,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
             onClick={onBack}
             className="o-btn o-btn--ghost o-btn--sm"
           >
-            <ArrowLeft size={24} className="text-gray-300" />
+            < size={24} className="text-gray-300" />
           </button>
           <div>
             <h1 className="text-2xl font-medium text-orion-text">Mes Stats</h1>
