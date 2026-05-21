@@ -103,7 +103,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
             onClick={onBack}
             className="o-btn o-btn--ghost o-btn--sm"
           >
-            < size={24} className="text-gray-300" />
+            ←
           </button>
           <div>
             <h1 className="text-2xl font-medium text-orion-text">Mes Stats</h1>
