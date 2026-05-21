@@ -43,7 +43,9 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     videoRef.current.addEventListener('timeupdate', check);
     return () => videoRef.current?.removeEventListener('timeupdate', check);
   }, [activeEventId, offset, clipAfter, match.events]);
-    `${Math.floor(s / 60).toString().padStart(2, '0')}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
+
+  const formatTime = (seconds: number) =>
+    `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
 
   // Charger un fichier local
   const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
