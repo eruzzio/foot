@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {, UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
+import { UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';

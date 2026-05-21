@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {, TrendingUp, Calendar, Trophy, Target, Zap } from 'lucide-react';
+import { TrendingUp, Calendar, Trophy, Target, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 
