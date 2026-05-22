@@ -1,5 +1,89 @@
 import { useState } from 'react';
-import { Download, FileSpreadsheet, FileText, Code, Monitor, Film } from 'lucide-react';
+import { Download, FileSpreadsheet, FileText, FileCode } from 'lucide-react';
+import { MatchEventWithDetails } from '../types/database';
+import { exportToCSV, exportToExcel } from '../utils/exportData';
+import { exportToSportsCodeXML } from '../utils/exportPro';
+
+interface ExportButtonProps {
+  events: MatchEventWithDetails[];
+  teamAName: string;
+  teamBName: string;
+  teamAColor?: string;
+  teamBColor?: string;
+  matchDate?: string;
+  scoreA?: number;
+  scoreB?: number;
+  duration?: number;
+  location?: string;
+  competition?: string;
+  teamALogoUrl?: string;
+  teamBLogoUrl?: string;
+  disabled?: boolean;
+}
+
+export default function ExportButton({ events, teamAName, teamBName, teamAColor, teamBColor, matchDate, scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl, disabled }: ExportButtonProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const exportData = {
+    events,
+    matchInfo: {
+      teamA: teamAName, teamB: teamBName,
+      teamAColor: teamAColor || '#22c55e', teamBColor: teamBColor || '#f97316',
+      date: matchDate || new Date().toLocaleDateString('fr-FR'),
+      scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl,
+    },
+  };
+
+  const handleExport = (format: 'csv' | 'excel' | 'xml') => {
+    if (format === 'csv') exportToCSV(exportData);
+    else if (format === 'excel') exportToExcel(exportData);
+    else if (format === 'xml') exportToSportsCodeXML(exportData);
+    setIsOpen(false);
+  };
+
+  const formats = [
+    { id: 'excel', label: 'Excel (.xlsx)', desc: 'Avec statistiques',     icon: FileSpreadsheet, color: 'var(--orion-green)' },
+    { id: 'csv',   label: 'CSV (.csv)',   desc: 'Données brutes',          icon: FileText,        color: 'var(--orion-accent)' },
+    { id: 'xml',   label: 'XML (.xml)',   desc: 'Compatible SportsCode/Nacsport', icon: FileCode, color: 'var(--orion-amber)' },
+  ] as const;
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        disabled={disabled || events.length === 0}
+        className="o-btn o-btn--sm"
+        style={{ opacity: disabled || events.length === 0 ? 0.4 : 1, cursor: disabled || events.length === 0 ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:6 }}
+      >
+        <Download size={14} /> Exporter
+      </button>
+
+      {isOpen && !disabled && events.length > 0 && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div style={{ position:'absolute', right:0, marginTop:4, width:230, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', zIndex:20, borderRadius:4, overflow:'hidden' }}>
+            {formats.map((f, i) => {
+              const Icon = f.icon;
+              return (
+                <button key={f.id} onClick={() => handleExport(f.id)}
+                  style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom: i < formats.length-1 ? '1px solid var(--orion-line)' : 'none', background:'none', cursor:'pointer', textAlign:'left' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+                >
+                  <Icon size={15} style={{ color: f.color, flexShrink:0 }} />
+                  <div>
+                    <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:600 }}>{f.label}</div>
+                    <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>{f.desc}</div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 import { MatchEventWithDetails } from '../types/database';
 import { exportToCSV, exportToExcel } from '../utils/exportData';
 import { exportToPdf } from '../utils/exportPdf';
