@@ -108,22 +108,138 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
       <div style={{ background: '#0a0f18', border: '1.5px solid var(--orion-line-strong)', borderRadius: 6, overflow: 'hidden', marginBottom: 12 }}>
 
         {/* Zone vidéo */}
-        {videoSource?.type === 'local' ? (
-          <div style={{ position: 'relative', background: '#000' }}>
-            <video
-              ref={videoRef}
-              src={videoSource.url}
-              style={{ width: '100%', maxHeight: 400, display: 'block' }}
-              onTimeUpdate={handleTimeUpdate}
-              onPlay={() => setIsPlaying(true)}
-              onPause={() => setIsPlaying(false)}
-              controls
-            />
-            <div style={{ position: 'absolute', top: 10, left: 10, background: 'rgba(0,0,0,0.6)', padding: '3px 8px', borderRadius: 4, fontSize: 11, color: '#7ab4f0', fontFamily: 'var(--orion-font-mono)' }}>
-              {formatTime(currentTime)}
+        {videoSource?.type === 'local' ? (() => {
+          // Bornes du clip actif
+          const activeEvent = match.events.find(e => e.id === activeEventId);
+          const clipStart = activeEvent ? Math.max(0, (activeEvent.video_timestamp ?? activeEvent.timestamp) + offset - clipBefore) : 0;
+          const clipEnd = activeEvent ? (activeEvent.video_timestamp ?? activeEvent.timestamp) + offset + clipAfter : Infinity;
+          const clipDuration = activeEvent ? clipBefore + clipAfter : 0;
+          const clipProgress = activeEvent && clipDuration > 0 ? Math.min(1, Math.max(0, (currentTime - clipStart) / clipDuration)) : 0;
+
+          return (
+            <div style={{ position: 'relative', background: '#000' }}>
+              {/* Vidéo sans contrôles natifs */}
+              <video
+                ref={videoRef}
+                src={videoSource.url}
+                style={{ width: '100%', maxHeight: 380, display: 'block' }}
+                onTimeUpdate={handleTimeUpdate}
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+              />
+
+              {/* Overlay clip actif */}
+              {activeEvent && (
+                <div style={{ position:'absolute', inset:0, pointerEvents:'none', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+                  {/* Badge clip en haut */}
+                  <div style={{ display:'flex', justifyContent:'space-between', padding:'8px 12px' }}>
+                    <span style={{ background:'rgba(0,0,0,0.7)', padding:'3px 8px', borderRadius:4, fontSize:11, color:'var(--orion-accent)', fontFamily:'var(--orion-font-mono)', fontWeight:700 }}>
+                      {activeEvent.event_type?.name || activeEvent.label}
+                    </span>
+                    <span style={{ background:'rgba(0,0,0,0.7)', padding:'3px 8px', borderRadius:4, fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>
+                      {formatTime(currentTime)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Contrôles custom */}
+              <div style={{ background:'rgba(0,0,0,0.85)', padding:'10px 14px' }}>
+                {/* Barre de progression du clip */}
+                {activeEvent ? (
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', fontSize:10, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', marginBottom:5 }}>
+                      <span>−{clipBefore}s</span>
+                      <span style={{ color:'var(--orion-accent)', fontWeight:700 }}>● {activeEvent.event_type?.name || activeEvent.label}</span>
+                      <span>+{clipAfter}s</span>
+                    </div>
+                    {/* Barre cliquable */}
+                    <div
+                      style={{ height:6, background:'rgba(255,255,255,0.15)', borderRadius:3, cursor:'pointer', position:'relative' }}
+                      onClick={e => {
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const ratio = (e.clientX - rect.left) / rect.width;
+                        const newTime = clipStart + ratio * clipDuration;
+                        if (videoRef.current) videoRef.current.currentTime = Math.max(clipStart, Math.min(clipEnd, newTime));
+                      }}
+                    >
+                      {/* Fond gris = zone hors clip */}
+                      <div style={{ position:'absolute', inset:0, background:'rgba(255,255,255,0.08)', borderRadius:3 }} />
+                      {/* Progression */}
+                      <div style={{ position:'absolute', left:0, top:0, height:'100%', width:`${clipProgress * 100}%`, background:'var(--orion-accent)', borderRadius:3, transition:'width .1s linear' }} />
+                      {/* Curseur */}
+                      <div style={{ position:'absolute', top:'50%', left:`${clipProgress * 100}%`, transform:'translate(-50%,-50%)', width:12, height:12, borderRadius:'50%', background:'white', boxShadow:'0 0 4px rgba(0,0,0,0.5)' }} />
+                      {/* Marqueur moment action */}
+                      <div style={{ position:'absolute', top:-2, left:`${(clipBefore / clipDuration) * 100}%`, transform:'translateX(-50%)', width:2, height:10, background:'var(--orion-red)', borderRadius:1 }} />
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:10 }}>
+                    <div style={{ height:'100%', width:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, background:'var(--orion-accent)', borderRadius:3 }} />
+                  </div>
+                )}
+
+                {/* Boutons de contrôle */}
+                <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                  {/* Play/Pause */}
+                  <button
+                    onClick={() => { if (videoRef.current) { if (isPlaying) videoRef.current.pause(); else videoRef.current.play(); } }}
+                    style={{ background:'none', border:'none', cursor:'pointer', color:'white', display:'flex', padding:2 }}
+                  >
+                    {isPlaying
+                      ? <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                      : <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21"/></svg>
+                    }
+                  </button>
+
+                  {/* Rejouer le clip */}
+                  {activeEvent && (
+                    <button
+                      onClick={() => { if (videoRef.current) { videoRef.current.currentTime = clipStart; videoRef.current.play(); } }}
+                      style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', display:'flex', padding:2 }}
+                      title="Rejouer le clip"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.85"/></svg>
+                    </button>
+                  )}
+
+                  {/* Temps */}
+                  <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', flex:1 }}>
+                    {activeEvent ? `${formatTime(Math.max(0, currentTime - clipStart))} / ${formatTime(clipDuration)}` : formatTime(currentTime)}
+                  </span>
+
+                  {/* Clip précédent / suivant */}
+                  {activeEvent && (() => {
+                    const sorted = match.events.filter(e => filterTeam === 'all' || e.team === filterTeam).sort((a,b) => a.timestamp - b.timestamp);
+                    const idx = sorted.findIndex(e => e.id === activeEventId);
+                    return (
+                      <>
+                        <button onClick={() => idx > 0 && seekToEvent(sorted[idx-1])}
+                          disabled={idx <= 0}
+                          style={{ background:'none', border:'none', cursor: idx > 0 ? 'pointer' : 'not-allowed', color: idx > 0 ? 'var(--orion-text-dim)' : 'var(--orion-text-faint)', display:'flex', padding:2 }}
+                          title="Action précédente">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button onClick={() => idx < sorted.length-1 && seekToEvent(sorted[idx+1])}
+                          disabled={idx >= sorted.length-1}
+                          style={{ background:'none', border:'none', cursor: idx < sorted.length-1 ? 'pointer' : 'not-allowed', color: idx < sorted.length-1 ? 'var(--orion-text-dim)' : 'var(--orion-text-faint)', display:'flex', padding:2 }}
+                          title="Action suivante">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                      </>
+                    );
+                  })()}
+
+                  {/* Plein écran */}
+                  <button onClick={() => videoRef.current?.requestFullscreen()}
+                    style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', display:'flex', padding:2 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        ) : videoSource?.type === 'veo' ? (
+          );
+        })() : videoSource?.type === 'veo' ? (
           <div style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 4, background: 'rgba(61,128,224,0.15)', border: '1px solid rgba(61,128,224,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
