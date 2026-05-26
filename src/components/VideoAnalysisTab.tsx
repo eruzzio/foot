@@ -22,8 +22,9 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [clipBefore, setClipBefore] = useState(3);  // secondes avant
-  const [clipAfter, setClipAfter] = useState(5);   // secondes après
+  const [clipBefore, setClipBefore] = useState(3);  // secondes avant (global)
+  const [clipAfter, setClipAfter] = useState(5);   // secondes après (global)
+  const [clipOffsets, setClipOffsets] = useState<Record<string, number>>({}); // offset individuel par action
   const [offset, setOffset] = useState(0);          // décalage sync vidéo
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -111,9 +112,10 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         {videoSource?.type === 'local' ? (() => {
           // Bornes du clip actif
           const activeEvent = match.events.find(e => e.id === activeEventId);
-          const clipStart = activeEvent ? Math.max(0, (activeEvent.video_timestamp ?? activeEvent.timestamp) + offset - clipBefore) : 0;
+          const eventOffset = activeEventId ? (clipOffsets[activeEventId] || 0) : 0;
+          const clipStart = activeEvent ? Math.max(0, (activeEvent.video_timestamp ?? activeEvent.timestamp) + offset - clipBefore + eventOffset) : 0;
           const clipEnd = activeEvent ? (activeEvent.video_timestamp ?? activeEvent.timestamp) + offset + clipAfter : Infinity;
-          const clipDuration = activeEvent ? clipBefore + clipAfter : 0;
+          const clipDuration = activeEvent ? clipBefore + clipAfter - eventOffset : 0;
           const clipProgress = activeEvent && clipDuration > 0 ? Math.min(1, Math.max(0, (currentTime - clipStart) / clipDuration)) : 0;
 
           return (
@@ -201,6 +203,30 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.85"/></svg>
                     </button>
+                  )}
+
+                  {/* Ajuster le début du clip */}
+                  {activeEvent && activeEventId && (
+                    <div style={{ display:'flex', alignItems:'center', gap:2, background:'rgba(255,255,255,0.06)', borderRadius:4, padding:'2px 4px' }}>
+                      <button
+                        onClick={() => {
+                          setClipOffsets(prev => ({ ...prev, [activeEventId]: (prev[activeEventId] || 0) + 1 }));
+                        }}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', fontSize:11, fontWeight:700, padding:'0 3px', fontFamily:'var(--orion-font-mono)' }}
+                        title="Avancer le début du clip de 1s"
+                      >+1s</button>
+                      <span style={{ fontSize:10, color: eventOffset !== 0 ? 'var(--orion-amber)' : 'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)', minWidth:28, textAlign:'center' }}>
+                        {eventOffset > 0 ? `+${eventOffset}` : eventOffset}s
+                      </span>
+                      <button
+                        onClick={() => {
+                          setClipOffsets(prev => ({ ...prev, [activeEventId]: (prev[activeEventId] || 0) - 1 }));
+                          if (videoRef.current) videoRef.current.currentTime = Math.max(0, clipStart - 1);
+                        }}
+                        style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', fontSize:11, fontWeight:700, padding:'0 3px', fontFamily:'var(--orion-font-mono)' }}
+                        title="Reculer le début du clip de 1s"
+                      >-1s</button>
+                    </div>
                   )}
 
                   {/* Temps */}
