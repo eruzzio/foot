@@ -292,9 +292,9 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>CLIP</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <button onClick={() => setClipBefore(b => Math.min(b + 1, 60))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
+                  <button onClick={() => setClipBefore(b => Math.max(b - 1, 0))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
                   <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 28, textAlign: 'center' }}>−{clipBefore}s</span>
-                  <button onClick={() => setClipBefore(b => Math.max(b - 1, 0))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
+                  <button onClick={() => setClipBefore(b => Math.min(b + 1, 60))} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
                 </div>
                 <span style={{ fontSize: 11, color: 'var(--orion-text-faint)', fontFamily: 'var(--orion-font-mono)' }}>●</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
