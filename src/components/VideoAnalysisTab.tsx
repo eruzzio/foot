@@ -16,7 +16,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     match.video_url ? { type: 'veo', url: match.video_url } : null
   );
   const [urlInput, setUrlInput] = useState(match.video_url || '');
-  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [showBookmarkletHelp, setShowBookmarkletHelp] = useState(false);
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
@@ -305,6 +305,21 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           <button onClick={() => setShowUrlInput(!showUrlInput)} className="o-btn o-btn--ghost o-btn--sm">
             <Link size={12} /> Lien VEO
           </button>
+          {/* Bookmarklet VEO */}
+          <a
+            href={`javascript:(function(){var v=document.querySelector('video');if(!v){alert('Aucune vidéo trouvée sur cette page.');return;}var src=v.src||v.currentSrc||(v.querySelector('source')&&v.querySelector('source').src);if(!src){alert('URL vidéo introuvable. Essayez depuis la page VEO.');return;}navigator.clipboard.writeText(src).then(function(){alert('✓ URL vidéo copiée !\\nCollez-la dans ORION → Fichier local ou via le champ URL.');}).catch(function(){prompt('Copiez cette URL :', src);});})()`}
+            className="o-btn o-btn--ghost o-btn--sm"
+            style={{ textDecoration: 'none', borderColor: 'var(--orion-amber)', color: 'var(--orion-amber)' }}
+            title="Glisse ce bouton dans ta barre de favoris, puis clique-le sur une page VEO"
+            onClick={e => {
+              // Sur clic direct → afficher les instructions
+              e.preventDefault();
+              setShowBookmarkletHelp(prev => !prev);
+            }}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            Extraire MP4 VEO
+          </a>
           {videoSource && (
             <button onClick={() => setVideoSource(null)} className="o-btn o-btn--ghost o-btn--sm" style={{ color: 'var(--orion-red)' }}>
               <X size={12} /> Retirer
@@ -347,7 +362,30 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           )}
         </div>
 
-        {/* Input URL VEO */}
+        {/* Instructions bookmarklet */}
+        {showBookmarkletHelp && (
+          <div style={{ padding: '14px 16px', borderTop: '1px solid var(--orion-line)', background: 'rgba(243,156,18,0.06)', borderLeft: '3px solid var(--orion-amber)' }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--orion-amber)', marginBottom: 10 }}>
+              📌 Comment extraire la vidéo MP4 de VEO
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {[
+                { n: '1', txt: 'Glisse le bouton orange "Extraire MP4 VEO" dans ta barre de favoris du navigateur' },
+                { n: '2', txt: 'Ouvre ta vidéo sur veo.co et lance la lecture' },
+                { n: '3', txt: 'Clique sur le favori "Extraire MP4 VEO" — l\'URL MP4 est copiée automatiquement' },
+                { n: '4', txt: 'Reviens dans ORION → "Fichier local" n\'est pas adapté pour les URLs. Utilise le champ URL ci-dessous et colle l\'URL.' },
+              ].map(s => (
+                <div key={s.n} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <span style={{ width: 20, height: 20, borderRadius: '50%', background: 'var(--orion-amber)', color: '#000', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{s.n}</span>
+                  <span style={{ fontSize: 12, color: 'var(--orion-text-dim)', lineHeight: 1.5 }}>{s.txt}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12, padding: '8px 12px', background: 'rgba(255,255,255,0.04)', borderRadius: 4, fontSize: 11, color: 'var(--orion-text-mute)' }}>
+              💡 <strong style={{ color: 'var(--orion-text-dim)' }}>Astuce</strong> — Si l'URL commence par <code style={{ color: 'var(--orion-accent)', fontFamily: 'var(--orion-font-mono)' }}>blob:</code>, télécharge d'abord la vidéo depuis VEO puis utilise "Fichier local".
+            </div>
+          </div>
+        )}
         {showUrlInput && (
           <div style={{ padding: '10px 14px', borderTop: '1px solid var(--orion-line)', display: 'flex', gap: 8 }}>
             <input
