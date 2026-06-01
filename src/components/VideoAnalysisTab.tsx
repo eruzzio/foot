@@ -16,6 +16,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     match.video_url ? { type: 'veo', url: match.video_url } : null
   );
   const [urlInput, setUrlInput] = useState(match.video_url || '');
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [showBookmarkletHelp, setShowBookmarkletHelp] = useState(false);
   const [filterTeam, setFilterTeam] = useState<'all' | 'A' | 'B'>('all');
   const [filterType, setFilterType] = useState<string>('all');
