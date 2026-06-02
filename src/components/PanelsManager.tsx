@@ -602,8 +602,16 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
             <div className="space-y-3">
               {panels.length === 0 ? (
-                <div className="bg-dark-secondary  border border-orion-line p-8 text-center text-gray-500">
-                  Aucun panneau. Créez-en un pour commencer.
+                <div style={{ background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:6, padding:'32px 24px', textAlign:'center' }}>
+                  <div style={{ fontSize:28, marginBottom:12 }}>🎛️</div>
+                  <div style={{ fontSize:14, fontWeight:700, color:'var(--orion-text)', marginBottom:8 }}>Aucun panneau pour l'instant</div>
+                  <div style={{ fontSize:12, color:'var(--orion-text-mute)', marginBottom:20, lineHeight:1.6 }}>
+                    Un panneau définit les boutons que tu utiliseras pendant le codage live.<br />
+                    Clique sur <strong style={{ color:'var(--orion-accent)' }}>+ Nouveau panneau</strong> pour créer le tien.
+                  </div>
+                  <div style={{ padding:'10px 14px', background:'rgba(61,128,224,0.08)', border:'1px solid var(--orion-accent-line)', borderRadius:4, fontSize:12, color:'var(--orion-accent)', display:'inline-block' }}>
+                    💡 Le panneau <strong>Football (défaut)</strong> est créé automatiquement lors de ton premier codage
+                  </div>
                 </div>
               ) : (
                 panels.map((panel) => (

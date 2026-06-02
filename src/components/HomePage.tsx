@@ -25,14 +25,22 @@ const NAV_ITEMS = [
 export default function HomePage({ onNavigate, isAdmin = false }: HomePageProps) {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [userName, setUserName] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => { init(); }, []);
 
   const init = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setLoading(false); return; }
+    // Timeout 10s si Supabase ne répond pas
+    const timeout = setTimeout(() => {
+      setLoading(false);
+      setLoadError(true);
+    }, 10000);
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { clearTimeout(timeout); setLoading(false); return; }
     const meta = user.user_metadata || {};
     if (meta.first_name) setUserName(meta.first_name);
     await createDefaultFootballPanel(user.id);
@@ -53,7 +61,13 @@ export default function HomePage({ onNavigate, isAdmin = false }: HomePageProps)
       }));
       setMatches(summaries.reverse());
     }
-    setLoading(false);
+      setLoading(false);
+    } catch {
+      setLoadError(true);
+      setLoading(false);
+    } finally {
+      clearTimeout(timeout);
+    }
   };
 
   const stats = useMemo(() => ({
@@ -153,12 +167,64 @@ export default function HomePage({ onNavigate, isAdmin = false }: HomePageProps)
         <div style={{ maxWidth:860, margin:'0 auto', padding:'20px 16px', width:'100%' }}>
 
           {loading ? (
-            <div style={{ textAlign:'center', padding:'60px 0', color:'var(--orion-text-mute)', fontSize:13 }}>Chargement…</div>
-          ) : matches.length === 0 ? (
             <div style={{ textAlign:'center', padding:'60px 0' }}>
-              <Activity size={36} style={{ color:'var(--orion-text-faint)', margin:'0 auto 16px' }} />
-              <p style={{ color:'var(--orion-text-dim)', fontSize:14, marginBottom:20 }}>Aucun match codé pour l'instant</p>
-              <button className="o-btn o-btn--primary" onClick={() => onNavigate('live')}>Commencer →</button>
+              <div style={{ width:32, height:32, border:'3px solid var(--orion-line)', borderTopColor:'var(--orion-accent)', borderRadius:'50%', margin:'0 auto 16px', animation:'spin 0.8s linear infinite' }} />
+              <div style={{ fontSize:13, color:'var(--orion-text-mute)' }}>Chargement…</div>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          ) : loadError ? (
+            <div style={{ textAlign:'center', padding:'60px 20px' }}>
+              <div style={{ fontSize:32, marginBottom:16 }}>⚠️</div>
+              <h3 style={{ fontSize:16, fontWeight:700, color:'var(--orion-text)', marginBottom:8 }}>Problème de connexion</h3>
+              <p style={{ fontSize:13, color:'var(--orion-text-mute)', marginBottom:24, lineHeight:1.5 }}>
+                Impossible de se connecter au serveur.<br />Vérifie ta connexion internet et réessaie.
+              </p>
+              <button onClick={() => { setLoadError(false); setLoading(true); init(); }} className="o-btn o-btn--primary">
+                Réessayer
+              </button>
+            </div>
+          ) : matches.length === 0 ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+              {/* Bienvenue */}
+              <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'32px 24px', textAlign:'center' }}>
+                <div style={{ fontSize:32, marginBottom:12 }}>⚽</div>
+                <h2 style={{ fontSize:20, fontWeight:800, color:'var(--orion-text)', marginBottom:8 }}>
+                  Bienvenue sur ORION{userName ? `, ${userName}` : ''} !
+                </h2>
+                <p style={{ fontSize:13, color:'var(--orion-text-mute)', maxWidth:400, margin:'0 auto 24px', lineHeight:1.6 }}>
+                  Ton outil de codage et d'analyse vidéo pour le football. Suis ces 3 étapes pour démarrer.
+                </p>
+
+                {/* 3 étapes */}
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:8, marginBottom:28, textAlign:'left' }}>
+                  {[
+                    { n:'1', icon:'🎛️', title:'Crée ton panneau', desc:'Configure les actions que tu veux coder (tirs, passes, récupérations...)', action:'panels', btn:'Créer un panneau' },
+                    { n:'2', icon:'🎬', title:'Lance un codage live', desc:'Ouvre un match et tague les événements en temps réel ou depuis une vidéo', action:'live', btn:'Démarrer un match' },
+                    { n:'3', icon:'📊', title:'Analyse les stats', desc:'Visualise les heatmaps, exports PDF, stats par type d\'action', action:null, btn:null },
+                  ].map((step, i) => (
+                    <div key={i} style={{ background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:6, padding:'16px 18px', position:'relative' }}>
+                      <div style={{ position:'absolute', top:12, right:12, width:22, height:22, borderRadius:'50%', background: i < 2 ? 'var(--orion-accent-dim)' : 'var(--orion-surface-3)', border:`1px solid ${i < 2 ? 'var(--orion-accent-line)' : 'var(--orion-line)'}`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:800, color: i < 2 ? 'var(--orion-accent)' : 'var(--orion-text-faint)' }}>{step.n}</div>
+                      <div style={{ fontSize:22, marginBottom:10 }}>{step.icon}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:'var(--orion-text)', marginBottom:6 }}>{step.title}</div>
+                      <div style={{ fontSize:12, color:'var(--orion-text-mute)', lineHeight:1.5, marginBottom: step.btn ? 14 : 0 }}>{step.desc}</div>
+                      {step.btn && step.action && (
+                        <button onClick={() => onNavigate(step.action!)} className="o-btn o-btn--primary o-btn--sm" style={{ width:'100%', justifyContent:'center' }}>
+                          {step.btn} →
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <p style={{ fontSize:11, color:'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)' }}>
+                  Un panneau par défaut "Football" est déjà disponible — tu peux l'utiliser directement
+                </p>
+              </div>
+
+              {/* Raccourci rapide */}
+              <button onClick={() => onNavigate('live')} className="o-btn o-btn--primary" style={{ width:'100%', justifyContent:'center', padding:'14px', fontSize:14, borderRadius:6 }}>
+                <Radio size={16} /> Démarrer mon premier match maintenant
+              </button>
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
