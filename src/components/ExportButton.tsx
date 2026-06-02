@@ -42,38 +42,38 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
   };
 
   const formats = [
-    { id: 'excel', label: 'Excel (.xlsx)', desc: 'Avec statistiques',     icon: FileSpreadsheet, color: 'var(--orion-green)' },
-    { id: 'csv',   label: 'CSV (.csv)',   desc: 'Données brutes',          icon: FileText,        color: 'var(--orion-accent)' },
-    { id: 'xml',   label: 'XML (.xml)',   desc: 'Compatible SportsCode/Nacsport', icon: FileCode, color: 'var(--orion-amber)' },
-  ] as const;
+    { id: 'excel' as const, label: 'Excel (.xlsx)', desc: 'Avec statistiques',            icon: FileSpreadsheet, color: 'var(--orion-green)' },
+    { id: 'csv'   as const, label: 'CSV (.csv)',   desc: 'Données brutes',                icon: FileText,        color: 'var(--orion-accent)' },
+    { id: 'xml'   as const, label: 'XML (.xml)',   desc: 'Compatible SportsCode/Nacsport', icon: FileCode,       color: 'var(--orion-amber)' },
+  ];
 
   return (
-    <div className="relative">
+    <div style={{ position: 'relative' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled || events.length === 0}
         className="o-btn o-btn--sm"
-        style={{ opacity: disabled || events.length === 0 ? 0.4 : 1, cursor: disabled || events.length === 0 ? 'not-allowed' : 'pointer', display:'flex', alignItems:'center', gap:6 }}
+        style={{ opacity: disabled || events.length === 0 ? 0.4 : 1, cursor: disabled || events.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}
       >
         <Download size={14} /> Exporter
       </button>
 
       {isOpen && !disabled && events.length > 0 && (
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div style={{ position:'absolute', right:0, marginTop:4, width:230, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', zIndex:20, borderRadius:4, overflow:'hidden' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setIsOpen(false)} />
+          <div style={{ position: 'absolute', right: 0, marginTop: 4, width: 230, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', zIndex: 20, borderRadius: 4, overflow: 'hidden' }}>
             {formats.map((f, i) => {
               const Icon = f.icon;
               return (
                 <button key={f.id} onClick={() => handleExport(f.id)}
-                  style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 16px', borderBottom: i < formats.length-1 ? '1px solid var(--orion-line)' : 'none', background:'none', cursor:'pointer', textAlign:'left' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: i < formats.length - 1 ? '1px solid var(--orion-line)' : 'none', background: 'none', cursor: 'pointer', textAlign: 'left' }}
                   onMouseEnter={e => (e.currentTarget.style.background = 'var(--orion-surface-2)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'none')}
                 >
-                  <Icon size={15} style={{ color: f.color, flexShrink:0 }} />
+                  <Icon size={15} style={{ color: f.color, flexShrink: 0 }} />
                   <div>
-                    <div style={{ fontSize:12, color:'var(--orion-text)', fontWeight:600 }}>{f.label}</div>
-                    <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>{f.desc}</div>
+                    <div style={{ fontSize: 12, color: 'var(--orion-text)', fontWeight: 600 }}>{f.label}</div>
+                    <div style={{ fontSize: 10, color: 'var(--orion-text-mute)', marginTop: 2 }}>{f.desc}</div>
                   </div>
                 </button>
               );
@@ -83,25 +83,4 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
       )}
     </div>
   );
-}
-import { MatchEventWithDetails } from '../types/database';
-import { exportToCSV, exportToExcel } from '../utils/exportData';
-import { exportToPdf } from '../utils/exportPdf';
-import { exportToSportsCodeXML, exportToDartfishCSV, exportToLongoMatchCSV } from '../utils/exportPro';
-
-interface ExportButtonProps {
-  events: MatchEventWithDetails[];
-  teamAName: string;
-  teamBName: string;
-  teamAColor?: string;
-  teamBColor?: string;
-  matchDate?: string;
-  scoreA?: number;
-  scoreB?: number;
-  duration?: number;
-  location?: string;
-  competition?: string;
-  teamALogoUrl?: string;
-  teamBLogoUrl?: string;
-  disabled?: boolean;
 }

@@ -97,7 +97,7 @@ export default function AdminPanel() {
           style={{ width: '100%', padding: '8px 12px 8px 32px', background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 4, color: 'var(--orion-text)', fontSize: 13, outline: 'none' }} />
       </div>
 
-      <div className="o-card" style={{ overflow: 'auto' }}>
+      <div className="o-card" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--orion-text-mute)', fontSize: 13 }}>Chargement…</div>
         ) : filtered.length === 0 ? (
@@ -163,7 +163,7 @@ export default function AdminPanel() {
       </div>
 
       {!loading && users.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, marginTop: 12, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 6, overflow: 'hidden' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 0, marginTop: 12, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 6, overflow: 'hidden' }}>
           {[
             { label: 'Total utilisateurs', value: users.length },
             { label: 'Comptes actifs', value: users.filter(u => u.is_active).length },

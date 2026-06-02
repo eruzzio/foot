@@ -133,211 +133,139 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const stats = calculateMatchStats();
 
   return (
-    <div className="min-h-screen bg-dark text-white p-4">
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-8">
-          <button
-            onClick={onBack}
-            className="p-2 hover:bg-dark-secondary rounded-lg transition-colors mb-6 text-gray-400 hover:text-white"
-          >
-            <ArrowLeft size={24} />
+    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)', padding:'16px' }}>
+      <div style={{ maxWidth:900, margin:'0 auto' }}>
+        <header style={{ marginBottom:16 }}>
+          <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', marginBottom:12, display:'flex', alignItems:'center', gap:6, fontSize:13 }}>
+            <ArrowLeft size={18} /> Retour
           </button>
 
-          <div className="bg-gradient-to-br from-dark-secondary to-dark border border-gray-800 rounded-2xl p-8 shadow-2xl overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-orange-primary/5 rounded-full -mr-48 -mt-48 blur-3xl" />
-            <div className="relative z-10">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <p className="text-gray-400 text-sm uppercase tracking-wider mb-2">Match de football</p>
-                  <h1 className="text-4xl font-bold text-white">
-                    {match.team_a_name} <span className="text-orange-primary">vs</span> {match.team_b_name}
-                  </h1>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setShowPdfConfig(true)}
-                    className="o-btn o-btn--sm"
-                    style={{ display:'flex', alignItems:'center', gap:6 }}
-                  >
-                    📄 Rapport PDF
-                  </button>
-                  <ExportButton
-                    events={match.events}
-                    teamAName={match.team_a_name}
-                    teamBName={match.team_b_name}
-                    teamAColor={match.team_a_color || '#22c55e'}
-                    teamBColor={match.team_b_color || '#f97316'}
-                    matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
-                    scoreA={match.team_a_score}
-                    scoreB={match.team_b_score}
-                    duration={match.match_time}
-                    teamALogoUrl={teamALogoUrl}
-                    teamBLogoUrl={teamBLogoUrl}
-                  />
-                </div>
+          <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'20px 20px 16px', overflow:'hidden' }}>
+            {/* Titre + boutons */}
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:16, flexWrap:'wrap' }}>
+              <div>
+                <p style={{ fontSize:10, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.1em', fontFamily:'var(--orion-font-mono)', marginBottom:6 }}>Match de football</p>
+                <h1 style={{ fontSize:'clamp(18px, 4vw, 28px)', fontWeight:800, color:'var(--orion-text)', lineHeight:1.1 }}>
+                  {match.team_a_name} <span style={{ color:'var(--orion-accent)' }}>vs</span> {match.team_b_name}
+                </h1>
               </div>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap', flexShrink:0 }}>
+                <button onClick={() => setShowPdfConfig(true)} className="o-btn o-btn--sm" style={{ display:'flex', alignItems:'center', gap:6 }}>
+                  📄 Rapport PDF
+                </button>
+                <ExportButton
+                  events={match.events}
+                  teamAName={match.team_a_name}
+                  teamBName={match.team_b_name}
+                  teamAColor={match.team_a_color || '#22c55e'}
+                  teamBColor={match.team_b_color || '#f97316'}
+                  matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
+                  scoreA={match.team_a_score}
+                  scoreB={match.team_b_score}
+                  duration={match.match_time}
+                  teamALogoUrl={teamALogoUrl}
+                  teamBLogoUrl={teamBLogoUrl}
+                />
+              </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-6 items-center mb-6">
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-white mb-2">{match.team_a_score}</div>
-                  <p className="text-gray-400">Buts</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-3">
-                    <div className="flex items-center gap-1 text-gray-400 text-sm">
-                      <Calendar size={16} />
+            {/* Score */}
+            <div style={{ display:'grid', gridTemplateColumns:'1fr auto 1fr', gap:8, alignItems:'center', marginBottom:16 }}>
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontSize:'clamp(36px, 8vw, 56px)', fontWeight:800, lineHeight:1, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>{match.team_a_score}</div>
+                <p style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Buts</p>
+              </div>
+              <div style={{ textAlign:'center', padding:'0 8px' }}>
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', justifyContent:'center' }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, color:'var(--orion-text-mute)' }}>
+                      <Calendar size={13} />
                       {new Date(match.match_date).toLocaleDateString('fr-FR')}
                     </div>
-                    <div className="w-1 h-1 bg-gray-600 rounded-full" />
-                    <div className="flex items-center gap-1 text-gray-400 text-sm">
-                      <Clock size={16} />
+                    <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, color:'var(--orion-text-mute)' }}>
+                      <Clock size={13} />
                       {formatDuration(match.match_time)}
                     </div>
                   </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-bold text-white mb-2">{match.team_b_score}</div>
-                  <p className="text-gray-400">Buts</p>
+                  <div style={{ fontSize:18, fontWeight:800, color:'var(--orion-text-mute)' }}>—</div>
                 </div>
               </div>
-
-              {/* Tags contextuels */}
-              {(match.tag_competition || match.tag_venue || match.tag_stake || match.tag_surface || match.tag_weather) && (
-                <div style={{ display:'flex', flexWrap:'wrap', gap:6, paddingTop:14, borderTop:'1px solid rgba(255,255,255,0.08)' }}>
-                  {match.tag_competition && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(61,128,224,0.12)', border:'1px solid rgba(61,128,224,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#7ab4f0', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
-                      🏆 {match.tag_competition}
-                    </span>
-                  )}
-                  {match.tag_venue && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
-                      📍 {match.tag_venue === 'home' ? 'Domicile' : match.tag_venue === 'away' ? 'Extérieur' : 'Terrain neutre'}
-                    </span>
-                  )}
-                  {match.tag_stake && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(243,156,18,0.1)', border:'1px solid rgba(243,156,18,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#f39c12', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
-                      🎯 {match.tag_stake === 'decisive' ? 'Match décisif' : match.tag_stake === 'friendly' ? 'Amical' : 'Match normal'}
-                    </span>
-                  )}
-                  {match.tag_surface && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(46,204,113,0.08)', border:'1px solid rgba(46,204,113,0.25)', borderRadius:4, fontSize:11, fontWeight:600, color:'#2ecc71', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
-                      🌱 {match.tag_surface === 'grass' ? 'Pelouse naturelle' : 'Synthétique'}
-                    </span>
-                  )}
-                  {match.tag_weather && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', letterSpacing:'0.06em' }}>
-                      {match.tag_weather === 'sun' ? '☀️ Beau temps' : match.tag_weather === 'rain' ? '🌧️ Pluie' : match.tag_weather === 'wind' ? '💨 Vent' : '❄️ Neige/Froid'}
-                    </span>
-                  )}
-                  {match.tag_notes && (
-                    <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 10px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', fontStyle:'italic', maxWidth:300, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                      📝 {match.tag_notes}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontSize:'clamp(36px, 8vw, 56px)', fontWeight:800, lineHeight:1, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>{match.team_b_score}</div>
+                <p style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Buts</p>
+              </div>
             </div>
+
+            {/* Tags contextuels */}
+            {(match.tag_competition || match.tag_venue || match.tag_stake || match.tag_surface || match.tag_weather) && (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6, paddingTop:12, borderTop:'1px solid var(--orion-line)' }}>
+                {match.tag_competition && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(61,128,224,0.12)', border:'1px solid rgba(61,128,224,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#7ab4f0', fontFamily:'var(--orion-font-mono)' }}>
+                    🏆 {match.tag_competition}
+                  </span>
+                )}
+                {match.tag_venue && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)' }}>
+                    📍 {match.tag_venue === 'home' ? 'Domicile' : match.tag_venue === 'away' ? 'Extérieur' : 'Terrain neutre'}
+                  </span>
+                )}
+                {match.tag_stake && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(243,156,18,0.1)', border:'1px solid rgba(243,156,18,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#f39c12', fontFamily:'var(--orion-font-mono)' }}>
+                    🎯 {match.tag_stake === 'decisive' ? 'Match décisif' : match.tag_stake === 'friendly' ? 'Amical' : 'Match normal'}
+                  </span>
+                )}
+                {match.tag_surface && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(46,204,113,0.08)', border:'1px solid rgba(46,204,113,0.25)', borderRadius:4, fontSize:11, fontWeight:600, color:'#2ecc71', fontFamily:'var(--orion-font-mono)' }}>
+                    🌱 {match.tag_surface === 'grass' ? 'Pelouse' : 'Synthétique'}
+                  </span>
+                )}
+                {match.tag_weather && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)' }}>
+                    {match.tag_weather === 'sun' ? '☀️' : match.tag_weather === 'rain' ? '🌧️' : match.tag_weather === 'wind' ? '💨' : '❄️'} {match.tag_weather === 'sun' ? 'Beau temps' : match.tag_weather === 'rain' ? 'Pluie' : match.tag_weather === 'wind' ? 'Vent' : 'Froid'}
+                  </span>
+                )}
+                {match.tag_notes && (
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', fontStyle:'italic', maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                    📝 {match.tag_notes}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </header>
 
-        <div className="mb-6 flex gap-3 border-b border-gray-800">
-          <button
-            onClick={() => handleTabChange('overview')}
-            className={`px-6 py-3 font-medium transition-all relative ${
-              activeTab === 'overview'
-                ? 'text-orange-primary'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            Aperçu du match
-            {activeTab === 'overview' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-primary" />
-            )}
-          </button>
-          <button
-            onClick={() => handleTabChange('video')}
-            className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
-              activeTab === 'video'
-                ? 'text-yellow-400'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            <Video size={15} />
-            Analyse Vid&eacute;o
-            {match.video_url && (
-              <span className="w-2 h-2 rounded-full bg-yellow-500" />
-            )}
-            {activeTab === 'video' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400" />
-            )}
-          </button>
-          <button
-            onClick={() => handleTabChange('tags')}
-            className={`px-6 py-3 font-medium transition-all relative flex items-center gap-2 ${
-              activeTab === 'tags'
-                ? 'text-orange-primary'
-                : 'text-gray-400 hover:text-gray-300'
-            }`}
-          >
-            <Tag size={15} />
-            Tags
-            {(match.tag_competition || match.tag_venue || match.tag_stake) && (
-              <span className="w-2 h-2 rounded-full bg-orange-primary" />
-            )}
-            {activeTab === 'tags' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-primary" />
-            )}
-          </button>
+        {/* TABS */}
+        <div style={{ display:'flex', gap:0, borderBottom:'1.5px solid var(--orion-line-strong)', marginBottom:16, overflowX:'auto' }}>
+          {[
+            { id:'overview', label:'Aperçu du match' },
+            { id:'video',    label:'Analyse Vidéo', icon:'🎬' },
+            { id:'tags',     label:'Tags', dot: !!(match.tag_competition || match.tag_venue || match.tag_stake) },
+          ].map(tab => (
+            <button key={tab.id}
+              onClick={() => handleTabChange(tab.id as any)}
+              style={{ display:'flex', alignItems:'center', gap:6, padding:'12px 18px', background:'none', border:'none', borderBottom: activeTab === tab.id ? '2px solid var(--orion-accent)' : '2px solid transparent', cursor:'pointer', fontSize:13, fontWeight: activeTab === tab.id ? 700 : 500, color: activeTab === tab.id ? 'var(--orion-text)' : 'var(--orion-text-mute)', whiteSpace:'nowrap', transition:'all .15s', marginBottom:-1.5 }}
+            >
+              {tab.icon && <span>{tab.icon}</span>}
+              {tab.label}
+              {tab.dot && <span style={{ width:6, height:6, borderRadius:'50%', background:'var(--orion-accent)', flexShrink:0 }} />}
+            </button>
+          ))}
         </div>
-
         {activeTab === 'overview' && (
           <>
             {stats && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-dark-secondary border border-gray-800 rounded-xl p-6 hover:border-blue-500/50 transition-colors shadow-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-2 bg-blue-500/20 rounded-lg">
-                      <TrendingUp size={20} className="text-blue-400" />
-                    </div>
-                    <span className="font-semibold text-white">{match.team_a_name}</span>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:8, marginBottom:20 }}>
+                {[
+                  { label: match.team_a_name, value: stats.teamATotal, sub: `${stats.teamASuccess} réussies (${stats.teamASuccessRate}%)`, color: 'var(--orion-accent)' },
+                  { label: match.team_b_name, value: stats.teamBTotal, sub: `${stats.teamBSuccess} réussies (${stats.teamBSuccessRate}%)`, color: 'var(--orion-amber)' },
+                  { label: 'Total', value: stats.totalEvents, sub: 'événements codés', color: 'var(--orion-green)' },
+                ].map((k, i) => (
+                  <div key={i} style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'16px 18px' }}>
+                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8 }}>{k.label}</div>
+                    <div style={{ fontSize:32, fontWeight:800, color:k.color, lineHeight:1, fontFamily:'var(--orion-font-mono)' }}>{k.value}</div>
+                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>{k.sub}</div>
                   </div>
-                  <div className="text-4xl font-bold text-blue-400 mb-1">
-                    {stats.teamATotal}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {stats.teamASuccess} réussies <span className="text-blue-400 font-semibold">({stats.teamASuccessRate}%)</span>
-                  </div>
-                </div>
-
-                <div className="bg-dark-secondary border border-gray-800 rounded-xl p-6 hover:border-orange-primary/50 transition-colors shadow-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-2 bg-orange-primary/20 rounded-lg">
-                      <Users size={20} className="text-orange-primary" />
-                    </div>
-                    <span className="font-semibold text-white">{match.team_b_name}</span>
-                  </div>
-                  <div className="text-4xl font-bold text-orange-primary mb-1">
-                    {stats.teamBTotal}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    {stats.teamBSuccess} réussies <span className="text-orange-primary font-semibold">({stats.teamBSuccessRate}%)</span>
-                  </div>
-                </div>
-
-                <div className="bg-dark-secondary border border-gray-800 rounded-xl p-6 hover:border-green-500/50 transition-colors shadow-lg">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="p-2 bg-green-500/20 rounded-lg">
-                      <BarChart3 size={20} className="text-green-400" />
-                    </div>
-                    <span className="font-semibold text-white">Total</span>
-                  </div>
-                  <div className="text-4xl font-bold text-green-400 mb-1">
-                    {stats.totalEvents}
-                  </div>
-                  <div className="text-sm text-gray-400">
-                    événements codés
-                  </div>
-                </div>
+                ))}
               </div>
             )}
 
