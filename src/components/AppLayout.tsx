@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield } from 'lucide-react';
 import { OrionLogo } from './orion/Orion';
 
 interface AppLayoutProps {
@@ -21,6 +21,17 @@ const NAV_ITEMS = [
 
 export default function AppLayout({ children, onNavigate, currentPage, userName }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    import('../lib/supabase').then(({ supabase }) => {
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        supabase.from('orion_users').select('is_admin').eq('id', user.id).single()
+          .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
+      });
+    });
+  }, []);
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <>
@@ -34,7 +45,7 @@ export default function AppLayout({ children, onNavigate, currentPage, userName 
         </div>
       )}
       <nav style={{ flex:1, padding:'8px 0', overflowY:'auto' }}>
-        {NAV_ITEMS.map(item => {
+        {[...NAV_ITEMS, ...(isAdmin ? [{ id: 'admin', label: 'Administration', icon: Shield }] : [])].map(item => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
           return (

@@ -9,9 +9,10 @@ import PanelsManager from './components/PanelsManager';
 import EvolutionDashboard from './components/EvolutionDashboard';
 import ProfilePage from './components/ProfilePage';
 import AppLayout from './components/AppLayout';
+import AdminPanel from './components/AdminPanel';
 import { I18nProvider } from './i18n/I18nContext';
 
-type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile';
+type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -93,6 +94,7 @@ function App() {
       case 'panels':   return <PanelsManager onBack={handleBackToHome} />;
       case 'evolution':return <EvolutionDashboard onBack={handleBackToHome} />;
       case 'profile':  return <ProfilePage onBack={handleBackToHome} />;
+      case 'admin':    return <AdminPanel />;
       default:         return <HomePage key={homeKey} onNavigate={handleNavigate} />;
     }
   };
