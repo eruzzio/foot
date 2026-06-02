@@ -303,8 +303,11 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           <button onClick={() => fileInputRef.current?.click()} className="o-btn o-btn--ghost o-btn--sm">
             <Upload size={12} /> Fichier local
           </button>
-          <button onClick={() => setShowUrlInput(!showUrlInput)} className="o-btn o-btn--ghost o-btn--sm">
+          <button className="o-btn o-btn--ghost o-btn--sm" disabled
+            style={{ opacity: 0.4, cursor: 'not-allowed', color: 'var(--orion-text-mute)' }}
+            title="Fonctionnalité en développement">
             <Link size={12} /> Lien VEO
+            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orion-amber)', fontFamily: 'var(--orion-font-mono)', marginLeft: 4 }}>BIENTÔT</span>
           </button>
           {/* Bookmarklet VEO - en développement */}
           <a
