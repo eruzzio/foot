@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield } from 'lucide-react';
 import { OrionLogo } from './orion/Orion';
+import { supabase } from '../lib/supabase';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -24,12 +25,10 @@ export default function AppLayout({ children, onNavigate, currentPage, userName 
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    import('../lib/supabase').then(({ supabase }) => {
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (!user) return;
-        supabase.from('orion_users').select('is_admin').eq('id', user.id).single()
-          .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
-      });
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      supabase.from('orion_users').select('is_admin').eq('id', user.id).single()
+        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
     });
   }, []);
 
