@@ -20,6 +20,7 @@ function App() {
   const [homeKey, setHomeKey] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userName, setUserName] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -37,6 +38,10 @@ function App() {
     setIsAuthenticated(!!session);
     if (session?.user?.user_metadata?.first_name) {
       setUserName(session.user.user_metadata.first_name);
+    }
+    if (session?.user) {
+      supabase.from('orion_users').select('is_admin').eq('id', session.user.id).single()
+        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
     }
   };
 
@@ -81,7 +86,7 @@ function App() {
   if (currentPage === 'home') {
     return (
       <I18nProvider>
-        <HomePage key={homeKey} onNavigate={handleNavigate} />
+        <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} />
       </I18nProvider>
     );
   }
@@ -95,13 +100,13 @@ function App() {
       case 'evolution':return <EvolutionDashboard onBack={handleBackToHome} />;
       case 'profile':  return <ProfilePage onBack={handleBackToHome} />;
       case 'admin':    return <AdminPanel />;
-      default:         return <HomePage key={homeKey} onNavigate={handleNavigate} />;
+      default:         return <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} />;
     }
   };
 
   return (
     <I18nProvider>
-      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName}>
+      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin}>
         {renderContent()}
       </AppLayout>
     </I18nProvider>

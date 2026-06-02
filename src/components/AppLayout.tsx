@@ -8,6 +8,7 @@ interface AppLayoutProps {
   onNavigate: (page: string) => void;
   currentPage?: string;
   userName?: string;
+  isAdmin?: boolean;
 }
 
 const NAV_ITEMS = [
@@ -20,17 +21,8 @@ const NAV_ITEMS = [
   { id: 'profile',   label: 'Mon Profil',      icon: User },
 ];
 
-export default function AppLayout({ children, onNavigate, currentPage, userName }: AppLayoutProps) {
+export default function AppLayout({ children, onNavigate, currentPage, userName, isAdmin = false }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      supabase.from('orion_users').select('is_admin').eq('id', user.id).single()
-        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
-    });
-  }, []);
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <>

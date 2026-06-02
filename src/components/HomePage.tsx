@@ -1,11 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Activity, AlertTriangle, CheckCircle, Menu, X, ChevronRight, Radio, PanelLeft, BarChart2, TrendingUp, Users, User } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle, Menu, X, ChevronRight, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { calculateTeamXG } from '../utils/xg';
 import { OrionLogo, Result } from './orion/Orion';
 
-interface HomePageProps { onNavigate: (page: string) => void; }
+interface HomePageProps { onNavigate: (page: string) => void; isAdmin?: boolean; }
 interface MatchSummary {
   id: string; team_a_name: string; team_b_name: string;
   team_a_score: number; team_b_score: number; match_date: string;
@@ -22,7 +22,7 @@ const NAV_ITEMS = [
   { id: 'profile',   label: 'Mon Profil',     icon: User },
 ];
 
-export default function HomePage({ onNavigate }: HomePageProps) {
+export default function HomePage({ onNavigate, isAdmin = false }: HomePageProps) {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
