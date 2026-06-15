@@ -5,6 +5,7 @@ import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
 import Timeline from './Timeline';
 import ExportButton from './ExportButton';
+import { Share2, Check, Copy } from 'lucide-react';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
 import MatchTags from './MatchTags';
@@ -13,6 +14,7 @@ import PdfConfigModal from './PdfConfigModal';
 interface MatchReportProps {
   matchId: string;
   onBack: () => void;
+  readOnly?: boolean;
 }
 
 interface MatchWithEvents extends Match {
@@ -26,6 +28,30 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'overview' | 'video' | 'tags'>('overview');
   const [showPdfConfig, setShowPdfConfig] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+
+  const handleShare = async () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+      return;
+    }
+    setSharing(true);
+    // Générer un token unique
+    const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    const { error } = await supabase.from('matches').update({ share_token: token }).eq('id', matchId);
+    if (!error) {
+      const url = `${window.location.origin}/share/${token}`;
+      setShareUrl(url);
+      navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    }
+    setSharing(false);
+  };
 
   const handleTabChange = (tab: typeof activeTab) => {
     setActiveTab(tab);
@@ -152,6 +178,10 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
               <div style={{ display:'flex', gap:8, flexWrap:'wrap', flexShrink:0 }}>
                 <button onClick={() => setShowPdfConfig(true)} className="o-btn o-btn--sm" style={{ display:'flex', alignItems:'center', gap:6 }}>
                   📄 Rapport PDF
+                </button>
+                <button onClick={handleShare} className="o-btn o-btn--sm" disabled={sharing}
+                  style={{ display:'flex', alignItems:'center', gap:6, borderColor: shareCopied ? 'var(--orion-green)' : undefined, color: shareCopied ? 'var(--orion-green)' : undefined }}>
+                  {shareCopied ? <><Check size={13} /> Lien copié !</> : sharing ? 'Génération…' : <><Share2 size={13} /> Partager</>}
                 </button>
                 <ExportButton
                   events={match.events}
