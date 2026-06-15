@@ -10,6 +10,7 @@ import EvolutionDashboard from './components/EvolutionDashboard';
 import ProfilePage from './components/ProfilePage';
 import AppLayout from './components/AppLayout';
 import AdminPanel from './components/AdminPanel';
+import ConfirmEmail from './components/ConfirmEmail';
 import { I18nProvider } from './i18n/I18nContext';
 
 type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin';
@@ -60,6 +61,11 @@ function App() {
     setHomeKey(prev => prev + 1);
     setCurrentPage('home');
   };
+
+  // Détecter la page de confirmation email
+  if (window.location.pathname === '/confirm' || window.location.hash.includes('type=signup')) {
+    return <ConfirmEmail />;
+  }
 
   if (isAuthenticated === null) {
     return (
