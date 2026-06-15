@@ -41,26 +41,26 @@ export default function HomePage({ onNavigate, isAdmin = false }: HomePageProps)
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { clearTimeout(timeout); setLoading(false); return; }
-    const meta = user.user_metadata || {};
-    if (meta.first_name) setUserName(meta.first_name);
-    await createDefaultFootballPanel(user.id);
-    const { data: matchesData } = await supabase
-      .from('matches').select('*').eq('status', 'completed').eq('user_id', user.id)
-      .order('match_date', { ascending: false }).limit(8);
-    if (matchesData?.length) {
-      const summaries = await Promise.all(matchesData.map(async m => {
-        const { data: evts } = await supabase.from('match_events').select('*, event_type:event_types(*)').eq('match_id', m.id);
-        const e = evts || [];
-        return {
-          id: m.id, team_a_name: m.team_a_name, team_b_name: m.team_b_name,
-          team_a_score: m.team_a_score, team_b_score: m.team_b_score,
-          match_date: m.match_date, events_count: e.length,
-          xg_for: calculateTeamXG(e as any, 'A'), xg_against: calculateTeamXG(e as any, 'B'),
-          result: (m.team_a_score > m.team_b_score ? 'W' : m.team_a_score === m.team_b_score ? 'D' : 'L') as 'W'|'D'|'L',
-        };
-      }));
-      setMatches(summaries.reverse());
-    }
+      const meta = user.user_metadata || {};
+      if (meta.first_name) setUserName(meta.first_name);
+      await createDefaultFootballPanel(user.id);
+      const { data: matchesData } = await supabase
+        .from('matches').select('*').eq('status', 'completed').eq('user_id', user.id)
+        .order('match_date', { ascending: false }).limit(8);
+      if (matchesData?.length) {
+        const summaries = await Promise.all(matchesData.map(async m => {
+          const { data: evts } = await supabase.from('match_events').select('*, event_type:event_types(*)').eq('match_id', m.id);
+          const e = evts || [];
+          return {
+            id: m.id, team_a_name: m.team_a_name, team_b_name: m.team_b_name,
+            team_a_score: m.team_a_score, team_b_score: m.team_b_score,
+            match_date: m.match_date, events_count: e.length,
+            xg_for: calculateTeamXG(e as any, 'A'), xg_against: calculateTeamXG(e as any, 'B'),
+            result: (m.team_a_score > m.team_b_score ? 'W' : m.team_a_score === m.team_b_score ? 'D' : 'L') as 'W'|'D'|'L',
+          };
+        }));
+        setMatches(summaries.reverse());
+      }
       setLoading(false);
     } catch {
       setLoadError(true);
