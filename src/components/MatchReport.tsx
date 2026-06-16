@@ -21,7 +21,7 @@ interface MatchWithEvents extends Match {
   events: MatchEventWithDetails[];
 }
 
-export default function MatchReport({ matchId, onBack }: MatchReportProps) {
+export default function MatchReport({ matchId, onBack, readOnly = false }: MatchReportProps) {
   const [match, setMatch] = useState<MatchWithEvents | null>(null);
   const [loading, setLoading] = useState(true);
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
@@ -176,26 +176,30 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
                 </h1>
               </div>
               <div style={{ display:'flex', gap:8, flexWrap:'wrap', flexShrink:0 }}>
-                <button onClick={() => setShowPdfConfig(true)} className="o-btn o-btn--sm" style={{ display:'flex', alignItems:'center', gap:6 }}>
-                  📄 Rapport PDF
-                </button>
-                <button onClick={handleShare} className="o-btn o-btn--sm" disabled={sharing}
-                  style={{ display:'flex', alignItems:'center', gap:6, borderColor: shareCopied ? 'var(--orion-green)' : undefined, color: shareCopied ? 'var(--orion-green)' : undefined }}>
-                  {shareCopied ? <><Check size={13} /> Lien copié !</> : sharing ? 'Génération…' : <><Share2 size={13} /> Partager</>}
-                </button>
-                <ExportButton
-                  events={match.events}
-                  teamAName={match.team_a_name}
-                  teamBName={match.team_b_name}
-                  teamAColor={match.team_a_color || '#22c55e'}
-                  teamBColor={match.team_b_color || '#f97316'}
-                  matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
-                  scoreA={match.team_a_score}
-                  scoreB={match.team_b_score}
-                  duration={match.match_time}
-                  teamALogoUrl={teamALogoUrl}
-                  teamBLogoUrl={teamBLogoUrl}
-                />
+                {!readOnly && (
+                  <>
+                    <button onClick={() => setShowPdfConfig(true)} className="o-btn o-btn--sm" style={{ display:'flex', alignItems:'center', gap:6 }}>
+                      📄 Rapport PDF
+                    </button>
+                    <button onClick={handleShare} className="o-btn o-btn--sm" disabled={sharing}
+                      style={{ display:'flex', alignItems:'center', gap:6, borderColor: shareCopied ? 'var(--orion-green)' : undefined, color: shareCopied ? 'var(--orion-green)' : undefined }}>
+                      {shareCopied ? <><Check size={13} /> Lien copié !</> : sharing ? 'Génération…' : <><Share2 size={13} /> Partager</>}
+                    </button>
+                    <ExportButton
+                      events={match.events}
+                      teamAName={match.team_a_name}
+                      teamBName={match.team_b_name}
+                      teamAColor={match.team_a_color || '#22c55e'}
+                      teamBColor={match.team_b_color || '#f97316'}
+                      matchDate={new Date(match.match_date).toLocaleDateString('fr-FR')}
+                      scoreA={match.team_a_score}
+                      scoreB={match.team_b_score}
+                      duration={match.match_time}
+                      teamALogoUrl={teamALogoUrl}
+                      teamBLogoUrl={teamBLogoUrl}
+                    />
+                  </>
+                )}
               </div>
             </div>
 
@@ -268,8 +272,10 @@ export default function MatchReport({ matchId, onBack }: MatchReportProps) {
         <div style={{ display:'flex', gap:0, borderBottom:'1.5px solid var(--orion-line-strong)', marginBottom:16, overflowX:'auto' }}>
           {[
             { id:'overview', label:'Aperçu du match' },
-            { id:'video',    label:'Analyse Vidéo', icon:'🎬' },
-            { id:'tags',     label:'Tags', dot: !!(match.tag_competition || match.tag_venue || match.tag_stake) },
+            ...(!readOnly ? [
+              { id:'video', label:'Analyse Vidéo', icon:'🎬' },
+              { id:'tags',  label:'Tags', dot: !!(match.tag_competition || match.tag_venue || match.tag_stake) },
+            ] : []),
           ].map(tab => (
             <button key={tab.id}
               onClick={() => handleTabChange(tab.id as any)}
