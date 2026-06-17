@@ -303,24 +303,6 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           <button onClick={() => fileInputRef.current?.click()} className="o-btn o-btn--ghost o-btn--sm">
             <Upload size={12} /> Fichier local
           </button>
-          <button className="o-btn o-btn--ghost o-btn--sm" disabled
-            style={{ opacity: 0.4, cursor: 'not-allowed', color: 'var(--orion-text-mute)' }}
-            title="Fonctionnalité en développement">
-            <Link size={12} /> Lien VEO
-            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orion-amber)', fontFamily: 'var(--orion-font-mono)', marginLeft: 4 }}>BIENTÔT</span>
-          </button>
-          {/* Bookmarklet VEO - en développement */}
-          <a
-            href="#"
-            className="o-btn o-btn--ghost o-btn--sm"
-            style={{ textDecoration: 'none', opacity: 0.4, cursor: 'not-allowed', borderColor: 'var(--orion-line)', color: 'var(--orion-text-mute)', position: 'relative' }}
-            onClick={e => e.preventDefault()}
-            title="Fonctionnalité en développement"
-          >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            Extraire MP4 VEO
-            <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--orion-amber)', fontFamily: 'var(--orion-font-mono)', marginLeft: 4 }}>BIENTÔT</span>
-          </a>
           {videoSource && (
             <button onClick={() => setVideoSource(null)} className="o-btn o-btn--ghost o-btn--sm" style={{ color: 'var(--orion-red)' }}>
               <X size={12} /> Retirer
