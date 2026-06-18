@@ -225,3 +225,31 @@ function downloadFile(content: string, filename: string, mimeType: string): void
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+// Export CSV compatible Once Sport Analyser
+export function exportToOnceSport(data: ExportData): void {
+  const formatTime = (seconds: number): string => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const rows = ['Start Time,End Time,Action,Team,Outcome'];
+  data.events.forEach(e => {
+    const start = formatTime(e.timestamp);
+    const end = formatTime(e.timestamp + 5); // clip de 5s par défaut
+    const action = e.event_type?.name || e.label || 'Action';
+    const team = e.team === 'A' ? data.matchInfo.teamA : data.matchInfo.teamB;
+    const outcome = e.outcome || '';
+    rows.push(`${start},${end},${action},${team},${outcome}`);
+  });
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `ORION_OnceSport_${data.matchInfo.teamA}_vs_${data.matchInfo.teamB}_${data.matchInfo.date}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}

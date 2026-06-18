@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Download, FileSpreadsheet, FileText, FileCode } from 'lucide-react';
 import { MatchEventWithDetails } from '../types/database';
-import { exportToCSV, exportToExcel } from '../utils/exportData';
+import { exportToCSV, exportToExcel, exportToOnceSport } from '../utils/exportData';
 import { exportToSportsCodeXML } from '../utils/exportPro';
 
 interface ExportButtonProps {
@@ -34,17 +34,19 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
     },
   };
 
-  const handleExport = (format: 'csv' | 'excel' | 'xml') => {
+  const handleExport = (format: 'csv' | 'excel' | 'xml' | 'oncesport') => {
     if (format === 'csv') exportToCSV(exportData);
     else if (format === 'excel') exportToExcel(exportData);
     else if (format === 'xml') exportToSportsCodeXML(exportData);
+    else if (format === 'oncesport') exportToOnceSport(exportData);
     setIsOpen(false);
   };
 
   const formats = [
-    { id: 'excel' as const, label: 'Excel (.xlsx)', desc: 'Avec statistiques',            icon: FileSpreadsheet, color: 'var(--orion-green)' },
-    { id: 'csv'   as const, label: 'CSV (.csv)',   desc: 'Données brutes',                icon: FileText,        color: 'var(--orion-accent)' },
-    { id: 'xml'   as const, label: 'XML (.xml)',   desc: 'Compatible SportsCode/Nacsport', icon: FileCode,       color: 'var(--orion-amber)' },
+    { id: 'excel'     as const, label: 'Excel (.xlsx)',      desc: 'Avec statistiques',             icon: FileSpreadsheet, color: 'var(--orion-green)' },
+    { id: 'csv'       as const, label: 'CSV (.csv)',          desc: 'Données brutes',                icon: FileText,        color: 'var(--orion-accent)' },
+    { id: 'xml'       as const, label: 'XML (.xml)',          desc: 'Compatible SportsCode/Nacsport', icon: FileCode,       color: 'var(--orion-amber)' },
+    { id: 'oncesport' as const, label: 'Once Sport (.csv)',   desc: 'Import direct Once Sport',      icon: FileText,        color: 'var(--orion-red)' },
   ];
 
   return (
