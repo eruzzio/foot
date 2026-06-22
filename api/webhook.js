@@ -27,6 +27,12 @@ export default async function handler(req, res) {
         stripe_subscription_id: session.subscription,
       }).eq('id', userId);
     }
+  } else if (event.type === 'invoice.payment_succeeded') {
+    // Activer le plan pro via customer_id
+    const customerId = session.customer;
+    if (customerId) {
+      await supabase.from('orion_users').update({ plan: 'pro' }).eq('stripe_customer_id', customerId);
+    }
   } else if (event.type === 'customer.subscription.deleted' || event.type === 'invoice.payment_failed') {
     await supabase.from('orion_users').update({ plan: 'free' }).eq('stripe_customer_id', session.customer);
   }
