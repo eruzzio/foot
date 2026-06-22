@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield } from 'lucide-react';
+import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield, Zap } from 'lucide-react';
 import { OrionLogo } from './orion/Orion';
 import { supabase } from '../lib/supabase';
 
@@ -62,8 +62,17 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
           );
         })}
       </nav>
-      <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)', fontSize:10, color:'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)' }}>
-        ORION · Sports Analytics
+      <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)' }}>
+        {!isPro && (
+          <button onClick={() => { onNavigate('pricing'); }}
+            style={{ width:'100%', display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'rgba(61,128,224,0.1)', border:'1px solid var(--orion-accent-line)', borderRadius:4, cursor:'pointer', marginBottom:8 }}>
+            <Zap size={14} style={{ color:'var(--orion-accent)' }} />
+            <span style={{ fontSize:12, fontWeight:700, color:'var(--orion-accent)' }}>Passer en Pro — 8,99€/mois</span>
+          </button>
+        )}
+        <div style={{ fontSize:10, color:'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)' }}>
+          ORION · Sports Analytics
+        </div>
       </div>
     </>
   );
