@@ -12,9 +12,11 @@ import AppLayout from './components/AppLayout';
 import AdminPanel from './components/AdminPanel';
 import ConfirmEmail from './components/ConfirmEmail';
 import SharedReport from './components/SharedReport';
+import PricingPage from './components/PricingPage';
+import { usePlan } from './hooks/usePlan';
 import { I18nProvider } from './i18n/I18nContext';
 
-type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin';
+type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -23,6 +25,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userName, setUserName] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const { trialDaysLeft, trialExpired, isPro, isTrial } = usePlan();
 
   useEffect(() => {
     checkAuth();
@@ -112,13 +115,14 @@ function App() {
       case 'evolution':return <EvolutionDashboard onBack={handleBackToHome} />;
       case 'profile':  return <ProfilePage onBack={handleBackToHome} />;
       case 'admin':    return <AdminPanel />;
+      case 'pricing':  return <PricingPage onBack={handleBackToHome} />;
       default:         return <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} />;
     }
   };
 
   return (
     <I18nProvider>
-      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin}>
+      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
         {renderContent()}
       </AppLayout>
     </I18nProvider>

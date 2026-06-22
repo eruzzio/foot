@@ -9,6 +9,9 @@ interface AppLayoutProps {
   currentPage?: string;
   userName?: string;
   isAdmin?: boolean;
+  trialDaysLeft?: number;
+  trialExpired?: boolean;
+  isPro?: boolean;
 }
 
 const NAV_ITEMS = [
@@ -21,7 +24,7 @@ const NAV_ITEMS = [
   { id: 'profile',   label: 'Mon Profil',      icon: User },
 ];
 
-export default function AppLayout({ children, onNavigate, currentPage, userName, isAdmin = false }: AppLayoutProps) {
+export default function AppLayout({ children, onNavigate, currentPage, userName, isAdmin = false, trialDaysLeft = 7, trialExpired = false, isPro = false }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
@@ -105,6 +108,27 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
 
         {/* Slot contenu */}
         <div style={{ flex:1 }}>
+          {/* Bannière trial */}
+          {!isPro && !trialExpired && trialDaysLeft <= 3 && (
+            <div style={{ background:'rgba(61,128,224,0.1)', borderBottom:'1px solid var(--orion-accent-line)', padding:'8px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
+              <span style={{ fontSize:12, color:'var(--orion-accent)', fontWeight:600 }}>
+                ⏳ Essai gratuit — {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
+              </span>
+              <button onClick={() => onNavigate('pricing')} className="o-btn o-btn--primary o-btn--sm" style={{ fontSize:11 }}>
+                Passer en Pro — 8,99€/mois →
+              </button>
+            </div>
+          )}
+          {trialExpired && (
+            <div style={{ background:'var(--orion-red-dim)', borderBottom:'1px solid var(--orion-red)', padding:'10px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
+              <span style={{ fontSize:12, color:'var(--orion-red)', fontWeight:700 }}>
+                ⚠️ Essai expiré — accès limité
+              </span>
+              <button onClick={() => onNavigate('pricing')} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-red)', color:'var(--orion-red)', fontSize:11 }}>
+                Voir les plans →
+              </button>
+            </div>
+          )}
           {children}
         </div>
       </div>
