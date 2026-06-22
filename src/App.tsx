@@ -119,7 +119,7 @@ function App() {
   if (currentPage === 'home') {
     return (
       <I18nProvider>
-        <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} />
+        <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} isPro={isPro} />
       </I18nProvider>
     );
   }
