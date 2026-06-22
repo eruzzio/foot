@@ -1,10 +1,9 @@
-import Stripe from 'stripe';
+const Stripe = require('stripe');
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
+  const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
   const { userId, email } = req.body;
 
   try {
@@ -13,8 +12,8 @@ export default async function handler(req, res) {
       mode: 'subscription',
       customer_email: email,
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: `${process.env.APP_URL}/billing/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_URL}/billing/cancel`,
+      success_url: `${process.env.APP_URL}/?payment=success`,
+      cancel_url: `${process.env.APP_URL}/?payment=cancel`,
       metadata: { userId },
     });
 
@@ -22,4 +21,4 @@ export default async function handler(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
