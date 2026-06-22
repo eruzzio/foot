@@ -66,6 +66,24 @@ function App() {
     setCurrentPage('home');
   };
 
+  // Retour Stripe succès
+  if (window.location.search.includes('payment=success')) {
+    return (
+      <div style={{ minHeight:'100vh', background:'var(--orion-bg)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:20, padding:24 }}>
+        <div style={{ width:64, height:64, borderRadius:'50%', background:'var(--orion-green-dim)', border:'2px solid var(--orion-green)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--orion-green)" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style={{ textAlign:'center' }}>
+          <h2 style={{ fontSize:20, fontWeight:800, color:'var(--orion-text)', marginBottom:8 }}>Bienvenue dans ORION Pro ! 🎉</h2>
+          <p style={{ fontSize:13, color:'var(--orion-text-mute)', marginBottom:24 }}>Ton abonnement est actif. Profite de toutes les fonctionnalités.</p>
+          <button onClick={() => window.location.href = '/'} className="o-btn o-btn--primary" style={{ padding:'12px 24px', fontSize:14 }}>
+            Accéder à l'app →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Rapport partagé public
   if (window.location.pathname.startsWith('/share/')) {
     return <SharedReport />;

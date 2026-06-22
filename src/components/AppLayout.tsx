@@ -30,7 +30,12 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
   const SidebarContent = ({ onClose }: { onClose?: () => void }) => (
     <>
       <div style={{ padding:'20px 16px 14px', borderBottom:'1px solid var(--orion-line)' }}>
-        <OrionLogo height={15} />
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <OrionLogo height={15} />
+          {isPro && (
+            <span style={{ fontSize:9, fontWeight:800, color:'var(--orion-accent)', background:'var(--orion-accent-dim)', border:'1px solid var(--orion-accent-line)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>PRO</span>
+          )}
+        </div>
       </div>
       {userName && (
         <div style={{ padding:'12px 16px', borderBottom:'1px solid var(--orion-line)' }}>
