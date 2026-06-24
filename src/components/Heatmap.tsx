@@ -20,8 +20,9 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
   const eventTypes = useMemo(() => {
     const types = new Set<string>();
     events.forEach(e => {
-      // N'afficher que les actions qui ont une position terrain ou but
+      // Exclure les events sans coordonnées ou codés via ZoneSelector (y=50, x fixe)
       if (e.field_x === null && e.goal_x === null) return;
+      if (e.field_y === 50 && (e.field_x === 16.5 || e.field_x === 50 || e.field_x === 83.5)) return;
       const name = e.event_type?.name || e.label;
       if (name) types.add(name);
     });
