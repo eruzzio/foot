@@ -41,7 +41,10 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
       });
   }, [events, filterTeam, filterType, filterHalf, halfTime]);
 
-  const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null && e.location_mode !== 'zones');
+  // Exclure les events codés via ZoneSelector (coordonnées fixes : y=50, x=16.5/50/83.5)
+  const isZoneCoord = (e: { field_x: number | null; field_y: number | null }) =>
+    e.field_y === 50 && (e.field_x === 16.5 || e.field_x === 50 || e.field_x === 83.5);
+  const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null && !isZoneCoord(e));
   const goalEvents = filteredEvents.filter(e => e.goal_x !== null && e.goal_y !== null);
 
   // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
