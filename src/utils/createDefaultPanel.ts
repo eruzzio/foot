@@ -16,7 +16,7 @@ export async function createDefaultFootballPanel(userId: string) {
     .from('panels')
     .insert({
       user_id: userId,
-      name: 'Football (défaut)',
+      name: 'Football Pro',
       description: 'Panneau complet pour le codage de matchs de football — attaque, défense, phases arrêtées',
       is_default: true,
       use_free_layout: false,
