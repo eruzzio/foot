@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Download, FileSpreadsheet, FileText, FileCode } from 'lucide-react';
 import { MatchEventWithDetails } from '../types/database';
 import { exportToCSV, exportToExcel, exportToOnceSport } from '../utils/exportData';
@@ -23,6 +23,16 @@ interface ExportButtonProps {
 
 export default function ExportButton({ events, teamAName, teamBName, teamAColor, teamBColor, matchDate, scoreA, scoreB, duration, location, competition, teamALogoUrl, teamBLogoUrl, disabled }: ExportButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [openUpward, setOpenUpward] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (isOpen && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setOpenUpward(spaceBelow < 220); // 4 items × ~55px
+    }
+  }, [isOpen]);
 
   const exportData = {
     events,
@@ -43,15 +53,16 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
   };
 
   const formats = [
-    { id: 'excel'     as const, label: 'Excel (.xlsx)',      desc: 'Avec statistiques',             icon: FileSpreadsheet, color: 'var(--orion-green)' },
-    { id: 'csv'       as const, label: 'CSV (.csv)',          desc: 'Données brutes',                icon: FileText,        color: 'var(--orion-accent)' },
-    { id: 'xml'       as const, label: 'XML (.xml)',          desc: 'Compatible SportsCode/Nacsport', icon: FileCode,       color: 'var(--orion-amber)' },
-    { id: 'oncesport' as const, label: 'Once Sport (.csv)',   desc: 'Import direct Once Sport',      icon: FileText,        color: 'var(--orion-red)' },
+    { id: 'excel'     as const, label: 'Excel (.xlsx)',      desc: 'Avec statistiques',              icon: FileSpreadsheet, color: 'var(--orion-green)' },
+    { id: 'csv'       as const, label: 'CSV (.csv)',          desc: 'Données brutes',                 icon: FileText,        color: 'var(--orion-accent)' },
+    { id: 'xml'       as const, label: 'XML (.xml)',          desc: 'Compatible SportsCode/Nacsport',  icon: FileCode,        color: 'var(--orion-amber)' },
+    { id: 'oncesport' as const, label: 'Once Sport (.csv)',   desc: 'Import direct Once Sport',        icon: FileText,        color: 'var(--orion-red)' },
   ];
 
   return (
-    <div style={{ position: 'relative', overflow: 'visible' }}>
+    <div style={{ position: 'relative' }}>
       <button
+        ref={btnRef}
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled || events.length === 0}
         className="o-btn o-btn--sm"
@@ -63,7 +74,22 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
       {isOpen && !disabled && events.length > 0 && (
         <>
           <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setIsOpen(false)} />
-          <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, width: 230, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', zIndex: 9999, borderRadius: 4, overflow: 'hidden' }}>
+          <div style={{
+            position: 'fixed',
+            right: 'auto',
+            zIndex: 9999,
+            width: 230,
+            background: 'var(--orion-surface)',
+            border: '1.5px solid var(--orion-line-strong)',
+            borderRadius: 4,
+            overflow: 'hidden',
+            ...(btnRef.current ? (() => {
+              const rect = btnRef.current.getBoundingClientRect();
+              return openUpward
+                ? { left: rect.right - 230, top: rect.top - 220 }
+                : { left: rect.right - 230, top: rect.bottom + 4 };
+            })() : {})
+          }}>
             {formats.map((f, i) => {
               const Icon = f.icon;
               return (
