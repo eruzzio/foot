@@ -50,7 +50,7 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
   ];
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', overflow: 'visible' }}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={disabled || events.length === 0}
@@ -63,7 +63,7 @@ export default function ExportButton({ events, teamAName, teamBName, teamAColor,
       {isOpen && !disabled && events.length > 0 && (
         <>
           <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setIsOpen(false)} />
-          <div style={{ position: 'absolute', right: 0, bottom: '100%', marginBottom: 4, width: 230, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', zIndex: 20, borderRadius: 4, overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', right: 0, top: '100%', marginTop: 4, width: 230, background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line-strong)', zIndex: 9999, borderRadius: 4, overflow: 'hidden' }}>
             {formats.map((f, i) => {
               const Icon = f.icon;
               return (
