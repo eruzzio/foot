@@ -41,7 +41,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
       });
   }, [events, filterTeam, filterType, filterHalf, halfTime]);
 
-  const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null);
+  const fieldEvents = filteredEvents.filter(e => e.field_x !== null && e.field_y !== null && e.location_mode !== 'zones');
   const goalEvents = filteredEvents.filter(e => e.goal_x !== null && e.goal_y !== null);
 
   // Events par zone (3 zones : offensive y<33, médiane 33<y<66, défensive y>66)
