@@ -137,6 +137,47 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
     }
   };
 
+
+  // Sync match_players table from current formation positions
+  const syncMatchPlayers = async (formationId: string) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get match team_id
+      const { data: matchData } = await supabase
+        .from('matches')
+        .select('team_a_id, team_b_id')
+        .eq('id', matchId)
+        .single();
+
+      const teamId = team === 'A' ? matchData?.team_a_id : matchData?.team_b_id;
+      if (!teamId) return;
+
+      // Get all player_ids from this formation
+      const { data: posData } = await supabase
+        .from('formation_positions')
+        .select('player_id')
+        .eq('formation_id', formationId)
+        .not('player_id', 'is', null);
+
+      const playerIds = [...new Set((posData ?? []).map(p => p.player_id).filter(Boolean))];
+      if (playerIds.length === 0) return;
+
+      // Upsert match_players
+      const rows = playerIds.map(pid => ({
+        match_id: matchId,
+        player_id: pid,
+        team_id: teamId,
+        user_id: user.id,
+      }));
+
+      await supabase.from('match_players').upsert(rows, { onConflict: 'match_id,player_id' });
+    } catch (err) {
+      console.error('Error syncing match_players:', err);
+    }
+  };
+
   const handleCreateFromActive = async () => {
     try {
       setSaving(true);
@@ -201,6 +242,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
       if (matchFormError) throw matchFormError;
 
       await loadData();
+      await syncMatchPlayers(newFormation.id);
       
     } catch (error) {
       console.error('Error creating formation:', error);
@@ -255,6 +297,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
       if (matchFormError) throw matchFormError;
 
       await loadData();
+      await syncMatchPlayers(newFormation.id);
       
     } catch (error) {
       console.error('Error creating formation:', error);
@@ -274,6 +317,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
       if (error) throw error;
 
       await loadData();
+      if (currentFormation?.formation_id) await syncMatchPlayers(currentFormation.formation_id);
     } catch (error) {
       console.error('Error assigning player:', error);
     }
