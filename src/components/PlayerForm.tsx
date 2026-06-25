@@ -96,7 +96,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
   const age = formData.birth_date ? Math.floor((Date.now() - new Date(formData.birth_date).getTime()) / (365.25 * 24 * 3600 * 1000)) : null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4 overflow-y-auto">
       <div className="bg-dark-secondary border border-orion-line  shadow-2xl w-full max-w-lg my-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-orion-line">
           <h3 className="text-sm font-medium text-orion-text">{player ? 'Modifier le joueur' : 'Ajouter un joueur'}</h3>
