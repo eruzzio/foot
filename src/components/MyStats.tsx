@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BarChart3, Calendar, ChevronRight, Trash2 } from 'lucide-react';
+import { BarChart3, Calendar, ChevronRight, Trash2, Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Match } from '../types/database';
 import MatchReport from './MatchReport';
@@ -15,10 +15,21 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(initialMatchId || null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     loadCompletedMatches();
   }, []);
+
+  const filteredMatches = matches.filter(m => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      m.team_a_name?.toLowerCase().includes(q) ||
+      m.team_b_name?.toLowerCase().includes(q) ||
+      new Date(m.match_date).toLocaleDateString('fr-FR').includes(q)
+    );
+  });
 
   const loadCompletedMatches = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -111,6 +122,19 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
           </div>
         </header>
 
+        {/* Search bar */}
+        {matches.length > 0 && (
+          <div style={{ position: 'relative', marginBottom: 16 }}>
+            <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--orion-text-mute)', pointerEvents: 'none' }} />
+            <input
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Rechercher par équipe ou date..."
+              style={{ width: '100%', padding: '9px 12px 9px 36px', background: 'var(--orion-surface)', border: '1.5px solid var(--orion-line)', borderRadius: 8, color: 'var(--orion-text)', fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+        )}
+
         {matches.length === 0 ? (
           <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-12 text-center">
             <BarChart3 size={80} className="text-orange-primary mx-auto mb-4" />
@@ -123,7 +147,12 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            {matches.map((match) => (
+            {filteredMatches.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--orion-text-mute)', fontSize: 13 }}>
+                Aucun match ne correspond à "{searchQuery}"
+              </div>
+            )}
+            {filteredMatches.map((match) => (
               <div key={match.id}>
                 <div
                   className="w-full bg-dark-secondary border border-orion-line  shadow-2xl p-6 hover:border-orion-accent/50 transition-all group flex items-center justify-between"
