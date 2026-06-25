@@ -69,7 +69,7 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)' }}>
         {!isPro && (
-          <button onClick={() => { onNavigate('pricing'); onClose?.(); }}
+          <button onClick={() => { onNavigate('pricing'); onClose?.(); }} style={{ display: 'none' }}
             style={{ width:'100%', display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'rgba(61,128,224,0.1)', border:'1px solid var(--orion-accent-line)', borderRadius:4, cursor:'pointer', marginBottom:8 }}>
             <Zap size={14} style={{ color:'var(--orion-accent)' }} />
             <span style={{ fontSize:12, fontWeight:700, color:'var(--orion-accent)' }}>Passer en Pro — 8,99€/mois</span>
@@ -128,24 +128,24 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
         {/* Slot contenu */}
         <div style={{ flex:1 }}>
           {/* Bannière trial */}
-          {!isPro && !trialExpired && trialDaysLeft <= 3 && (
+          {false && !isPro && !trialExpired && trialDaysLeft <= 3 && (
             <div style={{ background:'rgba(61,128,224,0.1)', borderBottom:'1px solid var(--orion-accent-line)', padding:'8px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
               <span style={{ fontSize:12, color:'var(--orion-accent)', fontWeight:600 }}>
                 ⏳ Essai gratuit — {trialDaysLeft} jour{trialDaysLeft > 1 ? 's' : ''} restant{trialDaysLeft > 1 ? 's' : ''}
               </span>
-              <button onClick={() => onNavigate('pricing')} className="o-btn o-btn--primary o-btn--sm" style={{ fontSize:11 }}>
+              {false && <button onClick={() => onNavigate('pricing')} className="o-btn o-btn--primary o-btn--sm" style={{ fontSize:11 }}>
                 Passer en Pro — 8,99€/mois →
-              </button>
+              </button>}
             </div>
           )}
-          {trialExpired && (
+          {false && trialExpired && (
             <div style={{ background:'var(--orion-red-dim)', borderBottom:'1px solid var(--orion-red)', padding:'10px 20px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, flexWrap:'wrap' }}>
               <span style={{ fontSize:12, color:'var(--orion-red)', fontWeight:700 }}>
                 ⚠️ Essai expiré — accès limité
               </span>
-              <button onClick={() => onNavigate('pricing')} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-red)', color:'var(--orion-red)', fontSize:11 }}>
+              {false && (<button onClick={() => onNavigate('pricing')} className="o-btn o-btn--sm" style={{ borderColor:'var(--orion-red)', color:'var(--orion-red)', fontSize:11 }}>
                 Voir les plans →
-              </button>
+              </button>)}
             </div>
           )}
           {children}
