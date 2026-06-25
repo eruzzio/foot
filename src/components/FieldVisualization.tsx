@@ -145,7 +145,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
               }}
             >
               {isSelecting && !player ? (
-                <div className="flex flex-col items-center gap-2" style={{ minWidth: '200px' }}>
+                <div className="flex flex-col items-center gap-2" style={{ minWidth: 'min(200px, 80vw)' }}>
                   <select
                     autoFocus
                     onChange={(e) => {
@@ -174,7 +174,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
                 >
                   <div
                     className={`relative ${getRoleColor(pos.role)} rounded-full shadow-lg border-2 border-white overflow-hidden`}
-                    style={{ width: '44px', height: '44px' }}
+                    style={{ width: 'clamp(28px, 6vw, 44px)', height: 'clamp(28px, 6vw, 44px)' }}
                   >
                     {player ? (
                       player.photo_url ? (
@@ -201,19 +201,19 @@ export default function FieldVisualization({ players, positions, onPositionClick
                     )}
                   </div>
                   {dragOverPosition === pos.id && (
-                    <div className="absolute rounded-full border-4 border-orange-400 bg-orange-400/30 " style={{ width: '56px', height: '56px', top: '-6px', left: '-6px' }} />
+                    <div className="absolute rounded-full border-4 border-orange-400 bg-orange-400/30 " style={{ width: 'clamp(36px, 7.5vw, 56px)', height: 'clamp(36px, 7.5vw, 56px)', top: '-6px', left: '-6px' }} />
                   )}
                   {player ? (
                     <span
                       className="mt-1 text-white font-semibold leading-tight text-center whitespace-nowrap"
-                      style={{ fontSize: '9px', textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8)' }}
+                      style={{ fontSize: 'clamp(6px, 1.5vw, 9px)', textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8)' }}
                     >
                       {player.first_name}
                     </span>
                   ) : (
                     <span
                       className="mt-1 text-white/70 leading-tight text-center"
-                      style={{ fontSize: '8px', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+                      style={{ fontSize: 'clamp(5px, 1.2vw, 8px)', textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
                     >
                       {pos.role}
                     </span>
