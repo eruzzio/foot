@@ -1,6 +1,17 @@
 import { supabase } from '../lib/supabase';
 
 export async function createDefaultFootballPanel(userId: string) {
+  // Vérifier si le panneau par défaut a déjà été créé via orion_users
+  const { data: userRecord } = await supabase
+    .from('orion_users')
+    .select('default_panel_created')
+    .eq('id', userId)
+    .single();
+
+  if (userRecord?.default_panel_created) {
+    return;
+  }
+
   // Ne rien faire si l'utilisateur a déjà au moins un panneau
   const { data: existingPanels } = await supabase
     .from('panels')
@@ -8,6 +19,8 @@ export async function createDefaultFootballPanel(userId: string) {
     .eq('user_id', userId);
 
   if (existingPanels && existingPanels.length > 0) {
+    // Marquer quand même pour éviter les appels futurs
+    await supabase.from('orion_users').update({ default_panel_created: true }).eq('id', userId);
     return;
   }
 
@@ -28,6 +41,9 @@ export async function createDefaultFootballPanel(userId: string) {
     console.error('Error creating default panel:', panelError);
     return;
   }
+
+  // Marquer que le panneau par défaut a été créé
+  await supabase.from('orion_users').update({ default_panel_created: true }).eq('id', userId);
 
   // Récupérer les event types existants
   const { data: eventTypes } = await supabase
