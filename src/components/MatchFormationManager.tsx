@@ -353,9 +353,7 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
     );
   }
 
-  if (inline) {
-    return (
-      <div style={{ background:"var(--orion-surface)", color:"var(--orion-text)", borderRadius: 8, border: '1px solid var(--orion-line)' }}>
+
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
             <h3 className="text-2xl font-bold text-white">
