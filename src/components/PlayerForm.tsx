@@ -90,7 +90,11 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
         nationality: formData.nationality || undefined,
         coach_notes: formData.coach_notes || undefined,
       } as any);
-    } catch (err) { setUploading(false); }
+    } catch (err) {
+      console.error("PlayerForm error:", err);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const age = formData.birth_date ? Math.floor((Date.now() - new Date(formData.birth_date).getTime()) / (365.25 * 24 * 3600 * 1000)) : null;
