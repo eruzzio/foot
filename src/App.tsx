@@ -154,9 +154,11 @@ function App() {
   return (
     <I18nProvider>
       <ToastProvider addToast={addToast}>
-    <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
-        {renderContent()}
-      </AppLayout>
+        <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
+          {renderContent()}
+        </AppLayout>
+        <Toast toasts={toasts} onRemove={removeToast} />
+      </ToastProvider>
     </I18nProvider>
   );
 }
