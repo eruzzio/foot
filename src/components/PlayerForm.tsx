@@ -81,7 +81,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
       }
       await onSave({
         ...formData,
-        number: typeof formData.number === 'string' ? parseInt(formData.number) || 0 : formData.number,
+        number: formData.number === '' || formData.number === undefined ? 0 : (typeof formData.number === 'string' ? parseInt(formData.number) || 0 : formData.number),
         height: formData.height ? (typeof formData.height === 'string' ? parseInt(formData.height) : formData.height) : undefined,
         weight: formData.weight ? (typeof formData.weight === 'string' ? parseInt(formData.weight) : formData.weight) : undefined,
         photo_url: finalPhotoUrl,
