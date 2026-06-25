@@ -365,14 +365,12 @@ export default function MyTeam({ onBack }: MyTeamProps) {
         .from('players')
         .update(playerData)
         .eq('id', editingPlayer.id);
-      if (error) { console.error('Update player error:', error); throw error; }
+      if (error) throw error;
     } else {
-      const payload = { ...playerData, user_id: user.id, team_id: selectedTeam?.id };
-      console.log('Inserting player:', payload);
       const { error } = await supabase
         .from('players')
-        .insert(payload);
-      if (error) { console.error('Insert player error:', error); throw error; }
+        .insert({ ...playerData, user_id: user.id, team_id: selectedTeam?.id });
+      if (error) throw error;
     }
 
     if (selectedTeam) await loadTeamDetail(selectedTeam.id);
