@@ -59,9 +59,10 @@ export default function FieldVisualization({ players, positions, onPositionClick
   };
 
   return (
+    <div style={{ width: 'min(100%, 320px)', margin: '0 auto', borderRadius: 8, overflow: 'hidden' }}>
     <div
       className="relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl"
-      style={{ width: 'min(100%, 320px)', paddingBottom: 'min(140%, 448px)', margin: '0 auto', overflow: 'visible' }}
+      style={{ width: '100%', paddingBottom: '140%', overflow: 'hidden' }}
       onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
       onDrop={(e) => {
         e.preventDefault();
@@ -224,6 +225,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
           );
         })}
       </div>
+    </div>
     </div>
   );
 }
