@@ -342,7 +342,9 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
   };
 
   if (loading) {
-    return (
+    return inline ? (
+      <div style={{ padding: 24, color: 'var(--orion-text)' }}>Chargement...</div>
+    ) : (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div style={{ background:"var(--orion-surface)", padding:24, color:"var(--orion-text)" }}>
           <div className="text-gray-400">Chargement...</div>
@@ -351,9 +353,9 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
     );
   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div style={{ background:"var(--orion-surface)", maxWidth:900, width:"100%", margin:"32px auto", color:"var(--orion-text)" }}>
+  if (inline) {
+    return (
+      <div style={{ background:"var(--orion-surface)", color:"var(--orion-text)", borderRadius: 8, border: '1px solid var(--orion-line)' }}>
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
             <h3 className="text-2xl font-bold text-white">
@@ -454,14 +456,16 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
           )}
         </div>
 
-        <div className="flex gap-3 p-6 border-t border-gray-200">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Fermer
-          </button>
-        </div>
+        {!inline && (
+          <div className="flex gap-3 p-6 border-t border-gray-200">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Fermer
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
