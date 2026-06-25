@@ -180,7 +180,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                 <div>
                   <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Date de naissance</label>
                   <div className="flex items-center gap-3">
-                    <input type="date" value={formData.birth_date} onChange={e => setFormData(f => ({ ...f, birth_date: e.target.value }))} className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    <input type="date" value={formData.birth_date} onChange={e => setFormData(f => ({ ...f, birth_date: e.target.value }))} className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" style={{ colorScheme: "dark", color: "var(--orion-text)" }} />
                     {age !== null && <span className="text-sm text-gray-400 font-medium">{age} ans</span>}
                   </div>
                 </div>
