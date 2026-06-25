@@ -734,12 +734,14 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                       </select>
                     </div>
                   </div>
-                  <FieldVisualization
-                    players={players}
-                    positions={positions}
-                    onPositionClick={handlePositionClick}
-                    onAssignPlayer={handleAssignPlayer}
-                  />
+                  <div style={{ maxHeight: 480, overflow: 'hidden' }}>
+                    <FieldVisualization
+                      players={players}
+                      positions={positions}
+                      onPositionClick={handlePositionClick}
+                      onAssignPlayer={handleAssignPlayer}
+                    />
+                  </div>
                 </div>
               </div>
               <div>
