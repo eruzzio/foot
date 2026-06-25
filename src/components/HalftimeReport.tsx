@@ -86,7 +86,7 @@ export default function HalftimeReport({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-50 p-3 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[1000] p-3 overflow-y-auto">
       <div className="bg-dark-secondary border border-orion-line rounded-2xl w-full max-w-lg shadow-2xl my-2">
 
         {/* Header */}

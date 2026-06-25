@@ -124,7 +124,7 @@ export default function MatchLineupEditor({ matchId, teamAId, teamBId, teamAName
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 8, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 16 }}>
             {players.map(player => {
               const selected = selectedPlayerIds.has(player.id);
               return (

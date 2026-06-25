@@ -53,7 +53,7 @@ export default function LocationSelector({ zoneButtons, onZoneSelected, onCancel
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1100] p-4">
       <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-3xl max-h-screen overflow-auto">
         <div className="sticky top-0 bg-dark-secondary border-b border-gray-700 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

@@ -12,7 +12,7 @@ const ZONES = [
 
 export default function ZoneSelector({ onZoneSelected, onSkip, eventName }: ZoneSelectorProps) {
   return (
-    <div className="fixed inset-0 bg-black/90 flex flex-col z-50">
+    <div className="fixed inset-0 bg-black/90 flex flex-col z-[1100]">
       {/* Header compact */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0">
         <div>
