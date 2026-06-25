@@ -423,7 +423,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
                 <th className="text-center px-2 py-2 text-yellow-400 text-xs font-semibold">🟨</th>
                 <th className="text-center px-2 py-2 text-red-400 text-xs font-semibold">🟥</th>
                 <th className="text-center px-2 py-2"><SortBtn label="Actions" sKey="totalEvents" /></th>
-                <th className="text-center px-2 py-2"><SortBtn label="%" sKey="successRate" /></th>
+
                 {statDefinitions.map(def => (
                   <th key={def.id} className="text-center px-2 py-2 text-xs text-gray-400 font-semibold">{def.name}</th>
                 ))}
@@ -457,14 +457,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
                       <td className="text-center px-2 py-3 text-sm text-yellow-400">{player.yellowCards || '–'}</td>
                       <td className="text-center px-2 py-3 text-sm text-red-400">{player.redCards || '–'}</td>
                       <td className="text-center px-2 py-3 text-sm font-semibold text-orange-400">{player.totalEvents}</td>
-                      <td className="text-center px-2 py-3">
-                        <div className="flex items-center gap-1 justify-center">
-                          <div className="w-10 bg-gray-800 rounded-full h-1.5 overflow-hidden">
-                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${player.successRate}%` }} />
-                          </div>
-                          <span className="text-xs text-gray-400">{player.successRate}%</span>
-                        </div>
-                      </td>
+
                       {statDefinitions.map(def => (
                         <td key={def.id} className="text-center px-2 py-3 text-sm text-gray-300">
                           {player.customStats[def.name] || '–'}
