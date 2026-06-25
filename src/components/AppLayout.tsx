@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield, Zap } from 'lucide-react';
-import { OrionLogo } from './orion/Orion';
-import { supabase } from '../lib/supabase';
+import { Shield, useState, useEffect } from 'react';
+import { Shield, Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield, Zap } from 'lucide-react';
+import { Shield, OrionLogo } from './orion/Orion';
+import { Shield, supabase } from '../lib/supabase';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -115,6 +115,11 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
           </button>
           <OrionLogo height={14} />
           <span style={{ flex:1 }} />
+          {isAdmin && (
+            <button onClick={() => onNavigate('admin')} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-accent)', display:'flex', padding:6 }}>
+              <Shield size={20} />
+            </button>
+          )}
           <button onClick={() => onNavigate('profile')} className="o-avatar" style={{ cursor:'pointer', width:32, height:32 }}>
             {(userName || '?')[0].toUpperCase()}
           </button>
