@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import OnboardingWizard from './components/OnboardingWizard';
 import { supabase } from './lib/supabase';
 import Auth from './components/Auth';
 import HomePage from './components/HomePage';
@@ -25,6 +26,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [userName, setUserName] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { trialDaysLeft, trialExpired, isPro, isTrial } = usePlan();
 
   useEffect(() => {
@@ -45,8 +47,11 @@ function App() {
       setUserName(session.user.user_metadata.first_name);
     }
     if (session?.user) {
-      supabase.from('orion_users').select('is_admin').eq('id', session.user.id).single()
-        .then(({ data }) => { if (data?.is_admin) setIsAdmin(true); });
+      supabase.from('orion_users').select('is_admin, onboarding_completed').eq('id', session.user.id).single()
+        .then(({ data }) => {
+          if (data?.is_admin) setIsAdmin(true);
+          if (data && !data.onboarding_completed) setShowOnboarding(true);
+        });
     }
   };
 
@@ -65,6 +70,10 @@ function App() {
     setHomeKey(prev => prev + 1);
     setCurrentPage('home');
   };
+
+  if (isAuthenticated && showOnboarding) {
+    return <OnboardingWizard onComplete={() => setShowOnboarding(false)} />;
+  }
 
   // Retour Stripe succès
   if (window.location.search.includes('payment=success')) {
