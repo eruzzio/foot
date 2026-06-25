@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { UserPlus, Pencil, Trash2, Users, Settings, Plus, ChevronRight, Shield, BarChart2, Download } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useToastContext } from '../contexts/ToastContext';
 import FieldVisualization from './FieldVisualization';
 import PlayerForm from './PlayerForm';
 import { exportTeamPdf } from '../utils/exportTeamPdf';
@@ -227,6 +228,7 @@ const FORMATIONS = {
 
 export default function MyTeam({ onBack }: MyTeamProps) {
   const [view, setView] = useState<'list' | 'detail'>('list');
+  const { addToast } = useToastContext();
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [loadingTeams, setLoadingTeams] = useState(true);
@@ -376,6 +378,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
     if (selectedTeam) await loadTeamDetail(selectedTeam.id);
     setShowPlayerForm(false);
     setEditingPlayer(null);
+    addToast(editingPlayer ? 'Joueur modifié ✓' : 'Joueur ajouté ✓', 'success');
   };
 
   const handleExportTeamPdf = () => {
@@ -489,6 +492,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
       const { error } = await supabase.from('players').delete().eq('id', playerId);
       if (error) throw error;
       if (selectedTeam) await loadTeamDetail(selectedTeam.id);
+      addToast('Joueur supprimé', 'success');
     } catch (error) {
       console.error('Error deleting player:', error);
     }

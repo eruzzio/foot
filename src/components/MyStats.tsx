@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart3, Calendar, ChevronRight, Trash2, Search } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useToastContext } from '../contexts/ToastContext';
 import { Match } from '../types/database';
 import MatchReport from './MatchReport';
 
@@ -14,6 +15,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
   const [loading, setLoading] = useState(true);
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(initialMatchId || null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const { addToast } = useToastContext();
   const [isDeleting, setIsDeleting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -66,6 +68,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
     }
 
     setMatches(matches.filter(m => m.id !== matchId));
+    addToast('Match supprimé', 'success');
     setDeleteConfirmId(null);
     setIsDeleting(false);
   };

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import OnboardingWizard from './components/OnboardingWizard';
+import Toast from './components/Toast';
+import { useToast } from './hooks/useToast';
+import { ToastProvider } from './contexts/ToastContext';
 import { supabase } from './lib/supabase';
 import Auth from './components/Auth';
 import HomePage from './components/HomePage';
@@ -27,6 +30,7 @@ function App() {
   const [userName, setUserName] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const { toasts, addToast, removeToast } = useToast();
   const { trialDaysLeft, trialExpired, isPro, isTrial } = usePlan();
 
   useEffect(() => {
@@ -149,7 +153,8 @@ function App() {
 
   return (
     <I18nProvider>
-      <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
+      <ToastProvider addToast={addToast}>
+    <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
         {renderContent()}
       </AppLayout>
     </I18nProvider>

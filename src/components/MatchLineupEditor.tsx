@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useToastContext } from '../contexts/ToastContext';
 import { Check } from 'lucide-react';
 
 interface Player {
@@ -25,6 +26,7 @@ export default function MatchLineupEditor({ matchId, teamAId, teamBId, teamAName
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { addToast } = useToastContext();
   const [saved, setSaved] = useState(false);
 
   const teamId = selectedTeam === 'A' ? teamAId : teamBId;
@@ -79,6 +81,7 @@ export default function MatchLineupEditor({ matchId, teamAId, teamBId, teamAName
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+    addToast('Composition enregistrée ✓', 'success');
   };
 
   const teams = [
