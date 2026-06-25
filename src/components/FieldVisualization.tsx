@@ -59,7 +59,7 @@ export default function FieldVisualization({ players, positions, onPositionClick
   };
 
   return (
-    <div style={{ width: 'min(100%, 320px)', margin: '0 auto', borderRadius: 8, overflow: 'visible', paddingBottom: 40 }}>
+    <div style={{ width: 'min(100%, 320px)', margin: '0 auto', borderRadius: 8, overflow: 'visible', paddingBottom: 60 }}>
     <div
       className="relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl"
       style={{ width: '100%', paddingBottom: '140%', overflow: 'visible', borderRadius: 8 }}
