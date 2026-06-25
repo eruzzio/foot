@@ -9,7 +9,7 @@ import { Share2, Check, Copy } from 'lucide-react';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
 import MatchTags from './MatchTags';
-import MatchFormationManager from './MatchFormationManager';
+import MatchLineupEditor from './MatchLineupEditor';
 import PdfConfigModal from './PdfConfigModal';
 
 interface MatchReportProps {
@@ -339,16 +339,13 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
         )}
 
         {activeTab === 'composition' && (
-          <div style={{ padding: '20px 0', display: 'flex', gap: 16 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--orion-text-mute)', marginBottom: 8 }}>{match.team_a_name}</div>
-              <MatchFormationManager matchId={match.id} team="A" onClose={() => {}} inline />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--orion-text-mute)', marginBottom: 8 }}>{match.team_b_name}</div>
-              <MatchFormationManager matchId={match.id} team="B" onClose={() => {}} inline />
-            </div>
-          </div>
+          <MatchLineupEditor
+            matchId={match.id}
+            teamAId={match.team_a_id ?? null}
+            teamBId={match.team_b_id ?? null}
+            teamAName={match.team_a_name}
+            teamBName={match.team_b_name}
+          />
         )}
         {activeTab === 'tags' && (
           <MatchTags
