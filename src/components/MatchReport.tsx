@@ -274,14 +274,14 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
           {[
             { id:'overview', label:'Aperçu du match' },
             ...(!readOnly ? [
-              { id:'video', label:'Analyse Vidéo', icon:'🎬' },
+              { id:'video', label:'Analyse Vidéo 🔒', icon:'🎬', disabled: true },
               { id:'tags',  label:'Tags', dot: !!(match.tag_competition || match.tag_venue || match.tag_stake) },
             { id:'composition', label:'Composition' },
             ] : []),
           ].map(tab => (
             <button key={tab.id}
-              onClick={() => handleTabChange(tab.id as any)}
-              style={{ display:'flex', alignItems:'center', gap:6, padding:'12px 18px', background:'none', border:'none', borderBottom: activeTab === tab.id ? '2px solid var(--orion-accent)' : '2px solid transparent', cursor:'pointer', fontSize:13, fontWeight: activeTab === tab.id ? 700 : 500, color: activeTab === tab.id ? 'var(--orion-text)' : 'var(--orion-text-mute)', whiteSpace:'nowrap', transition:'all .15s', marginBottom:-1.5 }}
+              onClick={() => !(tab as any).disabled && handleTabChange(tab.id as any)}
+              style={{ display:'flex', alignItems:'center', gap:6, padding:'12px 18px', background:'none', border:'none', borderBottom: activeTab === tab.id ? '2px solid var(--orion-accent)' : '2px solid transparent', cursor: (tab as any).disabled ? 'not-allowed' : 'pointer', fontSize:13, fontWeight: activeTab === tab.id ? 700 : 500, color: activeTab === tab.id ? 'var(--orion-text)' : 'var(--orion-text-mute)', whiteSpace:'nowrap', transition:'all .15s', marginBottom:-1.5, opacity: (tab as any).disabled ? 0.4 : 1 }}
             >
               {tab.icon && <span>{tab.icon}</span>}
               {tab.label}
