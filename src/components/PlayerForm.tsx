@@ -137,13 +137,13 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
           </div>
 
           {/* Tabs */}
-          <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column" }}><div className="flex border-b border-orion-line">
+          <div><div className="flex border-b border-orion-line">
             {[{ key: 'identity', label: 'Identité' }, { key: 'physical', label: 'Physique' }, { key: 'notes', label: 'Notes coach' }].map(t => (
               <button key={t.key} type="button" onClick={() => setTab(t.key as any)} className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${tab === t.key ? 'text-orion-accent border-b-2 border-orange-400' : 'text-gray-500 hover:text-gray-300'}`}>{t.label}</button>
             ))}
           </div>
 
-          <div className="px-6 py-5 space-y-4">
+          <div className="px-4 py-3 space-y-3">
             {tab === 'identity' && (
               <>
                 <div>
@@ -223,7 +223,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
             )}
           </div>
 
-          </div><div className="flex gap-3 px-4 py-3 border-t border-orion-line">
+          <div className="flex gap-3 px-4 py-3 border-t border-orion-line">
             <button type="button" onClick={onCancel} disabled={uploading} className="flex-1 py-2 border border-gray-600 text-gray-300  hover:bg-dark-tertiary transition-colors text-sm">Annuler</button>
             <button type="submit" disabled={uploading} className="flex-1 py-2 bg-orange-primary hover:bg-orange-600 text-white  text-sm font-semibold flex items-center justify-center gap-2">
               {uploading ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Upload...</> : player ? 'Modifier' : 'Ajouter'}
