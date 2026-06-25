@@ -1,28 +1,23 @@
 import { supabase } from '../lib/supabase';
 
+// Module-level set to prevent concurrent calls for the same user
+const _panelCreationInProgress = new Set<string>();
+
 export async function createDefaultFootballPanel(userId: string) {
-  // Vérifier si le panneau par défaut a déjà été créé via orion_users
-  const { data: userRecord } = await supabase
-    .from('orion_users')
-    .select('default_panel_created')
-    .eq('id', userId)
-    .single();
+  // Verrou en mémoire pour éviter les appels concurrents
+  if (_panelCreationInProgress.has(userId)) return;
+  _panelCreationInProgress.add(userId);
 
-  if (userRecord?.default_panel_created) {
-    return;
-  }
+  try {
+    // Ne rien faire si l'utilisateur a déjà au moins un panneau
+    const { data: existingPanels } = await supabase
+      .from('panels')
+      .select('id')
+      .eq('user_id', userId);
 
-  // Ne rien faire si l'utilisateur a déjà au moins un panneau
-  const { data: existingPanels } = await supabase
-    .from('panels')
-    .select('id')
-    .eq('user_id', userId);
-
-  if (existingPanels && existingPanels.length > 0) {
-    // Marquer quand même pour éviter les appels futurs
-    await supabase.from('orion_users').update({ default_panel_created: true }).eq('id', userId);
-    return;
-  }
+    if (existingPanels && existingPanels.length > 0) {
+      return;
+    }
 
   // Créer le panneau Football Pro comme panneau par défaut
   const { data: panel, error: panelError } = await supabase
@@ -42,8 +37,7 @@ export async function createDefaultFootballPanel(userId: string) {
     return;
   }
 
-  // Marquer que le panneau par défaut a été créé
-  await supabase.from('orion_users').update({ default_panel_created: true }).eq('id', userId);
+
 
   // Récupérer les event types existants
   const { data: eventTypes } = await supabase
@@ -207,5 +201,8 @@ export async function createDefaultFootballPanel(userId: string) {
         await supabase.from('panel_buttons').insert(subButtons);
       }
     }
+  }
+  } finally {
+    _panelCreationInProgress.delete(userId);
   }
 }
