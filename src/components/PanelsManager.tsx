@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Panel, PanelButtonWithEventType, EventType } from '../types/database';
 import { Plus, Pencil, Trash2, X, Check, ChevronRight, ChevronDown, GripVertical, LayoutGrid, Move, Tag, MapPin } from 'lucide-react';
-import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { createProFootballPanel } from '../utils/createProPanel';
 import FreeLayoutEditor from './FreeLayoutEditor';
 
@@ -62,9 +61,6 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
   const loadData = async () => {
     setLoading(true);
     const { data: userData } = await supabase.auth.getUser();
-    if (userData.user) {
-      await createDefaultFootballPanel(userData.user.id);
-    }
     await Promise.all([loadPanels(), loadEventTypes()]);
     setLoading(false);
   };

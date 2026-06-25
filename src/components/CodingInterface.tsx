@@ -10,7 +10,6 @@ import MatchFormationManager from './MatchFormationManager';
 import LocationSelector from './LocationSelector';
 import { ArrowLeft } from 'lucide-react';
 import ExportButton from './ExportButton';
-import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
 import ZoneSelector from './ZoneSelector';
@@ -144,7 +143,6 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const initializeData = async () => {
     const { data: userData } = await supabase.auth.getUser();
     if (userData.user) {
-      await createDefaultFootballPanel(userData.user.id);
     }
     await initializeMatch();
     await loadAllPanels();
