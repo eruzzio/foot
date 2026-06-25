@@ -291,8 +291,8 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
               <button onClick={() => fileInputRef.current?.click()} className="o-btn o-btn--sm">
                 <Upload size={13} /> Fichier local
               </button>
-              <button onClick={() => setShowUrlInput(true)} className="o-btn o-btn--sm">
-                <Link size={13} /> Lien VEO
+              <button disabled style={{ opacity: 0.5, cursor: 'not-allowed', position: 'relative' }} className="o-btn o-btn--sm" title="Prochainement disponible">
+                <Link size={13} /> Lien VEO <span style={{ fontSize: 10, marginLeft: 4, color: 'var(--orion-accent)' }}>Bientôt</span>
               </button>
             </div>
           </div>
