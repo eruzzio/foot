@@ -134,7 +134,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
                 <input type="text" required value={formData.last_name} onChange={e => setFormData(f => ({ ...f, last_name: e.target.value }))} placeholder="Nom *" className="flex-1 px-3 py-2 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
               </div>
               <div className="flex gap-2">
-                <input type="number" required min="1" max="99" value={formData.number} onChange={e => setFormData(f => ({ ...f, number: e.target.value }))} placeholder="N° *" className="w-20 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                <input type="number" min="1" max="99" value={formData.number} onChange={e => setFormData(f => ({ ...f, number: e.target.value }))} placeholder="N° *" className="w-20 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
                 <input type="text" value={formData.nationality} onChange={e => setFormData(f => ({ ...f, nationality: e.target.value }))} placeholder="Nationalité" className="flex-1 px-3 py-1.5 bg-dark-tertiary border border-gray-600 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
               </div>
             </div>
