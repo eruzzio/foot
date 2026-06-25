@@ -127,6 +127,12 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
       }
 
       // Charger les stats manuelles agrégées par joueur
+      // Charger les participations (match_players) pour MJ
+      const { data: allParticipations } = await supabase
+        .from('match_players')
+        .select('player_id, match_id')
+        .eq('user_id', user.id);
+
       const { data: manualStats } = await supabase
         .from('player_match_stats')
         .select('*')
@@ -136,6 +142,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
       const playerStats: PlayerStat[] = players.map(player => {
         const playerEvents = allEvents.filter(e => e.player_id === player.id);
         const matchSet = new Set(playerEvents.map(e => e.match_id));
+        const participationCount = (allParticipations ?? []).filter(p => p.player_id === player.id).length;
         const successCount = playerEvents.filter(e => e.outcome === 'success').length;
         const failureCount = playerEvents.filter(e => e.outcome === 'failure').length;
         const totalEvents = playerEvents.length;
@@ -181,7 +188,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
           number: player.number,
           position: player.position,
           photo_url: player.photo_url,
-          matchesPlayed: matchSet.size,
+          matchesPlayed: participationCount > 0 ? participationCount : matchSet.size,
           totalEvents,
           successRate,
           tirs: countByName(['tir', 'shot', 'frappe', 'penalty']),
