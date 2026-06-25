@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { ChevronRight, Users, Calendar, SkipForward, Check } from 'lucide-react';
+import { ChevronRight, Users, SkipForward, Check } from 'lucide-react';
 
 interface OnboardingWizardProps {
   onComplete: () => void;
@@ -9,7 +9,6 @@ interface OnboardingWizardProps {
 const STEPS = [
   { id: 1, title: 'Créez votre équipe', icon: Users, desc: 'Commencez par créer votre première équipe' },
   { id: 2, title: 'Ajoutez vos joueurs', icon: Users, desc: 'Ajoutez quelques joueurs à votre effectif' },
-  { id: 3, title: 'Créez un match', icon: Calendar, desc: 'Préparez votre premier match à analyser' },
 ];
 
 export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
@@ -84,7 +83,8 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
           }))
         );
       }
-      setStep(3);
+      await markComplete();
+      onComplete();
     } finally {
       setLoading(false);
     }
@@ -216,7 +216,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
               </div>
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={() => setStep(3)} style={{ flex: 1, padding: '10px', fontSize: 13, background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line)', borderRadius: 6, color: 'var(--orion-text-mute)', cursor: 'pointer' }}>
+                <button onClick={async () => { await markComplete(); onComplete(); }} style={{ flex: 1, padding: '10px', fontSize: 13, background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line)', borderRadius: 6, color: 'var(--orion-text-mute)', cursor: 'pointer' }}>
                   Passer cette étape
                 </button>
                 <button onClick={handleStep2} disabled={loading} className="o-btn o-btn--primary" style={{ flex: 2, padding: '10px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
