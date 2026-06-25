@@ -1,7 +1,7 @@
-import { Shield, useState, useEffect } from 'react';
-import { Shield, Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Shield, Zap } from 'lucide-react';
-import { Shield, OrionLogo } from './orion/Orion';
-import { Shield, supabase } from '../lib/supabase';
+import { useState, useEffect } from 'react';
+import { Shield, Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Zap } from 'lucide-react';
+import { OrionLogo } from './orion/Orion';
+import { supabase } from '../lib/supabase';
 
 interface AppLayoutProps {
   children: React.ReactNode;
