@@ -60,8 +60,8 @@ export default function FieldVisualization({ players, positions, onPositionClick
 
   return (
     <div
-      className="relative w-full bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl overflow-hidden"
-      style={{ paddingBottom: '140%', maxHeight: 480, maxWidth: 340, margin: '0 auto' }}
+      className="relative bg-gradient-to-b from-green-600 to-green-700 rounded-lg shadow-xl overflow-hidden"
+      style={{ width: '100%', aspectRatio: '5/7', maxWidth: 320, margin: '0 auto' }}
       onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
       onDrop={(e) => {
         e.preventDefault();
