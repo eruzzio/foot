@@ -8,6 +8,7 @@ interface MatchFormationManagerProps {
   matchId: string;
   team: 'A' | 'B';
   onClose: () => void;
+  inline?: boolean;
 }
 
 interface PlayerData {
@@ -74,7 +75,7 @@ const FORMATIONS = {
   ],
 };
 
-export default function MatchFormationManager({ matchId, team, onClose }: MatchFormationManagerProps) {
+export default function MatchFormationManager({ matchId, team, onClose, inline = false }: MatchFormationManagerProps) {
   const [currentFormation, setCurrentFormation] = useState<TeamFormation | null>(null);
   const [positions, setPositions] = useState<FormationPosition[]>([]);
   const [players, setPlayers] = useState<PlayerData[]>([]);
@@ -364,6 +365,7 @@ export default function MatchFormationManager({ matchId, team, onClose }: MatchF
           </div>
           <button
             onClick={onClose}
+              style={{ display: inline ? 'none' : undefined }}
             className="p-1 hover:bg-gray-100 rounded transition-colors"
           >
             <X size={24} className="text-gray-400" />

@@ -9,6 +9,7 @@ import { Share2, Check, Copy } from 'lucide-react';
 import VideoAnalysisTab from './VideoAnalysisTab';
 import Heatmap from './Heatmap';
 import MatchTags from './MatchTags';
+import MatchFormationManager from './MatchFormationManager';
 import PdfConfigModal from './PdfConfigModal';
 
 interface MatchReportProps {
@@ -26,7 +27,7 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
   const [loading, setLoading] = useState(true);
   const [teamALogoUrl, setTeamALogoUrl] = useState<string | undefined>(undefined);
   const [teamBLogoUrl, setTeamBLogoUrl] = useState<string | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState<'overview' | 'video' | 'tags'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'video' | 'tags' | 'composition'>('overview');
   const [showPdfConfig, setShowPdfConfig] = useState(false);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
@@ -275,6 +276,7 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
             ...(!readOnly ? [
               { id:'video', label:'Analyse Vidéo', icon:'🎬' },
               { id:'tags',  label:'Tags', dot: !!(match.tag_competition || match.tag_venue || match.tag_stake) },
+            { id:'composition', label:'Composition' },
             ] : []),
           ].map(tab => (
             <button key={tab.id}
@@ -336,6 +338,18 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
           />
         )}
 
+        {activeTab === 'composition' && (
+          <div style={{ padding: '20px 0', display: 'flex', gap: 16 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--orion-text-mute)', marginBottom: 8 }}>{match.team_a_name}</div>
+              <MatchFormationManager matchId={match.id} team="A" onClose={() => {}} inline />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--orion-text-mute)', marginBottom: 8 }}>{match.team_b_name}</div>
+              <MatchFormationManager matchId={match.id} team="B" onClose={() => {}} inline />
+            </div>
+          </div>
+        )}
         {activeTab === 'tags' && (
           <MatchTags
             matchId={matchId}
