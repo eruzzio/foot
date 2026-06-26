@@ -19,6 +19,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
   const [matchesStats, setMatchesStats] = useState<MatchStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeMetric, setActiveMetric] = useState<'goals' | 'actions' | 'success' | 'xg'>('goals');
+  const [actionStats, setActionStats] = useState<{ name: string; total: number; perMatch: number; color: string }[]>([]);
 
   useEffect(() => { loadData(); }, []);
 
@@ -53,6 +54,28 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
     }));
 
     setMatchesStats(stats);
+
+    // Stats par type d'action
+    const allEvents: any[] = [];
+    await Promise.all(matches.map(async m => {
+      const { data: evts } = await supabase.from('match_events').select('*, event_type:event_types(*)').eq('match_id', m.id).eq('team', 'A');
+      if (evts) allEvents.push(...evts);
+    }));
+
+    const byType: Record<string, { total: number; color: string }> = {};
+    allEvents.forEach(ev => {
+      const name = ev.event_type?.name || ev.label || 'Inconnu';
+      const color = ev.event_type?.color || '#6b7280';
+      if (!byType[name]) byType[name] = { total: 0, color };
+      byType[name].total++;
+    });
+
+    const n = matches.length;
+    const actionStatsArr = Object.entries(byType)
+      .map(([name, { total, color }]) => ({ name, total, perMatch: parseFloat((total / n).toFixed(1)), color }))
+      .sort((a, b) => b.total - a.total);
+
+    setActionStats(actionStatsArr);
     setLoading(false);
   };
 
@@ -248,6 +271,33 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
           />
         </div>
       </div>
+
+      {/* Stats par type d'action */}
+      {actionStats.length > 0 && (
+        <div className="o-card" style={{ marginBottom:12 }}>
+          <div className="o-card__header">
+            <span className="o-eyebrow">Stats par action — moyenne / match</span>
+            <span style={{ fontSize:11, color:'var(--orion-text-mute)' }}>{matchesStats.length} match{matchesStats.length > 1 ? 's' : ''}</span>
+          </div>
+          <div style={{ padding:'16px 20px' }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:10 }}>
+              {actionStats.map((stat) => (
+                <div key={stat.name} style={{ background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:6, padding:'12px 14px', display:'flex', alignItems:'center', gap:12 }}>
+                  <div style={{ width:10, height:10, borderRadius:'50%', background:stat.color, flexShrink:0 }} />
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:12, fontWeight:600, color:'var(--orion-text)', marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{stat.name}</div>
+                    <div style={{ display:'flex', alignItems:'baseline', gap:6 }}>
+                      <span style={{ fontSize:18, fontWeight:800, color:stat.color, fontFamily:'var(--orion-font-mono)' }}>{stat.perMatch}</span>
+                      <span style={{ fontSize:10, color:'var(--orion-text-mute)' }}>/ match</span>
+                      <span style={{ fontSize:10, color:'var(--orion-text-faint)', marginLeft:'auto' }}>{stat.total} tot.</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tableau récap */}
       <div className="o-card" style={{ overflowX:'auto' }}>
