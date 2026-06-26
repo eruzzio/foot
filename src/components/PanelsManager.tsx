@@ -494,6 +494,64 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
           </div>
         </div>
 
+        {editingButtonId === button.id && showCreateForm && (
+          <div className="border border-orion-accent/40 bg-dark-secondary/80 p-4 mt-1 mb-1">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-semibold text-orion-accent">Modifier le bouton</span>
+              <button onClick={() => { resetButtonForm(); setShowCreateForm(false); }} className="text-gray-500 hover:text-gray-300"><X size={14} /></button>
+            </div>
+            <div className="max-w-lg space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-gray-300 mb-1">Étiquette</label>
+                <input type="text" value={buttonLabel} onChange={(e) => setButtonLabel(e.target.value)} className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-2">Couleur</label>
+                  <div className="grid grid-cols-6 gap-1.5 mb-2">
+                    {PRESET_COLORS.map((c) => (
+                      <button key={c} onClick={() => setButtonColor(c)} className={`w-7 h-7 rounded transition-transform hover:scale-110 ${buttonColor === c ? 'ring-2 ring-white ring-offset-1 ring-offset-dark-secondary scale-110' : ''}`} style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="color" value={buttonColor} onChange={(e) => setButtonColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border border-orion-line bg-transparent" />
+                    <span className="text-xs text-gray-500">Personnalisée</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-2">Aperçu</label>
+                  <div className="relative flex flex-col items-center justify-center gap-1 text-white" style={{ backgroundColor: buttonColor, minHeight: '72px', padding: '10px 8px' }}>
+                    <span className="text-sm font-bold leading-tight text-center">{buttonLabel || 'Aperçu'}</span>
+                    <span className="text-[9px] uppercase opacity-60 tracking-wider">{buttonType === 'event' ? 'ÉVÉNEMENT' : 'QUALIFICATIF'}</span>
+                  </div>
+                </div>
+              </div>
+              {!parentButtonId && (
+                <div>
+                  <label className="block text-xs font-medium text-gray-300 mb-2">Localisation</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {(['none','zones','field','field_and_goal'] as const).map((mode) => (
+                      <button key={mode} onClick={() => { setLocationMode(mode); setIsZone(false); }} className={`p-2 border-2 transition-all text-center ${locationMode === mode ? 'border-orion-accent bg-orion-accent/10' : 'border-orion-line bg-dark-tertiary hover:border-gray-600'}`}>
+                        <div className="text-xs font-bold text-white">{mode === 'none' ? 'Normal' : mode === 'zones' ? '3 Zones' : mode === 'field' ? 'Position' : 'Pos+But'}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button onClick={addButton} disabled={saving || !buttonLabel.trim()} className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white transition-colors text-sm font-medium disabled:opacity-50">
+                  <Check size={14} />
+                  {saving ? 'Sauvegarde...' : 'Mettre à jour'}
+                </button>
+                <button onClick={() => { resetButtonForm(); setShowCreateForm(false); }} className="flex items-center gap-2 px-5 py-2 bg-dark-tertiary text-gray-300 hover:bg-dark-tertiary transition-colors text-sm font-medium">
+                  <X size={14} />
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {subButtons.length > 0 && isExpanded && (
           <div className="ml-6 mt-1 space-y-1 border-l-2 border-orion-line/50 pl-3">
             {subButtons.map((sub) => (
@@ -833,7 +891,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                   </>
                 )}
 
-                {showCreateForm && activeTab === 'list' && (
+                {showCreateForm && activeTab === 'list' && !editingButtonId && (
                   <div className="max-w-lg space-y-5">
                     {parentBtnForForm && (
                       <div className="flex items-center gap-2 px-3 py-2  border border-green-800/50 bg-green-900/10">
