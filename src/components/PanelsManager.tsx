@@ -58,21 +58,19 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    setLoading(true);
-    const loadPanels = async () => {
-  const { data: userData } = await supabase.auth.getUser();
-  if (!userData.user) return;
-  
-  const { data, error } = await supabase
-    .from('panels')
-    .select('*')
-    .eq('user_id', userData.user.id)
-    .order('is_default', { ascending: false })
-    .order('created_at', { ascending: false });
+  const loadPanels = async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
 
-  if (!error && data) setPanels(data);
-};
+    const { data, error } = await supabase
+      .from('panels')
+      .select('*')
+      .eq('user_id', userData.user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (!error && data) setPanels(data);
+  };
 
   const loadEventTypes = async () => {
     const { data: userData } = await supabase.auth.getUser();
@@ -84,6 +82,12 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
       .order('name', { ascending: true });
 
     if (data) setEventTypes(data);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
+    await Promise.all([loadPanels(), loadEventTypes()]);
+    setLoading(false);
   };
 
   const loadPanelButtons = async (panelId: string) => {
@@ -117,7 +121,6 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     const [moved] = reordered.splice(dragIdx, 1);
     reordered.splice(targetIdx, 0, moved);
 
-    // Mettre à jour localement
     const updatedIds = reordered.map(b => b.id);
     setPanelButtons(prev => {
       const subs = prev.filter(b => b.parent_button_id);
@@ -125,7 +128,6 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
       return [...newRoots, ...subs];
     });
 
-    // Sauvegarder en base
     await Promise.all(
       reordered.map((btn, i) =>
         supabase.from('panel_buttons').update({ display_order: i }).eq('id', btn.id)
@@ -605,7 +607,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     Clique sur <strong style={{ color:'var(--orion-accent)' }}>+ Nouveau panneau</strong> pour créer le tien.
                   </div>
                   <div style={{ padding:'10px 14px', background:'rgba(61,128,224,0.08)', border:'1px solid var(--orion-accent-line)', borderRadius:4, fontSize:12, color:'var(--orion-accent)', display:'inline-block' }}>
-                    💡 Le panneau <strong>Football (défaut)</strong> est créé automatiquement lors de ton premier codage
+                    💡 Le panneau <strong>Football Pro</strong> est créé automatiquement lors de ton premier codage
                   </div>
                 </div>
               ) : (
