@@ -1084,7 +1084,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
               </span>
               &nbsp;et la durée&nbsp;
               <span style={{ color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>
-                {Math.floor(currentTime / 60)}'
+                {currentTime < 60 ? `${currentTime}s` : `${Math.floor(currentTime / 60)}'${currentTime % 60 > 0 ? String(currentTime % 60).padStart(2,'0') : ''}`}
               </span>.
             </div>
             <div style={{ display:'flex', gap:10 }}>
