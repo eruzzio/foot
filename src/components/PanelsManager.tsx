@@ -60,15 +60,19 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
   const loadData = async () => {
     setLoading(true);
-    const { data: userData } = await supabase.auth.getUser();
-    await Promise.all([loadPanels(), loadEventTypes()]);
-    setLoading(false);
-  };
+    const loadPanels = async () => {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData.user) return;
+  
+  const { data, error } = await supabase
+    .from('panels')
+    .select('*')
+    .eq('user_id', userData.user.id)
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: false });
 
-  const loadPanels = async () => {
-    const { data, error } = await supabase
-      .from('panels')
-      .select('*')
+  if (!error && data) setPanels(data);
+};
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false });
 
