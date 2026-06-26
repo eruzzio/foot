@@ -69,8 +69,8 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)' }}>
         {!isPro && (
-          <button onClick={() => { onNavigate('pricing'); onClose?.(); }} style={{ display: 'none' }}
-            style={{ width:'100%', display:'flex', alignItems:'center', gap:8, padding:'8px 12px', background:'rgba(61,128,224,0.1)', border:'1px solid var(--orion-accent-line)', borderRadius:4, cursor:'pointer', marginBottom:8 }}>
+          <button onClick={() => { onNavigate('pricing'); onClose?.(); }}
+            style={{ display: 'none', width:'100%', alignItems:'center', gap:8, padding:'8px 12px', background:'rgba(61,128,224,0.1)', border:'1px solid var(--orion-accent-line)', borderRadius:4, cursor:'pointer', marginBottom:8 }}>
             <Zap size={14} style={{ color:'var(--orion-accent)' }} />
             <span style={{ fontSize:12, fontWeight:700, color:'var(--orion-accent)' }}>Passer en Pro — 8,99€/mois</span>
           </button>
