@@ -17,10 +17,13 @@ import AdminPanel from './components/AdminPanel';
 import ConfirmEmail from './components/ConfirmEmail';
 import SharedReport from './components/SharedReport';
 import PricingPage from './components/PricingPage';
+import MentionsLegales from './components/MentionsLegales';
+import CGU from './components/CGU';
+import PolitiqueConfidentialite from './components/PolitiqueConfidentialite';
 import { usePlan } from './hooks/usePlan';
 import { I18nProvider } from './i18n/I18nContext';
 
-type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing';
+type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing' | 'mentions-legales' | 'cgu' | 'confidentialite';
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -147,6 +150,9 @@ function App() {
       case 'profile':  return <ProfilePage onBack={handleBackToHome} />;
       case 'admin':    return <AdminPanel />;
       case 'pricing':  return <PricingPage onBack={handleBackToHome} />;
+      case 'mentions-legales': return <MentionsLegales onBack={handleBackToHome} />;
+      case 'cgu':      return <CGU onBack={handleBackToHome} />;
+      case 'confidentialite': return <PolitiqueConfidentialite onBack={handleBackToHome} />;
       default:         return <HomePage key={homeKey} onNavigate={handleNavigate} isAdmin={isAdmin} />;
     }
   };

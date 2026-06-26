@@ -78,6 +78,11 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
         <div style={{ fontSize:10, color:'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)' }}>
           ORION · Sports Analytics
         </div>
+        <div style={{ display:'flex', gap:8, marginTop:6, flexWrap:'wrap' }}>
+          <button onClick={() => { onNavigate('mentions-legales'); onClose?.(); }} style={{ background:'none', border:'none', cursor:'pointer', fontSize:9, color:'var(--orion-text-faint)', padding:0, textDecoration:'underline' }}>Mentions légales</button>
+          <button onClick={() => { onNavigate('cgu'); onClose?.(); }} style={{ background:'none', border:'none', cursor:'pointer', fontSize:9, color:'var(--orion-text-faint)', padding:0, textDecoration:'underline' }}>CGU</button>
+          <button onClick={() => { onNavigate('confidentialite'); onClose?.(); }} style={{ background:'none', border:'none', cursor:'pointer', fontSize:9, color:'var(--orion-text-faint)', padding:0, textDecoration:'underline' }}>Confidentialité</button>
+        </div>
       </div>
     </>
   );
