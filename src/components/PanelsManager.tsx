@@ -72,12 +72,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     .order('created_at', { ascending: false });
 
   if (!error && data) setPanels(data);
-};
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: false });
 
-    if (!error && data) setPanels(data);
-  };
 
   const loadEventTypes = async () => {
     const { data: userData } = await supabase.auth.getUser();
