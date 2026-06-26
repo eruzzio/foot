@@ -99,8 +99,11 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
       <div style={{ padding:'20px 16px 12px', borderBottom:'1px solid var(--orion-line)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:8 }}>
           <OrionLogo height={15} />
-          {isPro && (
+          {isPro && isAdmin && (
             <span style={{ fontSize:9, fontWeight:800, color:'var(--orion-accent)', background:'var(--orion-accent-dim)', border:'1px solid var(--orion-accent-line)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>PRO</span>
+          )}
+          {!isAdmin && (
+            <span style={{ fontSize:9, fontWeight:800, color:'#f97316', background:'rgba(249,115,22,0.15)', border:'1px solid rgba(249,115,22,0.3)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>BETA</span>
           )}
         </div>
       </div>
