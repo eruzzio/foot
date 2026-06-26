@@ -222,7 +222,7 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
                 </div>
 
                 <p style={{ fontSize:11, color:'var(--orion-text-faint)', fontFamily:'var(--orion-font-mono)' }}>
-                  Un panneau par défaut "Football" est déjà disponible — tu peux l'utiliser directement
+                  Un panneau par défaut "Football Pro" est déjà disponible — tu peux l'utiliser directement
                 </p>
               </div>
 

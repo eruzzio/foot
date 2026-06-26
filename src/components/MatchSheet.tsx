@@ -76,7 +76,11 @@ export default function MatchSheet({ isOpen, onClose, onSave, initialTeamA, init
       .order('name', { ascending: true });
 
     if (!error && data) {
-      setSavedTeams(data.map((t: any) => ({ id: t.id, name: t.name, color: t.colors?.primary, logoUrl: t.logo_url })));
+      const teams = data.map((t: any) => ({ id: t.id, name: t.name, color: t.colors?.primary, logoUrl: t.logo_url }));
+      setSavedTeams(teams);
+      if (teams.length === 1) {
+        setFormData(prev => ({ ...prev, teamA: prev.teamA || teams[0].name }));
+      }
     }
   };
 

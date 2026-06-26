@@ -895,7 +895,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
             {/* Barre Undo */}
             {showUndoBar && undoEvent && (
-              <div style={{ position:'relative', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', overflow:'hidden' }}>
+              <div key={undoEvent.id} style={{ position:'relative', background:'rgba(245,158,11,0.1)', border:'1px solid rgba(245,158,11,0.3)', padding:'10px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', overflow:'hidden' }}>
                 {/* Barre de progression */}
                 <div style={{ position:'absolute', bottom:0, left:0, height:2, background:'var(--orion-amber)', animation:'undoProgress 8s linear forwards' }} />
                 <div style={{ display:'flex', alignItems:'center', gap:10 }}>

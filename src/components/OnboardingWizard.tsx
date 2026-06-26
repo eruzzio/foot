@@ -121,7 +121,7 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div style={{ fontSize: 32, marginBottom: 8 }}>⚽</div>
           <h1 style={{ fontSize: 22, fontWeight: 800, color: 'var(--orion-text)', marginBottom: 6 }}>Bienvenue sur ORION</h1>
-          <p style={{ fontSize: 13, color: 'var(--orion-text-mute)' }}>Configurons votre espace en 3 étapes rapides</p>
+          <p style={{ fontSize: 13, color: 'var(--orion-text-mute)' }}>Configurons votre espace en 2 étapes rapides</p>
         </div>
 
         {/* Steps indicator */}
