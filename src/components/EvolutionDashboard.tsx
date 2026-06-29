@@ -195,7 +195,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
   );
 
   return (
-    <div style={{ padding:'24px 20px', maxWidth:960, margin:'0 auto' }}>
+    <div style={{ padding:'12px 16px', maxWidth:960, margin:'0 auto' }}>
 
       {/* Header */}
       <div style={{ marginBottom:20 }}>
@@ -211,7 +211,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
 
       {/* KPIs */}
       {avg && (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(130px, 1fr))', gap:8, marginBottom:16 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:8, marginBottom:16 }}>
           {[
             { icon:Trophy,   label:'Bilan',          value:`${avg.wins}V ${avg.draws}N ${avg.losses}D`, color:'var(--orion-accent)' },
             { icon:Target,   label:'Moy. buts',       value:avg.goalsFor,         color:'var(--orion-green)' },
@@ -280,7 +280,7 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
             <span style={{ fontSize:11, color:'var(--orion-text-mute)' }}>{matchesStats.length} match{matchesStats.length > 1 ? 's' : ''}</span>
           </div>
           <div style={{ padding:'16px 20px' }}>
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:10 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(150px, 1fr))', gap:10 }}>
               {actionStats.map((stat) => (
                 <div key={stat.name} style={{ background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:6, padding:'12px 14px', display:'flex', alignItems:'center', gap:12 }}>
                   <div style={{ width:10, height:10, borderRadius:'50%', background:stat.color, flexShrink:0 }} />

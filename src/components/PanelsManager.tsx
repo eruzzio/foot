@@ -508,7 +508,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-2">Couleur</label>
-                  <div className="grid grid-cols-6 gap-1.5 mb-2">
+                  <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 mb-2">
                     {PRESET_COLORS.map((c) => (
                       <button key={c} onClick={() => setButtonColor(c)} className={`w-7 h-7 rounded transition-transform hover:scale-110 ${buttonColor === c ? 'ring-2 ring-white ring-offset-1 ring-offset-dark-secondary scale-110' : ''}`} style={{ backgroundColor: c }} />
                     ))}
@@ -529,7 +529,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
               {!parentButtonId && (
                 <div>
                   <label className="block text-xs font-medium text-gray-300 mb-2">Localisation</label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {(['none','zones','field','field_and_goal'] as const).map((mode) => (
                       <button key={mode} onClick={() => { setLocationMode(mode); setIsZone(false); }} className={`p-2 border-2 transition-all text-center ${locationMode === mode ? 'border-orion-accent bg-orion-accent/10' : 'border-orion-line bg-dark-tertiary hover:border-gray-600'}`}>
                         <div className="text-xs font-bold text-white">{mode === 'none' ? 'Normal' : mode === 'zones' ? '3 Zones' : mode === 'field' ? 'Position' : 'Pos+But'}</div>
@@ -945,7 +945,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     {!parentButtonId && (
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Localisation</label>
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           <button
                             onClick={() => { setLocationMode('none'); setIsZone(false); }}
                             className={`p-3  border-2 transition-all text-center ${
@@ -1027,10 +1027,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       </select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Couleur</label>
-                        <div className="grid grid-cols-6 gap-1.5 mb-2">
+                        <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 mb-2">
                           {PRESET_COLORS.map((c) => (
                             <button
                               key={c}

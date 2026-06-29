@@ -836,8 +836,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           </div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6" style={{ padding:'20px 24px' }}>
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6" style={{ padding:'12px 16px' }}>
+          <div className="lg:col-span-2 space-y-4">
             {(championship || matchday || location || matchDate) && (
               <div style={{ background:"var(--orion-surface)", border:"1px solid var(--orion-line)", padding:"20px" }}>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -939,7 +939,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
             />
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 order-first lg:order-last">
             <Timeline
               events={events}
               onDeleteEvent={handleDeleteEvent}

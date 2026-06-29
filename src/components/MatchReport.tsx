@@ -160,7 +160,7 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
   const stats = calculateMatchStats();
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)', padding:'16px' }}>
+    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)', padding:'12px 16px' }}>
       <div style={{ maxWidth:900, margin:'0 auto' }}>
         <header style={{ marginBottom:16 }}>
           <button onClick={onBack} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', marginBottom:12, display:'flex', alignItems:'center', gap:6, fontSize:13 }}>
@@ -292,7 +292,7 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
         {activeTab === 'overview' && (
           <>
             {stats && (
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(200px, 1fr))', gap:8, marginBottom:20 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:8, marginBottom:20 }}>
                 {[
                   { label: match.team_a_name, value: stats.teamATotal, sub: `${stats.teamASuccess} réussies (${stats.teamASuccessRate}%)`, color: 'var(--orion-accent)' },
                   { label: match.team_b_name, value: stats.teamBTotal, sub: `${stats.teamBSuccess} réussies (${stats.teamBSuccessRate}%)`, color: 'var(--orion-amber)' },

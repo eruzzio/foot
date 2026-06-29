@@ -93,7 +93,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
         <div style={{ display:'flex', alignItems:'center', gap:18, height:56, padding:'0 24px', borderBottom:'1px solid var(--orion-line)' }}>
           <div style={{ width:80, height:14, background:'var(--orion-surface-2)', borderRadius:3 }} />
         </div>
-        <div style={{ maxWidth:800, margin:'0 auto', padding:'32px 24px' }}>
+        <div style={{ maxWidth:800, margin:'0 auto', padding:'16px' }}>
           {[1,2,3,4].map(i => (
             <div key={i} style={{ display:'flex', alignItems:'center', gap:16, padding:'16px 0', borderBottom:'1px solid var(--orion-line)', opacity: 1 - i * 0.15 }}>
               <div style={{ width:44, height:44, background:'var(--orion-surface-2)', flexShrink:0 }} />
