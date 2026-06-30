@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Clock, TrendingUp, BarChart3, Users, Video, Tag } 
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
+import { calculateTeamXG, getShotEvents } from '../utils/xg';
 import Timeline from './Timeline';
 import ExportButton from './ExportButton';
 import { Share2, Check, Copy } from 'lucide-react';
@@ -126,6 +127,11 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
     const teamASuccess = teamAEvents.filter(e => e.outcome === 'success').length;
     const teamBSuccess = teamBEvents.filter(e => e.outcome === 'success').length;
 
+    const shotsA = match.events.filter(e => e.team === 'A' && (e.event_type?.name === 'Tir' || e.label === 'Tir'));
+    const shotsB = match.events.filter(e => e.team === 'B' && (e.event_type?.name === 'Tir' || e.label === 'Tir'));
+    const onTargetA = shotsA.filter(e => e.outcome === 'success').length;
+    const onTargetB = shotsB.filter(e => e.outcome === 'success').length;
+
     return {
       teamATotal: teamAEvents.length,
       teamBTotal: teamBEvents.length,
@@ -134,6 +140,10 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
       teamASuccessRate: teamAEvents.length > 0 ? (teamASuccess / teamAEvents.length * 100).toFixed(1) : '0',
       teamBSuccessRate: teamBEvents.length > 0 ? (teamBSuccess / teamBEvents.length * 100).toFixed(1) : '0',
       totalEvents: match.events.length,
+      shotsA: shotsA.length,
+      shotsB: shotsB.length,
+      onTargetA,
+      onTargetB,
     };
   };
 
@@ -276,20 +286,78 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
         {activeTab === 'overview' && (
           <>
             {stats && (
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:8, marginBottom:20 }}>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:0, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:10, overflow:'hidden', marginBottom:16 }}>
                 {[
-                  { label: match.team_a_name, value: stats.teamATotal, sub: `${stats.teamASuccess} réussies (${stats.teamASuccessRate}%)`, color: 'var(--orion-accent)' },
-                  { label: match.team_b_name, value: stats.teamBTotal, sub: `${stats.teamBSuccess} réussies (${stats.teamBSuccessRate}%)`, color: 'var(--orion-amber)' },
-                  { label: 'Total', value: stats.totalEvents, sub: 'événements codés', color: 'var(--orion-green)' },
-                ].map((k, i) => (
-                  <div key={i} style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'16px 18px' }}>
-                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8 }}>{k.label}</div>
-                    <div style={{ fontSize:32, fontWeight:800, color:k.color, lineHeight:1, fontFamily:'var(--orion-font-mono)' }}>{k.value}</div>
-                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>{k.sub}</div>
+                  { label: `Actions ${match.team_a_name}`, value: stats.teamATotal, sub: `${stats.teamASuccess} réussies · ${stats.teamASuccessRate}%`, color: 'var(--orion-accent)' },
+                  { label: `Actions ${match.team_b_name}`, value: stats.teamBTotal, sub: `${stats.teamBSuccess} réussies · ${stats.teamBSuccessRate}%`, color: 'var(--orion-amber)' },
+                  { label: 'Total codé', value: stats.totalEvents, sub: 'événements', color: 'var(--orion-green)' },
+                  { label: 'Tirs cadrés', value: `${stats.onTargetA + stats.onTargetB}/${stats.shotsA + stats.shotsB}`, sub: (stats.shotsA + stats.shotsB) > 0 ? `${Math.round((stats.onTargetA + stats.onTargetB) / (stats.shotsA + stats.shotsB) * 100)}% de précision` : '—', color: 'var(--orion-text)' },
+                ].map((k, i, arr) => (
+                  <div key={i} style={{ padding:'16px 18px', borderRight: i < arr.length-1 ? '1px solid var(--orion-line)' : 'none' }}>
+                    <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:9, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orion-text-mute)', marginBottom:8 }}>{k.label}</div>
+                    <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:26, fontWeight:800, lineHeight:1, color:k.color }}>{k.value}</div>
+                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:5 }}>{k.sub}</div>
                   </div>
                 ))}
               </div>
             )}
+
+            {/* Possession + xG */}
+            {(() => {
+              const posA = match.possession_a_seconds || 0;
+              const posB = match.possession_b_seconds || 0;
+              const posTotal = posA + posB;
+              const possPctA = posTotal > 0 ? Math.round((posA / posTotal) * 100) : 50;
+              const possPctB = 100 - possPctA;
+              const xgA = calculateTeamXG(match.events as any, 'A');
+              const xgB = calculateTeamXG(match.events as any, 'B');
+              const xgTotal = xgA + xgB;
+              const xgPctA = xgTotal > 0 ? Math.round((xgA / xgTotal) * 100) : 50;
+
+              if (posTotal === 0 && xgTotal === 0) return null;
+
+              return (
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1.3fr', gap:14, marginBottom:16 }}>
+                  {posTotal > 0 && (
+                    <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line)', borderRadius:10, padding:18 }}>
+                      <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orion-text-mute)', marginBottom:14, textAlign:'center' }}>Possession</div>
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:16 }}>
+                        <div style={{ textAlign:'center' }}>
+                          <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:22, fontWeight:800, color:'var(--orion-accent)' }}>{possPctA}%</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>{match.team_a_name}</div>
+                        </div>
+                        <div style={{ position:'relative', width:84, height:84, borderRadius:'50%', background:`conic-gradient(var(--orion-accent) 0% ${possPctA}%, var(--orion-amber) ${possPctA}% 100%)` }}>
+                          <div style={{ position:'absolute', inset:12, background:'var(--orion-surface)', borderRadius:'50%' }} />
+                        </div>
+                        <div style={{ textAlign:'center' }}>
+                          <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:22, fontWeight:800, color:'var(--orion-amber)' }}>{possPctB}%</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:2 }}>{match.team_b_name}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {xgTotal > 0 && (
+                    <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line)', borderRadius:10, padding:18, display:'flex', flexDirection:'column', justifyContent:'center' }}>
+                      <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.12em', textTransform:'uppercase', color:'var(--orion-text-mute)', marginBottom:16, textAlign:'center' }}>Expected Goals · xG</div>
+                      <div style={{ display:'grid', gridTemplateColumns:'auto 1fr auto', alignItems:'center', gap:12 }}>
+                        <div style={{ textAlign:'center' }}>
+                          <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:24, fontWeight:800, color:'var(--orion-accent)', lineHeight:1 }}>{xgA.toFixed(2)}</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:4 }}>{stats?.shotsA || 0} tirs</div>
+                        </div>
+                        <div style={{ display:'flex', height:9, borderRadius:5, overflow:'hidden', background:'var(--orion-surface-3)' }}>
+                          <div style={{ width:`${xgPctA}%`, background:'var(--orion-accent)' }} />
+                          <div style={{ flex:1, background:'var(--orion-amber)' }} />
+                        </div>
+                        <div style={{ textAlign:'center' }}>
+                          <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:24, fontWeight:800, color:'var(--orion-amber)', lineHeight:1 }}>{xgB.toFixed(2)}</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)', marginTop:4 }}>{stats?.shotsB || 0} tirs</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             <div className="space-y-6">
               <Statistics

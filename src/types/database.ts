@@ -58,6 +58,8 @@ export interface Match {
   tag_surface?: 'grass' | 'synthetic' | null;
   tag_weather?: 'sun' | 'rain' | 'wind' | 'snow' | null;
   tag_notes?: string | null;
+  possession_a_seconds?: number | null;
+  possession_b_seconds?: number | null;
 }
 
 export interface ButtonTemplate {
