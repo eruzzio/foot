@@ -40,6 +40,8 @@ export default function MatchTimer({
   const inputBRef = useRef<HTMLInputElement>(null);
   const startTimeRef = useRef<number | null>(null);
   const baseTimeRef = useRef<number>(0);
+  const onTimeUpdateRef = useRef(onTimeUpdate);
+  onTimeUpdateRef.current = onTimeUpdate;
 
   useEffect(() => { if (teamALogoUrl && !logoA) setLogoA(teamALogoUrl); }, [teamALogoUrl]);
 
@@ -51,7 +53,7 @@ export default function MatchTimer({
       const tick = () => {
         const elapsed = Math.floor((Date.now() - (startTimeRef.current ?? Date.now())) / 1000);
         const newTime = baseTimeRef.current + elapsed;
-        if (newTime !== currentTime) onTimeUpdate(newTime);
+        onTimeUpdateRef.current(newTime);
         animFrame = requestAnimationFrame(tick);
       };
       animFrame = requestAnimationFrame(tick);
