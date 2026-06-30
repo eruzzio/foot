@@ -21,6 +21,9 @@ interface MatchTimerProps {
   onHalftime: () => void;
   kickoffRealTime?: Date | null;
   onKickoff?: (realTime: Date) => void;
+  possessionTeam?: 'A' | 'B' | null;
+  onTogglePossession?: (team: 'A' | 'B') => void;
+  possessionSeconds?: { A: number; B: number };
 }
 
 export default function MatchTimer({
@@ -29,6 +32,7 @@ export default function MatchTimer({
   onScoreChange, onSelectTeam, onOpenFormation,
   teamAColor = '#5BE3FF', teamALogoUrl = '',
   halftimes, onHalftime, kickoffRealTime, onKickoff,
+  possessionTeam, onTogglePossession, possessionSeconds,
 }: MatchTimerProps) {
   const [logoA, setLogoA] = useState<string | null>(teamALogoUrl || null);
   const [logoB, setLogoB] = useState<string | null>(null);
@@ -173,6 +177,52 @@ export default function MatchTimer({
 
         <TeamSide team="B" logo={logoB} inputRef={inputBRef} name={teamBName} score={teamBScore} color="var(--orion-amber)" />
       </div>
+
+      {/* Possession */}
+      {onTogglePossession && (
+        <div style={{ marginTop:14, borderTop:'1px solid var(--orion-line)', paddingTop:14 }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8 }}>
+            <span className="o-eyebrow">Possession</span>
+            {possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0 && (
+              <span className="o-num" style={{ fontSize:11, color:'var(--orion-text-mute)' }}>
+                {Math.round((possessionSeconds.A / (possessionSeconds.A + possessionSeconds.B)) * 100)}% — {Math.round((possessionSeconds.B / (possessionSeconds.A + possessionSeconds.B)) * 100)}%
+              </span>
+            )}
+          </div>
+          <div style={{ display:'flex', height:36, borderRadius:4, overflow:'hidden', border:'1px solid var(--orion-line)' }}>
+            <button
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onTogglePossession('A'); }}
+              style={{
+                flex: possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0
+                  ? Math.max(possessionSeconds.A, 1)
+                  : 1,
+                background: possessionTeam === 'A' ? teamAColor : 'var(--orion-surface-2)',
+                color: possessionTeam === 'A' ? '#0a0e14' : 'var(--orion-text-mute)',
+                border:'none', cursor:'pointer', fontWeight:700, fontSize:12,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                transition:'flex .3s ease, background .15s ease',
+              }}
+            >
+              {possessionTeam === 'A' && '●'} {teamAName}
+            </button>
+            <button
+              onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onTogglePossession('B'); }}
+              style={{
+                flex: possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0
+                  ? Math.max(possessionSeconds.B, 1)
+                  : 1,
+                background: possessionTeam === 'B' ? 'var(--orion-amber)' : 'var(--orion-surface-2)',
+                color: possessionTeam === 'B' ? '#0a0e14' : 'var(--orion-text-mute)',
+                border:'none', cursor:'pointer', fontWeight:700, fontSize:12,
+                display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                transition:'flex .3s ease, background .15s ease',
+              }}
+            >
+              {possessionTeam === 'B' && '●'} {teamBName}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Compos */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, marginTop:16, borderTop:'1px solid var(--orion-line)', paddingTop:14 }}>

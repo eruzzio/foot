@@ -66,9 +66,15 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
           localStorage.setItem(`orion_backup_${matchId}`, JSON.stringify(backup));
         } catch {}
       }
+      if (matchId && (possessionSeconds.A > 0 || possessionSeconds.B > 0)) {
+        supabase.from('matches').update({
+          possession_a_seconds: possessionSeconds.A,
+          possession_b_seconds: possessionSeconds.B,
+        }).eq('id', matchId);
+      }
     }, 30000);
     return () => clearInterval(saveInterval);
-  }, [matchId, events, currentTime, teamAScore, teamBScore]);
+  }, [matchId, events, currentTime, teamAScore, teamBScore, possessionSeconds]);
 
   // Sauvegarder aussi à chaque nouvel événement
   useEffect(() => {
@@ -98,6 +104,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [pendingEventId, setPendingEventId] = useState<string | null>(null);
   const [kickoffRealTime, setKickoffRealTime] = useState<Date | null>(null);
+  const [possessionTeam, setPossessionTeam] = useState<'A' | 'B' | null>(null);
+  const [possessionSeconds, setPossessionSeconds] = useState<{ A: number; B: number }>({ A: 0, B: 0 });
+  const lastPossessionTick = useRef<number | null>(null);
   const [veoUrl, setVeoUrl] = useState<string>('');
   const [, setVeoOffsetSeconds] = useState<number | null>(null);
   const [showVeoSync, setShowVeoSync] = useState(false);
@@ -316,12 +325,22 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
   const handleTimeUpdate = async (newTime: number) => {
     setCurrentTime(newTime);
+
+    // Incrémenter le temps de possession (1s par tick si une équipe est sélectionnée)
+    if (possessionTeam && isRunning) {
+      setPossessionSeconds(prev => ({ ...prev, [possessionTeam]: prev[possessionTeam] + 1 }));
+    }
+
     if (matchId) {
       await supabase
         .from('matches')
         .update({ match_time: newTime })
         .eq('id', matchId);
     }
+  };
+
+  const handleTogglePossession = (team: 'A' | 'B') => {
+    setPossessionTeam(prev => prev === team ? null : team);
   };
 
   const handleToggleTimer = async () => {
@@ -384,6 +403,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         match_time: currentTime,
         team_a_score: teamAScore,
         team_b_score: teamBScore,
+        possession_a_seconds: possessionSeconds.A,
+        possession_b_seconds: possessionSeconds.B,
       })
       .eq('id', matchId);
 
@@ -887,6 +908,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
               onHalftime={handleHalftime}
               kickoffRealTime={kickoffRealTime}
               onKickoff={handleKickoff}
+              possessionTeam={possessionTeam}
+              onTogglePossession={handleTogglePossession}
+              possessionSeconds={possessionSeconds}
               onOpenFormation={(team) => {
                 setFormationTeam(team);
                 setShowFormationManager(true);
