@@ -645,7 +645,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         {view === 'list' && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-medium text-orion-text">Mes Panneaux</h1>
+              <h1 className="text-2xl font-medium text-white">Mes Panneaux</h1>
               <button
                 onClick={startCreate}
                 className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium shadow"
@@ -707,7 +707,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
         {view === 'create' && (
           <div>
-            <h1 className="text-2xl font-medium text-orion-text mb-6">
+            <h1 className="text-2xl font-medium text-white mb-6">
               {selectedPanel ? 'Modifier le panneau' : 'Nouveau panneau'}
             </h1>
 
@@ -766,7 +766,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-medium text-orion-text">{selectedPanel.name}</h1>
+                  <h1 className="text-2xl font-medium text-white">{selectedPanel.name}</h1>
                   {selectedPanel.is_default && (
                     <span className="text-sm px-3 py-1 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
                       Défaut

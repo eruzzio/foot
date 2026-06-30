@@ -176,7 +176,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               ←
             </button>
             <div>
-              <h1 className="text-base font-medium text-orion-text">Mon Compte</h1>
+              <h1 className="text-base font-medium text-white">Mon Compte</h1>
               <p className="text-xs text-gray-500">{email}</p>
             </div>
           </div>

@@ -97,3 +97,6 @@ button { touch-action: manipulation; }
   /* Headers de page */
   h1 { font-size: 20px !important; }
 }
+
+/* Fix classes Tailwind orion-* non remappées au thème dynamique */
+.border-orion-line { border-color: var(--orion-line) !important; }

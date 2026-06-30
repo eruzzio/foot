@@ -104,7 +104,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
 
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-orion-line flex-shrink-0">
-          <h3 className="text-sm font-medium text-orion-text">{player ? 'Modifier le joueur' : 'Ajouter un joueur'}</h3>
+          <h3 className="text-sm font-medium text-white">{player ? 'Modifier le joueur' : 'Ajouter un joueur'}</h3>
           <button onClick={onCancel} className="p-1.5 hover:bg-dark-tertiary transition-colors rounded">
             <X size={18} className="text-gray-400" />
           </button>

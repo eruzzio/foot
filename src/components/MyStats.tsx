@@ -120,7 +120,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
             ←
           </button>
           <div>
-            <h1 className="text-2xl font-medium text-orion-text">Mes Stats</h1>
+            <h1 className="text-2xl font-medium text-white">Mes Stats</h1>
             <p className="text-gray-400">Sélectionnez un match pour voir les statistiques</p>
           </div>
         </header>
@@ -164,7 +164,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
                     onClick={() => setSelectedMatchId(match.id)}
                     className="flex-1 text-left"
                   >
-                    <h3 className="text-base font-medium text-orion-text mb-2 group-hover:text-orange-primary transition-colors">
+                    <h3 className="text-base font-medium text-white mb-2 group-hover:text-orange-primary transition-colors">
                       {match.team_a_name} vs {match.team_b_name}
                     </h3>
                     <div className="flex items-center gap-1 text-sm text-gray-400">

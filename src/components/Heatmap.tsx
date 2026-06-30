@@ -376,7 +376,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
                 {/* Zone Défensive (gauche) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(59,130,246,0.18)', borderRight: '2px dashed rgba(59,130,246,0.5)' }}>
                   <div className="text-center z-10">
-                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.defensive.length}</div>
+                    <div className="text-2xl font-medium text-white drop-shadow-lg">{zoneEvents.defensive.length}</div>
                     <div className="text-xs font-semibold text-blue-300 mt-1">Défensif</div>
                     <div className="text-[10px] text-blue-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.defensive.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.defensive} />
@@ -385,7 +385,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
                 {/* Zone Médiane (centre) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(250,204,21,0.12)', borderRight: '2px dashed rgba(250,204,21,0.5)' }}>
                   <div className="text-center z-10">
-                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.mediane.length}</div>
+                    <div className="text-2xl font-medium text-white drop-shadow-lg">{zoneEvents.mediane.length}</div>
                     <div className="text-xs font-semibold text-yellow-300 mt-1">Médian</div>
                     <div className="text-[10px] text-yellow-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.mediane.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.mediane} />
@@ -394,7 +394,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
                 {/* Zone Offensive (droite) */}
                 <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: 'rgba(239,68,68,0.18)' }}>
                   <div className="text-center z-10">
-                    <div className="text-2xl font-medium text-orion-text drop-shadow-lg">{zoneEvents.offensive.length}</div>
+                    <div className="text-2xl font-medium text-white drop-shadow-lg">{zoneEvents.offensive.length}</div>
                     <div className="text-xs font-semibold text-red-300 mt-1">Offensif</div>
                     <div className="text-[10px] text-red-400/70">{fieldEvents.length > 0 ? Math.round((zoneEvents.offensive.length / fieldEvents.length) * 100) : 0}%</div>
                     <ZoneTypeTags entries={zoneDetail.offensive} />

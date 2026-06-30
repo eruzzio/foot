@@ -582,7 +582,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 ←
               </button>
               <div className="flex-1">
-                <h1 className="text-2xl font-medium text-orion-text">{selectedTeam.name}</h1>
+                <h1 className="text-2xl font-medium text-white">{selectedTeam.name}</h1>
                 {selectedTeam.category && (
                   <p className="text-orion-accent text-sm font-medium">{selectedTeam.category}</p>
                 )}
@@ -618,7 +618,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                    <h2 className="text-xl sm:text-2xl font-medium text-orion-text truncate">{selectedTeam.name}</h2>
+                    <h2 className="text-xl sm:text-2xl font-medium text-white truncate">{selectedTeam.name}</h2>
                     {selectedTeam.category && (
                       <span className="px-3 py-1 bg-orange-primary/20 text-orion-accent rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
                         {selectedTeam.category}
@@ -626,7 +626,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                     )}
                   </div>
                   {selectedTeam.description && (
-                    <p className="text-xs text-orion-text-mute line-clamp-2">{selectedTeam.description}</p>
+                    <p className="text-xs text-white-mute line-clamp-2">{selectedTeam.description}</p>
                   )}
                 </div>
               </div>
@@ -720,7 +720,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
                 <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-base font-medium text-orion-text">Composition Tactique</h2>
+                    <h2 className="text-base font-medium text-white">Composition Tactique</h2>
                     <div className="flex items-center gap-2">
                       <label className="text-sm font-medium text-gray-300">Formation:</label>
                       <select
@@ -836,7 +836,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
           ) : activeTab === 'squad' ? (
             <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-base font-medium text-orion-text">Effectif</h2>
+                <h2 className="text-base font-medium text-white">Effectif</h2>
                 <button
                   onClick={() => { setEditingPlayer(null); setShowPlayerForm(true); }}
                   className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white  hover-orange transition-colors"
@@ -848,7 +848,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               {players.length === 0 ? (
                 <div className="text-center py-8">
                   <Users size={48} className="text-gray-600 mx-auto mb-3" />
-                  <p className="text-xs text-orion-text-mute">Aucun joueur dans l'effectif</p>
+                  <p className="text-xs text-white-mute">Aucun joueur dans l'effectif</p>
                   <p className="text-gray-600 text-xs mt-1">Ajoutez vos premiers joueurs</p>
                 </div>
               ) : (
@@ -913,7 +913,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
           ) : (
             <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base font-medium text-orion-text">Stats par joueurs</h2>
+                <h2 className="text-base font-medium text-white">Stats par joueurs</h2>
                 <span className="text-xs text-gray-500 bg-dark-tertiary px-2.5 py-1 rounded-full">Saison complète</span>
               </div>
               <PlayerSeasonStats teamId={selectedTeam.id} teamName={selectedTeam.name} />
@@ -956,7 +956,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
               ←
             </button>
             <div className="flex-1">
-              <h1 className="text-2xl font-medium text-orion-text">Mes Équipes</h1>
+              <h1 className="text-2xl font-medium text-white">Mes Équipes</h1>
               <p className="text-gray-400">Gérez vos équipes, effectifs et compositions tactiques</p>
             </div>
             <button
@@ -978,7 +978,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
             <div className="w-20 h-20 rounded-full bg-dark-secondary border-2 border-orion-line flex items-center justify-center mb-6">
               <Shield size={36} className="text-gray-500" />
             </div>
-            <h2 className="text-base font-medium text-orion-text mb-2">Aucune équipe créée</h2>
+            <h2 className="text-base font-medium text-white mb-2">Aucune équipe créée</h2>
             <p className="text-gray-400 mb-8 max-w-xs">Commencez par créer votre première équipe pour gérer votre effectif et vos compositions.</p>
             <button
               onClick={() => { setEditingTeamId(null); setShowTeamSettings(true); }}
@@ -1009,7 +1009,7 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-orion-text truncate group-hover:text-orion-accent transition-colors">{team.name}</h3>
+                    <h3 className="text-sm font-medium text-white truncate group-hover:text-orion-accent transition-colors">{team.name}</h3>
                     {team.category && (
                       <span className="inline-block px-2 py-0.5 bg-orange-primary/20 text-orion-accent rounded-full text-xs font-medium mt-1">
                         {team.category}
