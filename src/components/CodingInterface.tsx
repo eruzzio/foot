@@ -47,6 +47,9 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [lastEventButtonId, setLastEventButtonId] = useState<string | null>(null);
   const [showUndoBar, setShowUndoBar] = useState(false);
   const [undoEvent, setUndoEvent] = useState<MatchEventWithDetails | null>(null);
+  const [possessionTeam, setPossessionTeam] = useState<'A' | 'B' | null>(null);
+  const [possessionSeconds, setPossessionSeconds] = useState<{ A: number; B: number }>({ A: 0, B: 0 });
+  const lastPossessionTick = useRef<number | null>(null);
 
   // Sauvegarde locale anti-crash toutes les 30 secondes
   useEffect(() => {
@@ -104,9 +107,6 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [showLocationSelector, setShowLocationSelector] = useState(false);
   const [pendingEventId, setPendingEventId] = useState<string | null>(null);
   const [kickoffRealTime, setKickoffRealTime] = useState<Date | null>(null);
-  const [possessionTeam, setPossessionTeam] = useState<'A' | 'B' | null>(null);
-  const [possessionSeconds, setPossessionSeconds] = useState<{ A: number; B: number }>({ A: 0, B: 0 });
-  const lastPossessionTick = useRef<number | null>(null);
   const [veoUrl, setVeoUrl] = useState<string>('');
   const [, setVeoOffsetSeconds] = useState<number | null>(null);
   const [showVeoSync, setShowVeoSync] = useState(false);
