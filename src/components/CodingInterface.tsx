@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { EventType, MatchEventWithDetails, PanelButtonWithEventType, Panel } from '../types/database';
 import MatchTimer from './MatchTimer';
@@ -49,7 +49,6 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
   const [undoEvent, setUndoEvent] = useState<MatchEventWithDetails | null>(null);
   const [possessionTeam, setPossessionTeam] = useState<'A' | 'B' | null>(null);
   const [possessionSeconds, setPossessionSeconds] = useState<{ A: number; B: number }>({ A: 0, B: 0 });
-  const lastPossessionTick = useRef<number | null>(null);
 
   // Sauvegarde locale anti-crash toutes les 30 secondes
   useEffect(() => {
