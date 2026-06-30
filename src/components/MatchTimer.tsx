@@ -47,13 +47,17 @@ export default function MatchTimer({
 
   useEffect(() => {
     let animFrame: number | undefined;
+    let lastEmitted = currentTime;
     if (isRunning) {
       startTimeRef.current = Date.now();
       baseTimeRef.current = currentTime;
       const tick = () => {
         const elapsed = Math.floor((Date.now() - (startTimeRef.current ?? Date.now())) / 1000);
         const newTime = baseTimeRef.current + elapsed;
-        onTimeUpdateRef.current(newTime);
+        if (newTime !== lastEmitted) {
+          lastEmitted = newTime;
+          onTimeUpdateRef.current(newTime);
+        }
         animFrame = requestAnimationFrame(tick);
       };
       animFrame = requestAnimationFrame(tick);
