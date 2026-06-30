@@ -189,18 +189,19 @@ export default function MatchTimer({
               </span>
             )}
           </div>
-          <div style={{ display:'flex', height:36, borderRadius:4, overflow:'hidden', border:'1px solid var(--orion-line)' }}>
+          <div style={{ display:'flex', height:40, borderRadius:4, overflow:'hidden', border:'1px solid var(--orion-line)' }}>
             <button
               onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onTogglePossession('A'); }}
               style={{
-                flex: possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0
-                  ? Math.max(possessionSeconds.A, 1)
-                  : 1,
+                width: possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0
+                  ? `${Math.max(Math.min((possessionSeconds.A / (possessionSeconds.A + possessionSeconds.B)) * 100, 80), 20)}%`
+                  : '50%',
                 background: possessionTeam === 'A' ? teamAColor : 'var(--orion-surface-2)',
                 color: possessionTeam === 'A' ? '#0a0e14' : 'var(--orion-text-mute)',
                 border:'none', cursor:'pointer', fontWeight:700, fontSize:12,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                transition:'flex .3s ease, background .15s ease',
+                overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', padding:'0 8px',
+                transition:'width .3s ease, background .15s ease',
               }}
             >
               {possessionTeam === 'A' && '●'} {teamAName}
@@ -208,14 +209,13 @@ export default function MatchTimer({
             <button
               onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onTogglePossession('B'); }}
               style={{
-                flex: possessionSeconds && (possessionSeconds.A + possessionSeconds.B) > 0
-                  ? Math.max(possessionSeconds.B, 1)
-                  : 1,
+                flex: 1,
                 background: possessionTeam === 'B' ? 'var(--orion-amber)' : 'var(--orion-surface-2)',
                 color: possessionTeam === 'B' ? '#0a0e14' : 'var(--orion-text-mute)',
                 border:'none', cursor:'pointer', fontWeight:700, fontSize:12,
                 display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                transition:'flex .3s ease, background .15s ease',
+                overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', padding:'0 8px',
+                transition:'background .15s ease',
               }}
             >
               {possessionTeam === 'B' && '●'} {teamBName}
