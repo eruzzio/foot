@@ -167,24 +167,22 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
             <ArrowLeft size={18} /> Retour
           </button>
 
-          <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'20px 20px 16px', overflow:'hidden' }}>
+          <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'26px 20px 22px', color:'#fff', boxShadow:'0 16px 40px -16px rgba(13,17,23,0.5)' }}>
+            <div style={{ position:'absolute', top:0, right:0, width:340, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.25), transparent 60%)', pointerEvents:'none' }} />
+
             {/* Titre + boutons */}
-            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:16, flexWrap:'wrap' }}>
-              <div>
-                <p style={{ fontSize:10, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.1em', fontFamily:'var(--orion-font-mono)', marginBottom:6 }}>Match de football</p>
-                <h1 style={{ fontSize:'clamp(18px, 4vw, 28px)', fontWeight:800, color:'var(--orion-text)', lineHeight:1.1 }}>
-                  {match.team_a_name} <span style={{ color:'var(--orion-accent)' }}>vs</span> {match.team_b_name}
-                </h1>
-              </div>
-              <div style={{ display:'flex', gap:8, flexWrap:'wrap', flexShrink:0 }}>
+            <div style={{ position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:18, flexWrap:'wrap' }}>
+              <span style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd' }}>
+                {match.tag_competition || 'Match de football'}
+              </span>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
                 {!readOnly && (
                   <>
-                    <button onClick={() => setShowPdfConfig(true)} className="o-btn o-btn--sm" style={{ display:'flex', alignItems:'center', gap:6 }}>
-                      📄 Rapport PDF
+                    <button onClick={() => setShowPdfConfig(true)} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 12px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.18)', borderRadius:6, fontSize:11, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>
+                      📄 PDF
                     </button>
-                    <button onClick={handleShare} className="o-btn o-btn--sm" disabled={sharing}
-                      style={{ display:'flex', alignItems:'center', gap:6, borderColor: shareCopied ? 'var(--orion-green)' : undefined, color: shareCopied ? 'var(--orion-green)' : undefined }}>
-                      {shareCopied ? <><Check size={13} /> Lien copié !</> : sharing ? 'Génération…' : <><Share2 size={13} /> Partager</>}
+                    <button onClick={handleShare} disabled={sharing} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 12px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.18)', borderRadius:6, fontSize:11, fontWeight:600, color: shareCopied ? '#5ee29a' : '#dbe3ee', cursor:'pointer' }}>
+                      {shareCopied ? <><Check size={12} /> Copié</> : sharing ? '...' : <><Share2 size={12} /> Partager</>}
                     </button>
                     <ExportButton
                       events={match.events}
@@ -204,66 +202,52 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
               </div>
             </div>
 
-            {/* Score */}
-            <div style={{ display:'grid', gridTemplateColumns:'1fr auto 1fr', gap:8, alignItems:'center', marginBottom:16 }}>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize:'clamp(36px, 8vw, 56px)', fontWeight:800, lineHeight:1, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>{match.team_a_score}</div>
-                <p style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Buts</p>
-              </div>
-              <div style={{ textAlign:'center', padding:'0 8px' }}>
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap', justifyContent:'center' }}>
-                    <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, color:'var(--orion-text-mute)' }}>
-                      <Calendar size={13} />
-                      {new Date(match.match_date).toLocaleDateString('fr-FR')}
-                    </div>
-                    <div style={{ display:'flex', alignItems:'center', gap:4, fontSize:11, color:'var(--orion-text-mute)' }}>
-                      <Clock size={13} />
-                      {formatDuration(match.match_time)}
-                    </div>
-                  </div>
-                  <div style={{ fontSize:18, fontWeight:800, color:'var(--orion-text-mute)' }}>—</div>
+            {/* Score avec logos */}
+            <div style={{ position:'relative', display:'grid', gridTemplateColumns:'1fr auto 1fr', alignItems:'center', gap:10 }}>
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
+                <div style={{ width:'clamp(48px, 12vw, 72px)', height:'clamp(48px, 12vw, 72px)', borderRadius:16, background: `linear-gradient(135deg, ${match.team_a_color || '#3D80E0'}, ${match.team_a_color || '#2a63b8'})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'clamp(14px, 3vw, 22px)', fontWeight:900, letterSpacing:'0.02em', boxShadow:'0 8px 20px -6px rgba(61,128,224,0.5)' }}>
+                  {match.team_a_name.slice(0,3).toUpperCase()}
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:'clamp(12px, 2.5vw, 15px)', fontWeight:800 }}>{match.team_a_name}</div>
+                  <div style={{ fontSize:10, color:'#8aa0bd', marginTop:2 }}>{match.tag_venue === 'away' ? 'Extérieur' : 'Domicile'}</div>
                 </div>
               </div>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontSize:'clamp(36px, 8vw, 56px)', fontWeight:800, lineHeight:1, color:'var(--orion-text)', fontFamily:'var(--orion-font-mono)' }}>{match.team_b_score}</div>
-                <p style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Buts</p>
+
+              <div style={{ textAlign:'center', padding:'0 4px' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'clamp(6px, 2vw, 12px)' }}>
+                  <span style={{ fontFamily:'var(--orion-font-mono)', fontSize:'clamp(34px, 9vw, 56px)', fontWeight:800, lineHeight:1 }}>{match.team_a_score}</span>
+                  <span style={{ fontSize:'clamp(16px, 4vw, 24px)', fontWeight:300, color:'#5a6c85' }}>:</span>
+                  <span style={{ fontFamily:'var(--orion-font-mono)', fontSize:'clamp(34px, 9vw, 56px)', fontWeight:800, lineHeight:1, color:'#c3cedd' }}>{match.team_b_score}</span>
+                </div>
+                <div style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:9, padding:'3px 10px', background: match.team_a_score > match.team_b_score ? 'rgba(31,168,90,0.18)' : match.team_a_score < match.team_b_score ? 'rgba(224,59,46,0.15)' : 'rgba(232,146,12,0.15)', border: `1px solid ${match.team_a_score > match.team_b_score ? 'rgba(31,168,90,0.5)' : match.team_a_score < match.team_b_score ? 'rgba(224,59,46,0.4)' : 'rgba(232,146,12,0.4)'}`, borderRadius:999, fontSize:10, fontWeight:700, color: match.team_a_score > match.team_b_score ? '#5ee29a' : match.team_a_score < match.team_b_score ? '#ff8a7a' : '#ffc15e', letterSpacing:'0.04em' }}>
+                  {match.team_a_score > match.team_b_score ? 'VICTOIRE' : match.team_a_score < match.team_b_score ? 'DÉFAITE' : 'NUL'}
+                </div>
+                <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:9, color:'#6b7d96', marginTop:7 }}>
+                  {new Date(match.match_date).toLocaleDateString('fr-FR')} · {formatDuration(match.match_time)}
+                </div>
+              </div>
+
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
+                <div style={{ width:'clamp(48px, 12vw, 72px)', height:'clamp(48px, 12vw, 72px)', borderRadius:16, background: `linear-gradient(135deg, ${match.team_b_color || '#E8920C'}, ${match.team_b_color || '#c87908'})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:'clamp(14px, 3vw, 22px)', fontWeight:900, letterSpacing:'0.02em', boxShadow:'0 8px 20px -6px rgba(232,146,12,0.45)' }}>
+                  {match.team_b_name.slice(0,3).toUpperCase()}
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ fontSize:'clamp(12px, 2.5vw, 15px)', fontWeight:800 }}>{match.team_b_name}</div>
+                  <div style={{ fontSize:10, color:'#8aa0bd', marginTop:2 }}>{match.tag_venue === 'away' ? 'Domicile' : 'Extérieur'}</div>
+                </div>
               </div>
             </div>
 
             {/* Tags contextuels */}
-            {(match.tag_competition || match.tag_venue || match.tag_stake || match.tag_surface || match.tag_weather) && (
-              <div style={{ display:'flex', flexWrap:'wrap', gap:6, paddingTop:12, borderTop:'1px solid var(--orion-line)' }}>
-                {match.tag_competition && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(61,128,224,0.12)', border:'1px solid rgba(61,128,224,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#7ab4f0', fontFamily:'var(--orion-font-mono)' }}>
-                    🏆 {match.tag_competition}
-                  </span>
-                )}
-                {match.tag_venue && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)' }}>
-                    📍 {match.tag_venue === 'home' ? 'Domicile' : match.tag_venue === 'away' ? 'Extérieur' : 'Terrain neutre'}
-                  </span>
-                )}
-                {match.tag_stake && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(243,156,18,0.1)', border:'1px solid rgba(243,156,18,0.3)', borderRadius:4, fontSize:11, fontWeight:600, color:'#f39c12', fontFamily:'var(--orion-font-mono)' }}>
-                    🎯 {match.tag_stake === 'decisive' ? 'Match décisif' : match.tag_stake === 'friendly' ? 'Amical' : 'Match normal'}
-                  </span>
-                )}
-                {match.tag_surface && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(46,204,113,0.08)', border:'1px solid rgba(46,204,113,0.25)', borderRadius:4, fontSize:11, fontWeight:600, color:'#2ecc71', fontFamily:'var(--orion-font-mono)' }}>
-                    🌱 {match.tag_surface === 'grass' ? 'Pelouse' : 'Synthétique'}
-                  </span>
-                )}
-                {match.tag_weather && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, fontWeight:600, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)' }}>
-                    {match.tag_weather === 'sun' ? '☀️' : match.tag_weather === 'rain' ? '🌧️' : match.tag_weather === 'wind' ? '💨' : '❄️'} {match.tag_weather === 'sun' ? 'Beau temps' : match.tag_weather === 'rain' ? 'Pluie' : match.tag_weather === 'wind' ? 'Vent' : 'Froid'}
-                  </span>
-                )}
-                {match.tag_notes && (
-                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'3px 8px', background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:4, fontSize:11, color:'#a0b4cc', fontFamily:'var(--orion-font-mono)', fontStyle:'italic', maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                    📝 {match.tag_notes}
-                  </span>
-                )}
+            {(match.tag_competition || match.tag_venue || match.tag_stake || match.tag_surface || match.tag_weather || match.tag_notes) && (
+              <div style={{ position:'relative', display:'flex', flexWrap:'wrap', gap:8, marginTop:20, paddingTop:16, borderTop:'1px solid rgba(255,255,255,0.1)' }}>
+                {match.tag_competition && <span style={{ fontSize:11, color:'#dbe3ee' }}>🏆 {match.tag_competition}</span>}
+                {match.tag_venue && <span style={{ fontSize:11, color:'#dbe3ee' }}>📍 {match.tag_venue === 'home' ? 'Domicile' : match.tag_venue === 'away' ? 'Extérieur' : 'Terrain neutre'}</span>}
+                {match.tag_stake && <span style={{ fontSize:11, color:'#dbe3ee' }}>🎯 {match.tag_stake === 'decisive' ? 'Match décisif' : match.tag_stake === 'friendly' ? 'Amical' : 'Match normal'}</span>}
+                {match.tag_surface && <span style={{ fontSize:11, color:'#dbe3ee' }}>🌱 {match.tag_surface === 'grass' ? 'Pelouse' : 'Synthétique'}</span>}
+                {match.tag_weather && <span style={{ fontSize:11, color:'#dbe3ee' }}>{match.tag_weather === 'sun' ? '☀️' : match.tag_weather === 'rain' ? '🌧️' : match.tag_weather === 'wind' ? '💨' : '❄️'} {match.tag_weather === 'sun' ? 'Beau temps' : match.tag_weather === 'rain' ? 'Pluie' : match.tag_weather === 'wind' ? 'Vent' : 'Froid'}</span>}
+                {match.tag_notes && <span style={{ fontSize:11, color:'#dbe3ee', fontStyle:'italic' }}>📝 {match.tag_notes}</span>}
               </div>
             )}
           </div>
