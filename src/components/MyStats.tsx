@@ -120,7 +120,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
             ←
           </button>
           <div>
-            <h1 className="text-2xl font-medium text-white">Mes Stats</h1>
+            <h1 className="text-2xl font-medium" style={{ color: 'var(--orion-text)' }}>Mes Stats</h1>
             <p className="text-gray-400">Sélectionnez un match pour voir les statistiques</p>
           </div>
         </header>
@@ -141,7 +141,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
         {matches.length === 0 ? (
           <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-12 text-center">
             <BarChart3 size={80} className="text-orange-primary mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-white mb-2">
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--orion-text)' }}>
               Aucun match terminé
             </h2>
             <p className="text-gray-400">
@@ -164,7 +164,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
                     onClick={() => setSelectedMatchId(match.id)}
                     className="flex-1 text-left"
                   >
-                    <h3 className="text-base font-medium text-white mb-2 group-hover:text-orange-primary transition-colors">
+                    <h3 className="text-base font-medium mb-2 group-hover:text-orange-primary transition-colors" style={{ color: 'var(--orion-text)' }}>
                       {match.team_a_name} vs {match.team_b_name}
                     </h3>
                     <div className="flex items-center gap-1 text-sm text-gray-400">
