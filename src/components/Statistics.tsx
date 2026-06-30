@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { MatchEventWithDetails } from '../types/database';
-import { Activity, Target } from 'lucide-react';
-import { calculateTeamXG, getShotEvents } from '../utils/xg';
+import { Activity } from 'lucide-react';
 
 interface StatisticsProps {
   events: MatchEventWithDetails[];
@@ -72,146 +71,58 @@ export default function Statistics({ events, teamAName = 'Équipe A', teamBName 
 
   const showTabs = halftimes.length > 0;
 
-  const xgA = calculateTeamXG(filteredEvents, 'A');
-  const xgB = calculateTeamXG(filteredEvents, 'B');
-  const shotsA = getShotEvents(filteredEvents.filter(e => e.team === 'A')).length;
-  const shotsB = getShotEvents(filteredEvents.filter(e => e.team === 'B')).length;
-  const hasXG = xgA + xgB > 0;
-
   return (
-    <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6 text-white">
-      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-        <Activity size={20} />
-        Statistiques comparatives
-      </h3>
-
-      {/* Widget xG */}
-      {hasXG && (
-        <div className="bg-dark-tertiary border border-orion-line  p-4 mb-5">
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <Target size={14} className="text-orange-primary" />
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Expected Goals (xG)</span>
-          </div>
-          <div className="grid grid-cols-3 items-center gap-2">
-            <div className="text-center">
-              <div className="text-3xl font-black text-green-400">{xgA.toFixed(2)}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{teamAName}</div>
-              <div className="text-[10px] text-gray-600">{shotsA} tir{shotsA > 1 ? 's' : ''}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">xG</div>
-              <div className="w-full bg-gray-800 rounded-full h-2 mt-2 overflow-hidden flex">
-                <div
-                  className="h-full bg-green-500 rounded-l-full transition-all"
-                  style={{ width: `${xgA + xgB > 0 ? (xgA / (xgA + xgB)) * 100 : 50}%` }}
-                />
-                <div className="h-full flex-1 bg-orange-500 rounded-r-full" />
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-black text-orion-accent">{xgB.toFixed(2)}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{teamBName}</div>
-              <div className="text-[10px] text-gray-600">{shotsB} tir{shotsB > 1 ? 's' : ''}</div>
-            </div>
-          </div>
-          <p className="text-center text-[9px] text-gray-700 mt-3">Basé sur la position et l&apos;angle des tirs</p>
-        </div>
-      )}
-
-      {showTabs && (
-        <div className="flex gap-1 mb-4 bg-dark-tertiary  p-1">
-          {tabs.map(tab => {
-            const disabled = tab.key === 'second' && halftimes.length < 1;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => !disabled && setPeriod(tab.key)}
-                disabled={disabled}
-                className={`flex-1 py-1.5 text-xs font-semibold  transition-colors ${
-                  period === tab.key
-                    ? 'bg-blue-600 text-white'
-                    : disabled
-                    ? 'text-gray-600 cursor-not-allowed'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <h4 className="text-sm font-semibold text-gray-300">Par type d'action</h4>
-          <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm bg-green-500" />
-              <span className="text-gray-400">{teamAName}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-sm bg-orange-primary" />
-              <span className="text-gray-400">{teamBName}</span>
-            </div>
-          </div>
-        </div>
-
-        {stats.length === 0 ? (
-          <p className="text-gray-600 text-sm">Aucune donnée disponible</p>
-        ) : (
-          <div className="space-y-3">
-            {stats.map((stat) => {
-              const teamADominant = stat.teamA > stat.teamB;
-              const teamBDominant = stat.teamB > stat.teamA;
-              const isEqual = stat.teamA === stat.teamB;
-
+    <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line)', borderRadius:10, padding:20 }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, flexWrap:'wrap', marginBottom:16 }}>
+        <h3 style={{ margin:0, fontSize:15, fontWeight:800, color:'var(--orion-text)', display:'flex', alignItems:'center', gap:8 }}>
+          <Activity size={16} style={{ color:'var(--orion-accent)' }} />
+          Statistiques comparatives
+        </h3>
+        {showTabs && (
+          <div style={{ display:'flex', gap:2, background:'var(--orion-surface-2)', borderRadius:6, padding:2 }}>
+            {tabs.map(tab => {
+              const disabled = tab.key === 'second' && halftimes.length < 1;
               return (
-                <div key={stat.name} className="bg-dark-tertiary/50  p-3 border border-orion-line/60">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: stat.color }} />
-                      <span className="text-sm font-medium text-white">{stat.name}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">total : {stat.total}</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className={`text-base font-bold w-7 text-right tabular-nums ${teamADominant ? 'text-green-400' : 'text-gray-500'}`}>
-                      {stat.teamA}
-                    </span>
-
-                    <div className="flex-1 relative h-5 bg-gray-800 rounded-full overflow-hidden">
-                      <div
-                        className="absolute inset-y-0 left-0 transition-all duration-300"
-                        style={{
-                          width: `${stat.teamAPercentage}%`,
-                          backgroundColor: isEqual ? '#4B5563' : (teamADominant ? '#22C55E' : '#86EFAC55'),
-                        }}
-                      />
-                      <div
-                        className="absolute inset-y-0 right-0 transition-all duration-300"
-                        style={{
-                          width: `${100 - stat.teamAPercentage}%`,
-                          backgroundColor: isEqual ? '#4B5563' : (teamBDominant ? '#ff6b35' : '#ff855544'),
-                        }}
-                      />
-                      <div
-                        className="absolute top-1/2 -translate-y-1/2 w-0.5 h-6 bg-gray-200/80 shadow-lg"
-                        style={{ left: `calc(${stat.teamAPercentage}% - 1px)` }}
-                      />
-                    </div>
-
-                    <span className={`text-base font-bold w-7 text-left tabular-nums ${teamBDominant ? 'text-orion-accent' : 'text-gray-500'}`}>
-                      {stat.teamB}
-                    </span>
-                  </div>
-                </div>
+                <button
+                  key={tab.key}
+                  onClick={() => !disabled && setPeriod(tab.key)}
+                  disabled={disabled}
+                  style={{
+                    padding:'5px 11px', fontSize:11, fontWeight:600, border:'none', borderRadius:5, cursor: disabled ? 'not-allowed' : 'pointer',
+                    background: period === tab.key ? 'var(--orion-accent)' : 'transparent',
+                    color: period === tab.key ? '#fff' : disabled ? 'var(--orion-text-faint)' : 'var(--orion-text-mute)',
+                  }}
+                >
+                  {tab.label}
+                </button>
               );
             })}
           </div>
         )}
       </div>
+
+      {stats.length === 0 ? (
+        <p style={{ color:'var(--orion-text-faint)', fontSize:13 }}>Aucune donnée disponible</p>
+      ) : (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px 28px' }}>
+          {stats.map((stat) => (
+            <div key={stat.name}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:5 }}>
+                <span style={{ fontFamily:'var(--orion-font-mono)', fontWeight:700, fontSize:13, color: stat.teamA >= stat.teamB ? 'var(--orion-accent)' : 'var(--orion-text-mute)' }}>{stat.teamA}</span>
+                <span style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:500, color:'var(--orion-text-dim)' }}>
+                  <span style={{ width:8, height:8, borderRadius:'50%', background:stat.color, flexShrink:0 }} />
+                  {stat.name}
+                </span>
+                <span style={{ fontFamily:'var(--orion-font-mono)', fontWeight:700, fontSize:13, color: stat.teamB >= stat.teamA ? 'var(--orion-amber)' : 'var(--orion-text-mute)' }}>{stat.teamB}</span>
+              </div>
+              <div style={{ display:'flex', height:7, borderRadius:4, overflow:'hidden', background:'var(--orion-surface-3)' }}>
+                <div style={{ width:`${stat.teamAPercentage}%`, background:'var(--orion-accent)' }} />
+                <div style={{ flex:1, background:'var(--orion-amber)' }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
