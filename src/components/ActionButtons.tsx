@@ -198,7 +198,7 @@ export default function ActionButtons({
           backgroundColor: baseColor,
           minHeight: '72px',
           padding: '14px 12px',
-          borderRadius: 0,
+          borderRadius: 14,
           boxShadow: isActive
             ? `0 0 20px ${baseColor}88, 0 4px 12px ${baseColor}66`
             : `0 2px 10px ${baseColor}44`,
@@ -255,7 +255,7 @@ export default function ActionButtons({
           backgroundColor: isActive ? baseColor : isKeyword ? `${baseColor}cc` : baseColor,
           minHeight: '52px',
           padding: '10px 14px',
-          borderRadius: 0,
+          borderRadius: 12,
           boxShadow: isActive ? `0 0 14px ${baseColor}88` : `0 2px 8px ${baseColor}44`,
         }}
       >
@@ -390,15 +390,15 @@ export default function ActionButtons({
 
       return (
         <div
-          className="flex-1 rounded-xl border-2 overflow-hidden"
+          className="flex-1 rounded-2xl border-2 overflow-hidden"
           style={{ borderColor: `${teamColor}${isThisTeamActive ? 'aa' : '40'}`, transition: 'border-color 0.2s' }}
         >
           {/* Header équipe */}
           <div
-            className="px-3 py-2 flex items-center justify-between"
-            style={{ backgroundColor: `${teamColor}${isThisTeamActive ? '30' : '15'}`, borderBottom: `1px solid ${teamColor}40` }}
+            className="px-3 py-2.5 flex items-center justify-between"
+            style={{ background: `linear-gradient(90deg, ${teamColor}33, transparent)`, borderBottom: `1px solid ${teamColor}40` }}
           >
-            <span className="text-sm font-bold text-white truncate">{teamName}</span>
+            <span className="text-sm font-bold text-white truncate" style={{ display:'flex', alignItems:'center', gap:8 }}><span style={{ width:9, height:9, borderRadius:'50%', background: teamColor, display:'inline-block', flexShrink:0 }} />{teamName}</span>
             <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: teamColor }}>{team}</span>
           </div>
 
@@ -452,20 +452,23 @@ export default function ActionButtons({
                       onActionClick(btn.event_type ?? null, undefined, 'event', undefined, btn.id, btn.label);
                     }
                   }}
-                  className={`flex flex-col items-center justify-center rounded-xl font-bold text-white active:scale-95 transition-all select-none relative ${isActive ? 'ring-2 ring-white/80' : ''}`}
+                  className={`flex items-center gap-2.5 rounded-2xl font-semibold active:scale-95 transition-all select-none relative ${isActive ? 'ring-2 ring-white/80' : ''}`}
                   style={{
-                    backgroundColor: baseColor,
-                    minHeight: '72px',
-                    padding: '10px 8px',
-                    fontSize: '12px',
-                    textAlign: 'center',
+                    background: 'var(--orion-surface-2)',
+                    border: '1px solid var(--orion-line-strong)',
+                    minHeight: '58px',
+                    padding: '0 12px',
+                    fontSize: '13px',
+                    color: 'var(--orion-text)',
+                    textAlign: 'left',
                     wordBreak: 'break-word',
-                    boxShadow: isActive ? `0 0 16px ${baseColor}88` : `0 2px 8px ${baseColor}44`,
+                    boxShadow: isActive ? `0 0 0 2px ${baseColor}66` : 'none',
                   }}
                 >
-                  <span className="leading-tight">{btn.label}</span>
+                  <span style={{ width:28, height:28, borderRadius:9, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'var(--orion-font-mono)', fontSize:12, fontWeight:700, background:`${baseColor}2e`, color: baseColor }}>{(btn.shortcut_key || btn.label.charAt(0)).toUpperCase()}</span>
+                  <span className="leading-tight" style={{ flex:1 }}>{btn.label}</span>
                   {hasSubs && (
-                    <span className="text-[9px] text-white/50 mt-0.5">▾</span>
+                    <span style={{ fontSize:9, opacity:.5, flexShrink:0 }}>▾</span>
                   )}
                 </button>
               );

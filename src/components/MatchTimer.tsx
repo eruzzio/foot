@@ -62,6 +62,8 @@ export default function MatchTimer({
   const formatTime = (s: number) =>
     `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`;
 
+  const ringOffset = Math.round(289 * (1 - Math.min(1, currentTime / 5400)));
+
   const handleLogoUpload = (team: 'A'|'B', file: File) => {
     const url = URL.createObjectURL(file);
     if (team === 'A') setLogoA(url); else setLogoB(url);
@@ -77,7 +79,7 @@ export default function MatchTimer({
         {/* Logo */}
         <div
           onClick={() => inputRef.current?.click()}
-          style={{ width:52, height:52, border:`1px solid ${isSelected ? color : 'var(--orion-line-strong)'}`, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', overflow:'hidden', transition:'border-color .15s' }}
+          style={{ width:52, height:52, borderRadius:14, border:`1px solid ${isSelected ? color : 'var(--orion-line-strong)'}`, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', overflow:'hidden', transition:'border-color .15s' }}
         >
           {logo ? <img src={logo} style={{ width:'100%', height:'100%', objectFit:'contain', padding:4 }} /> : <Upload size={16} style={{ color:'var(--orion-text-mute)' }} />}
         </div>
@@ -118,15 +120,22 @@ export default function MatchTimer({
   };
 
   return (
-    <div style={{ background:'var(--orion-surface)', border:'1px solid var(--orion-line)', padding:'22px 20px' }}>
+    <div style={{ position:'relative', background:'var(--orion-surface)', border:'1px solid var(--orion-line)', borderRadius:18, padding:'22px 20px', overflow:'hidden' }}>
+      <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, var(--orion-accent), #5BE3FF 55%, var(--orion-amber))' }} />
       <div style={{ display:'flex', alignItems:'stretch', gap:16 }}>
         <TeamSide team="A" logo={logoA} inputRef={inputARef} name={teamAName} score={teamAScore} color={teamAColor} />
 
         {/* Centre */}
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', gap:10, padding:'4px 0' }}>
-          {/* Chrono */}
-          <div className="o-num" style={{ fontSize:44, color: isRunning ? 'var(--orion-text)' : 'var(--orion-text-mute)', letterSpacing:'0.04em', lineHeight:1 }}>
-            {formatTime(currentTime)}
+          {/* Chrono — anneau de progression */}
+          <div style={{ position:'relative', width:104, height:104, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <svg width="104" height="104" viewBox="0 0 104 104" style={{ position:'absolute', top:0, left:0, transform:'rotate(-90deg)' }}>
+              <circle cx="52" cy="52" r="46" fill="none" stroke="var(--orion-line)" strokeWidth="5" />
+              <circle cx="52" cy="52" r="46" fill="none" stroke={isRunning ? 'var(--orion-accent)' : 'var(--orion-text-mute)'} strokeWidth="5" strokeLinecap="round" strokeDasharray="289" strokeDashoffset={ringOffset} />
+            </svg>
+            <span className="o-num" style={{ fontSize:24, fontWeight:700, color: isRunning ? 'var(--orion-text)' : 'var(--orion-text-mute)', lineHeight:1 }}>
+              {formatTime(currentTime)}
+            </span>
           </div>
 
           {/* Séparateur */}
@@ -189,7 +198,7 @@ export default function MatchTimer({
               </span>
             )}
           </div>
-          <div style={{ display:'flex', height:40, borderRadius:4, overflow:'hidden', border:'1px solid var(--orion-line)' }}>
+          <div style={{ display:'flex', height:36, borderRadius:999, overflow:'hidden', border:'1px solid var(--orion-line)' }}>
             <button
               onClick={() => { if (navigator.vibrate) navigator.vibrate(15); onTogglePossession('A'); }}
               style={{

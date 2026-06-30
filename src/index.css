@@ -2,45 +2,63 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force la lisibilité sur tous les textes */
+/* Base claire — "Pro clair". Les zones sombres (.orion) re-posent le sombre. */
 body {
-  background: #0d1117;
-  color: #eef2f8;
+  background: var(--orion-bg, #f5f7fa);
+  color: var(--orion-text, #16202e);
 }
 
-/* Renforcer les textes Tailwind sur fond sombre */
-.text-white { color: #eef2f8 !important; }
-.text-gray-100 { color: #dde6f2 !important; }
-.text-gray-200 { color: #c8d4e4 !important; }
-.text-gray-300 { color: #b0c0d8 !important; }
-.text-gray-400 { color: #7a92b0 !important; }
-
-/* Fonds Tailwind hérités */
-.bg-dark { background: #0d1117; }
-.bg-dark-secondary { background: #161c26; }
-.bg-dark-tertiary { background: #1e2736; }
-
-/* Inputs lisibles */
+/* Texte par défaut clair pour le contenu hérité (hors zones .orion) */
 input, textarea, select {
-  background: #1e2736;
-  color: #eef2f8;
-  border-color: #2a3a50;
+  background: #ffffff;
+  color: #16202e;
+  border-color: #c8d3e2;
 }
 input:focus, textarea:focus, select:focus {
   border-color: #3d80e0;
   outline: none;
 }
 input::placeholder, textarea::placeholder {
-  color: #3d5570;
+  color: #aab8cc;
 }
 
-/* Borders lisibles */
-.border-gray-700 { border-color: #2a3a50 !important; }
-.border-gray-800 { border-color: #2a3a50 !important; }
-.border-dark-secondary { border-color: #2a3a50 !important; }
+/* Fonds Tailwind hérités */
+.bg-dark { background: var(--orion-bg); }
+.bg-dark-secondary { background: var(--orion-surface); }
+.bg-dark-tertiary { background: var(--orion-surface-2); }
 
 /* Orange accent conservé pour les boutons hérités */
 .bg-orange-primary, .hover-orange:hover { background: #3d80e0 !important; }
+
+/* ── Texte hérité (Tailwind) en contexte CLAIR (hors .orion) ──
+   L'app d'origine est sombre : text-white = texte principal.
+   On les remappe vers les tokens clairs pour le fond clair. */
+.text-white { color: var(--orion-text) !important; }
+.text-gray-100 { color: var(--orion-text) !important; }
+.text-gray-200 { color: var(--orion-text-dim) !important; }
+.text-gray-300 { color: var(--orion-text-dim) !important; }
+.text-gray-400 { color: var(--orion-text-mute) !important; }
+.text-gray-500 { color: var(--orion-text-mute) !important; }
+.text-gray-600 { color: var(--orion-text-faint) !important; }
+
+/* ── Overrides SOMBRES — uniquement dans les zones .orion ──
+   (priorité .orion .x (0,2,0) > .x (0,1,0)) */
+.orion .text-white { color: #eef2f8 !important; }
+.orion .text-gray-100 { color: #dde6f2 !important; }
+.orion .text-gray-200 { color: #c8d4e4 !important; }
+.orion .text-gray-300 { color: #b0c0d8 !important; }
+.orion .text-gray-400 { color: #7a92b0 !important; }
+.orion .text-gray-500 { color: #7a92b0 !important; }
+.orion .text-gray-600 { color: #3d5570 !important; }
+.orion input, .orion textarea, .orion select {
+  background: #1e2736;
+  color: #eef2f8;
+  border-color: #2a3a50;
+}
+.orion input::placeholder, .orion textarea::placeholder { color: #3d5570; }
+.orion .border-gray-700 { border-color: #2a3a50 !important; }
+.orion .border-gray-800 { border-color: #2a3a50 !important; }
+.orion .border-dark-secondary { border-color: #2a3a50 !important; }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }

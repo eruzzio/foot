@@ -264,6 +264,38 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
               }}
             >
               <div className="absolute inset-0">
+                {/* Couche densité — blobs floutés organiques */}
+                <div
+                  className="absolute inset-0"
+                  style={{ filter: 'blur(22px)', opacity: 0.85, mixBlendMode: 'hard-light', pointerEvents: 'none' }}
+                >
+                  {heatGrid.flatMap((rowArr, r) =>
+                    rowArr.map((v, c) => {
+                      if (v === 0) return null;
+                      const ratio = v / maxHeat;
+                      let color: string;
+                      if (ratio < 0.3)       color = `rgba(59,130,246,${0.5 + ratio * 0.4})`;
+                      else if (ratio < 0.6)  color = `rgba(34,197,94,${0.6 + ratio * 0.3})`;
+                      else if (ratio < 0.85) color = `rgba(250,204,21,${0.65 + ratio * 0.3})`;
+                      else                   color = `rgba(239,68,68,${0.7 + ratio * 0.3})`;
+                      const size = 12 + ratio * 16;
+                      return (
+                        <div
+                          key={`${r}-${c}`}
+                          className="absolute rounded-full"
+                          style={{
+                            left: `${((c + 0.5) / 10) * 100}%`,
+                            top: `${((r + 0.5) / 6) * 100}%`,
+                            width: `${size}%`,
+                            aspectRatio: '1',
+                            transform: 'translate(-50%, -50%)',
+                            background: `radial-gradient(circle, ${color} 0%, transparent 68%)`,
+                          }}
+                        />
+                      );
+                    })
+                  )}
+                </div>
                 {/* Points individuels */}
                 {fieldEvents.map(e => (
                   <div

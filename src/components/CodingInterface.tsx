@@ -794,14 +794,14 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark flex items-center justify-center">
+      <div className="orion min-h-screen bg-dark flex items-center justify-center">
         <div className="text-gray-400">Chargement...</div>
       </div>
     );
   }
 
   return (
-    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)' }}>
+    <div className="orion" style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)' }}>
       <div style={{ maxWidth:1400, margin:'0 auto' }}>
 
         {/* TOP BAR */}

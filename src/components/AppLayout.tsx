@@ -88,8 +88,8 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
   return (
     <div style={{ minHeight:'100vh', background:'var(--orion-bg)', display:'flex' }}>
 
-      {/* SIDEBAR DESKTOP */}
-      <aside className="orion-sidebar-desktop">
+      {/* SIDEBAR DESKTOP (sombre) */}
+      <aside className="orion-sidebar-desktop orion">
         <SidebarContent />
       </aside>
 
@@ -97,7 +97,7 @@ export default function AppLayout({ children, onNavigate, currentPage, userName,
       {menuOpen && (
         <>
           <div onClick={() => setMenuOpen(false)} style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.75)', zIndex:100, backdropFilter:'blur(4px)' }} />
-          <div style={{ position:'fixed', top:0, left:0, bottom:0, width:260, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', zIndex:101, display:'flex', flexDirection:'column', animation:'orionSlideIn .2s ease' }}>
+          <div className="orion" style={{ position:'fixed', top:0, left:0, bottom:0, width:260, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', zIndex:101, display:'flex', flexDirection:'column', animation:'orionSlideIn .2s ease' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 16px', borderBottom:'1px solid var(--orion-line)' }}>
               <OrionLogo height={14} />
               <button onClick={() => setMenuOpen(false)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)', display:'flex' }}>

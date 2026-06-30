@@ -137,7 +137,7 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
     <div style={{ minHeight:'100vh', background:'var(--orion-bg)', color:'var(--orion-text)', display:'flex' }}>
 
       {/* SIDEBAR DESKTOP — cachée sur mobile */}
-      <aside className="desktop-sidebar" style={{ width:220, flexShrink:0, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', overflow:'hidden' }}>
+      <aside className="desktop-sidebar orion" style={{ width:220, flexShrink:0, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', overflow:'hidden' }}>
         <SidebarContent />
       </aside>
 
@@ -145,7 +145,7 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
       {menuOpen && (
         <>
           <div onClick={() => setMenuOpen(false)} style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.7)', zIndex:100, backdropFilter:'blur(4px)' }} />
-          <div style={{ position:'fixed', top:0, left:0, bottom:0, width:260, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', zIndex:101, display:'flex', flexDirection:'column', animation:'slideIn .2s ease' }}>
+          <div className="orion" style={{ position:'fixed', top:0, left:0, bottom:0, width:260, background:'var(--orion-surface)', borderRight:'1.5px solid var(--orion-line-strong)', zIndex:101, display:'flex', flexDirection:'column', animation:'slideIn .2s ease' }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'flex-end', padding:'14px 16px', borderBottom:'1px solid var(--orion-line)' }}>
               <button onClick={() => setMenuOpen(false)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)' }}>
                 <X size={20} />

@@ -55,6 +55,54 @@
   --orion-shadow-lg:   0 4px 24px rgba(0,0,0,0.5);
 }
 
+/* ── Light theme — "Pro clair" (défaut global) ───────────────
+   Pose les tokens clairs sur :root : tout l'app hérite clair.
+   Les zones sombres (sidebar, codage live) re-posent le thème
+   sombre en local via .orion / [data-theme="orion-dark"].
+   ─────────────────────────────────────────────────────────── */
+:root, [data-theme="orion-light"], .orion-light {
+
+  --orion-bg:          #f5f7fa;
+  --orion-surface:     #ffffff;
+  --orion-surface-2:   #eef2f7;
+  --orion-surface-3:   #e4eaf2;
+
+  --orion-line:        #dde4ee;
+  --orion-line-strong: #c8d3e2;
+  --orion-line-focus:  #3d80e0;
+
+  --orion-text:        #16202e;
+  --orion-text-dim:    #3c4d63;
+  --orion-text-mute:   #7587a0;
+  --orion-text-faint:  #aab8cc;
+
+  --orion-accent:      #3d80e0;
+  --orion-accent-dim:  rgba(61,128,224,0.10);
+  --orion-accent-line: rgba(61,128,224,0.35);
+  --orion-accent-hover:#2f6fd0;
+  --orion-accent-ink:  #ffffff;
+
+  --orion-green:       #1f9d57;
+  --orion-green-dim:   rgba(46,204,113,0.14);
+  --orion-amber:       #d4820a;
+  --orion-amber-dim:   rgba(243,156,18,0.15);
+  --orion-red:         #d83a2b;
+  --orion-red-dim:     rgba(231,76,60,0.12);
+
+  --orion-shadow:      0 1px 3px rgba(20,30,50,0.08);
+  --orion-shadow-lg:   0 8px 28px rgba(20,30,50,0.12);
+}
+
+[data-theme="orion-light"] body,
+.orion-light {
+  background: var(--orion-bg);
+  color: var(--orion-text);
+}
+
+/* light scrollbar */
+.orion-light ::-webkit-scrollbar-track { background: transparent; }
+.orion-light ::-webkit-scrollbar-thumb { background: var(--orion-line-strong); }
+
 /* ── Reset & Base ────────────────────────────────────────── */
 .orion *, .orion *::before, .orion *::after { box-sizing: border-box; }
 

@@ -112,8 +112,8 @@ function App() {
 
   if (isAuthenticated === null) {
     return (
-      <div style={{ minHeight:'100vh', background:'#0d1117', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <div style={{ color:'#4a4a58', fontSize:13 }}>Chargement…</div>
+      <div style={{ minHeight:'100vh', background:'var(--orion-bg)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+        <div style={{ color:'var(--orion-text-mute)', fontSize:13 }}>Chargement…</div>
       </div>
     );
   }
