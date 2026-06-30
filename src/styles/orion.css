@@ -46,9 +46,9 @@
   --orion-font-disp:   'Inter', system-ui, sans-serif;
 
   /* Radius — léger, pas zéro */
-  --orion-radius:      6px;
-  --orion-radius-sm:   4px;
-  --orion-radius-lg:   8px;
+  --orion-radius:      8px;
+  --orion-radius-sm:   6px;
+  --orion-radius-lg:   10px;
 
   /* Shadows */
   --orion-shadow:      0 2px 8px rgba(0,0,0,0.4);

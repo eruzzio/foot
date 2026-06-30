@@ -100,3 +100,17 @@ button { touch-action: manipulation; }
 
 /* Fix classes Tailwind orion-* non remappées au thème dynamique */
 .border-orion-line { border-color: var(--orion-line) !important; }
+
+/* ===== HARMONISATION VISUELLE GLOBALE (Design Pro clair) ===== */
+/* Arrondi cohérent sur toutes les cards et boutons de contenu */
+.bg-dark-secondary.border,
+.bg-dark-tertiary.border {
+  border-radius: 8px !important;
+}
+.bg-dark-secondary.border.border-orion-line.overflow-hidden {
+  border-radius: 8px !important;
+}
+/* Boutons pill pour les badges (Défaut, BETA, Layout libre, etc.) */
+.rounded-full {
+  border-radius: 999px !important;
+}

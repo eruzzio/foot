@@ -36,6 +36,23 @@ export const OrionLogo = ({
   </span>
 );
 
+// Icône ronde avec signal — conforme au design Pro clair
+export const OrionIcon = ({ size = 30 }: { size?: number }) => (
+  <span style={{
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    width: size, height: size, borderRadius: '50%',
+    border: '1.5px solid var(--orion-accent-line)', background: 'var(--orion-accent-dim)',
+    flexShrink: 0,
+  }}>
+    <svg width={size * 0.53} height={size * 0.53} viewBox="0 0 24 24" fill="none" stroke="var(--orion-accent)" strokeWidth="2">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 2a10 10 0 0 1 7.5 16.6" />
+      <path d="M2.5 9A10 10 0 0 1 12 2" />
+      <circle cx="19" cy="5" r="1.4" fill="var(--orion-accent)" stroke="none" />
+    </svg>
+  </span>
+);
+
 // ── Atoms ───────────────────────────────────────────────────────────────
 export const Eyebrow: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="o-eyebrow">{children}</div>

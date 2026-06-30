@@ -3,7 +3,7 @@ import { Activity, AlertTriangle, CheckCircle, Menu, X, ChevronRight, Radio, Pan
 import { supabase } from '../lib/supabase';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { calculateTeamXG } from '../utils/xg';
-import { OrionLogo, Result } from './orion/Orion';
+import { OrionLogo, OrionIcon, Result } from './orion/Orion';
 
 interface HomePageProps { onNavigate: (page: string) => void; isAdmin?: boolean; }
 interface MatchSummary {
@@ -96,16 +96,15 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
   // Sidebar commune (mobile drawer + desktop fixe)
   const SidebarContent = () => (
     <>
-      <div style={{ padding:'20px 16px 12px', borderBottom:'1px solid var(--orion-line)' }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <OrionLogo height={15} />
-          {isPro && isAdmin && (
-            <span style={{ fontSize:9, fontWeight:800, color:'var(--orion-accent)', background:'var(--orion-accent-dim)', border:'1px solid var(--orion-accent-line)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>PRO</span>
-          )}
-          {!isAdmin && (
-            <span style={{ fontSize:9, fontWeight:800, color:'#f97316', background:'rgba(249,115,22,0.15)', border:'1px solid rgba(249,115,22,0.3)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>BETA</span>
-          )}
-        </div>
+      <div style={{ padding:'20px 18px 16px', borderBottom:'1px solid var(--orion-line)', display:'flex', alignItems:'center', gap:10 }}>
+        <OrionIcon size={30} />
+        <span style={{ fontSize:17, fontWeight:800, letterSpacing:'0.08em', color:'var(--orion-text)' }}>ORION</span>
+        {isPro && isAdmin && (
+          <span style={{ fontSize:9, fontWeight:800, color:'var(--orion-accent)', background:'var(--orion-accent-dim)', border:'1px solid var(--orion-accent-line)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>PRO</span>
+        )}
+        {!isAdmin && (
+          <span style={{ fontSize:9, fontWeight:800, color:'#f97316', background:'rgba(249,115,22,0.15)', border:'1px solid rgba(249,115,22,0.3)', padding:'2px 6px', borderRadius:3, fontFamily:'var(--orion-font-mono)', letterSpacing:'0.1em' }}>BETA</span>
+        )}
       </div>
       {userName && (
         <div style={{ padding:'14px 16px', borderBottom:'1px solid var(--orion-line)' }}>
@@ -172,7 +171,7 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
         </header>
 
         {/* CONTENU */}
-        <div style={{ maxWidth:860, margin:'0 auto', padding:'20px 16px', width:'100%' }}>
+        <div style={{ maxWidth:960, margin:'0 auto', padding:'20px 16px', width:'100%' }}>
 
           {loading ? (
             <div style={{ textAlign:'center', padding:'60px 0' }}>
@@ -235,20 +234,34 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
               </button>
             </div>
           ) : (
-            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-              {/* KPIs 2x2 */}
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:0, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, overflow:'hidden' }}>
+              {/* Header */}
+              <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:20, flexWrap:'wrap' }}>
+                <div>
+                  <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--orion-text-mute)', marginBottom:7 }}>
+                    Tableau de bord
+                  </div>
+                  <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:'-0.02em', color:'var(--orion-text)' }}>
+                    {userName ? `Salut, ${userName}` : 'Salut !'}
+                  </h1>
+                </div>
+                <button onClick={() => onNavigate('live')} style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'11px 18px', background:'var(--orion-accent)', color:'#fff', border:'1.5px solid var(--orion-accent)', borderRadius:999, fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                  <Radio size={15} /> Démarrer un codage live
+                </button>
+              </div>
+
+              {/* KPIs */}
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:0, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, overflow:'hidden' }}>
                 {[
                   { label:'Matchs', value: matches.length, sub:`${stats.wins}V · ${stats.draws}N · ${stats.losses}D` },
                   { label:'Buts', value: stats.goalsFor, sub:`${stats.goalsAgainst} encaissés`, accent: true },
                   { label:'xG Saison', value: stats.xgFor.toFixed(1), sub:'expected goals' },
-                  { label:'Actions', value: stats.events, sub:`${Math.round(stats.events/matches.length)}/match` },
-                ].map((k, i) => (
-                  <div key={i} style={{ padding:'16px 14px', borderRight: i%2===0 ? '1px solid var(--orion-line)' : 'none', borderTop: i>=2 ? '1px solid var(--orion-line)' : 'none' }}>
-                    <div style={{ fontSize:10, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:6 }}>{k.label}</div>
-                    <div style={{ fontSize:32, fontWeight:800, lineHeight:1, color: k.accent ? 'var(--orion-accent)' : 'var(--orion-text)', letterSpacing:'-0.02em' }}>{k.value}</div>
-                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>{k.sub}</div>
+                ].map((k, i, arr) => (
+                  <div key={i} style={{ padding:'18px 20px', borderRight: i < arr.length-1 ? '1px solid var(--orion-line)' : 'none' }}>
+                    <div style={{ fontSize:10, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8 }}>{k.label}</div>
+                    <div style={{ fontSize:34, fontWeight:800, lineHeight:1, color: k.accent ? 'var(--orion-accent)' : 'var(--orion-text)', letterSpacing:'-0.02em' }}>{k.value}</div>
+                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:6 }}>{k.sub}</div>
                   </div>
                 ))}
               </div>
@@ -318,11 +331,6 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
                   </div>
                 </div>
               )}
-
-              {/* CTA codage */}
-              <button onClick={() => onNavigate('live')} className="o-btn o-btn--primary" style={{ width:'100%', justifyContent:'center', padding:'14px', fontSize:14, borderRadius:6 }}>
-                <Radio size={16} /> Démarrer un codage live
-              </button>
 
             </div>
           )}
