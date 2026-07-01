@@ -354,23 +354,28 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
   }
 
   return (
-    <div className={inline ? '' : 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4 overflow-y-auto'}>
-      <div style={{ background:"var(--orion-surface)", maxWidth: inline ? '100%' : 900, width:"100%", margin: inline ? 0 : "32px auto", color:"var(--orion-text)", borderRadius: inline ? 8 : 0, border: inline ? "1px solid var(--orion-line)" : "none" }}>
+    <div
+      className={inline ? '' : 'fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center z-[1000] p-4 overflow-y-auto'}
+      onClick={inline ? undefined : onClose}
+    >
+      <div
+        style={{ background:"var(--orion-surface)", maxWidth: inline ? '100%' : 900, width:"100%", margin: inline ? 0 : "32px auto", color:"var(--orion-text)", borderRadius: inline ? 8 : 10, border: inline ? "1px solid var(--orion-line)" : "1.5px solid var(--orion-line-strong)" }}
+        onClick={e => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div>
-            <h3 className="text-2xl font-bold text-white">
+            <h3 className="text-2xl font-bold" style={{ color:'var(--orion-text)' }}>
               Composition Tactique - Équipe {team}
             </h3>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm mt-1" style={{ color:'var(--orion-text-mute)' }}>
               Gérez la formation spécifique pour ce match
             </p>
           </div>
           <button
             onClick={onClose}
-              style={{ display: inline ? 'none' : undefined }}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            style={{ display: inline ? 'none' : 'flex', alignItems:'center', justifyContent:'center', width:32, height:32, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', color:'var(--orion-text-mute)' }}
           >
-            <X size={24} className="text-gray-400" />
+            <X size={18} />
           </button>
         </div>
 
