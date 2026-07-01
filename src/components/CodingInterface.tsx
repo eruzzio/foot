@@ -702,12 +702,15 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
     const compo = savedCompositions.find((c: any) => c.id === compoId);
     if (!compo) return;
 
-    // Sauvegarder le lien match-formation
-    await supabase.from('match_formations').upsert({
-      match_id: matchId,
-      formation_id: compoId,
-      team: 'A',
-    }, { onConflict: 'match_id,team' });
+    try {
+      await supabase.from('match_formations').upsert({
+        match_id: matchId,
+        formation_id: compoId,
+        team: 'A',
+      }, { onConflict: 'match_id,team' });
+    } catch (e) {
+      console.error('match_formations error:', e);
+    }
 
     setSelectedCompoId(compoId);
     setShowCompoSelector(false);
@@ -1002,8 +1005,8 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         />
       )}
       {showCompoSelector && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] p-4">
-          <div className="bg-dark-secondary border border-blue-800/50  p-6 w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] p-4" onClick={() => setShowCompoSelector(false)}>
+          <div className="bg-dark-secondary border border-blue-800/50  p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
             <h2 className="text-lg font-bold text-white mb-1">Choisir une composition</h2>
             <p className="text-sm text-gray-400 mb-5">
               {"S\u00e9lectionnez la composition \u00e0 utiliser pour ce match"}
