@@ -197,42 +197,43 @@ export default function EvolutionDashboard({ onBack }: EvolutionDashboardProps) 
   return (
     <div style={{ padding:'12px 16px', maxWidth:960, margin:'0 auto' }}>
 
-      {/* Header */}
-      <div style={{ marginBottom:20 }}>
-        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:4 }}>
-          <TrendingUp size={18} style={{ color:'var(--orion-accent)' }} />
-          <span style={{ fontSize:16, fontWeight:700, color:'var(--orion-text)' }}>Évolution</span>
-          <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', background:'var(--orion-surface-2)', padding:'2px 8px', borderRadius:10 }}>
-            {matchesStats.length} match{matchesStats.length > 1 ? 's' : ''}
-          </span>
+      {/* Hero sombre */}
+      <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'24px 24px 20px', color:'#fff', marginBottom:16, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+        <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+        <div style={{ position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap', marginBottom: avg ? 18 : 0 }}>
+          <div>
+            <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>Statistiques</div>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <h1 style={{ margin:0, fontSize:24, fontWeight:800, color:'#fff' }}>Évolution</h1>
+              <span style={{ fontSize:11, color:'#8aa0bd', fontFamily:'var(--orion-font-mono)', background:'rgba(255,255,255,0.08)', padding:'2px 8px', borderRadius:10 }}>
+                {matchesStats.length} match{matchesStats.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            <p style={{ margin:'6px 0 0', fontSize:13, color:'#8aa0bd' }}>Progression de ton équipe sur la saison</p>
+          </div>
+          <button onClick={onBack} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 16px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:13, fontWeight:600, color:'#dbe3ee', cursor:'pointer', flexShrink:0 }}>
+            ← Retour
+          </button>
         </div>
-        <p style={{ fontSize:12, color:'var(--orion-text-mute)' }}>Progression de ton équipe sur la saison</p>
-      </div>
 
-      {/* KPIs */}
-      {avg && (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:8, marginBottom:16 }}>
-          {[
-            { icon:Trophy,   label:'Bilan',          value:`${avg.wins}V ${avg.draws}N ${avg.losses}D`, color:'var(--orion-accent)' },
-            { icon:Target,   label:'Moy. buts',       value:avg.goalsFor,         color:'var(--orion-green)' },
-            { icon:Target,   label:'Moy. encaissés',  value:avg.goalsAgainst,     color:'var(--orion-red)' },
-            { icon:Activity, label:'Moy. actions',    value:avg.actions,          color:'var(--orion-amber)' },
-            { icon:Zap,      label:'Taux réussite',   value:`${avg.successRate}%`, color:'var(--orion-accent)' },
-          ].map((k, i) => {
-            const Icon = k.icon;
-            return (
-              <div key={i} style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, padding:'14px 16px' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
-                  <Icon size={13} style={{ color:k.color }} />
-                  <span style={{ fontSize:10, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.1em' }}>{k.label}</span>
-                </div>
-                <div style={{ fontSize:22, fontWeight:800, color:k.color, fontFamily:'var(--orion-font-mono)' }}>{k.value}</div>
+        {/* KPIs intégrés dans le hero */}
+        {avg && (
+          <div style={{ position:'relative', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(100px, 1fr))', gap:0, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, overflow:'hidden' }}>
+            {[
+              { label:'Bilan',         value:`${avg.wins}V ${avg.draws}N ${avg.losses}D`, color:'var(--orion-accent)' },
+              { label:'Moy. buts',     value: avg.goalsFor,       color:'#5ee29a' },
+              { label:'Moy. encaissés',value: avg.goalsAgainst,   color:'#ff8a7a' },
+              { label:'Moy. actions',  value: avg.actions,        color:'var(--orion-amber)' },
+              { label:'Taux réussite', value:`${avg.successRate}%`, color:'var(--orion-accent)' },
+            ].map((k, i, arr) => (
+              <div key={i} style={{ padding:'12px 14px', borderRight: i < arr.length-1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+                <div style={{ fontSize:9, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'#8aa0bd', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:5 }}>{k.label}</div>
+                <div style={{ fontSize:18, fontWeight:800, color:k.color, fontFamily:'var(--orion-font-mono)', lineHeight:1 }}>{k.value}</div>
               </div>
-            );
-          })}
-        </div>
-      )}
-
+            ))}
+          </div>
+        )}
+      </div>
       {/* Sélecteur métrique */}
       <div className="o-card" style={{ marginBottom:12 }}>
         <div className="o-card__header">
