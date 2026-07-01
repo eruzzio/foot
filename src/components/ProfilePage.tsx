@@ -178,7 +178,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               {avatarPreview ? (
                 <img src={avatarPreview} style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', border:'2px solid rgba(61,128,224,0.5)' }} />
               ) : (
-                <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(61,128,224,0.2)', border:'2px solid rgba(61,128,224,0.4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'var(--orion-accent)' }}>
+                <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(61,128,224,0.2)', border:'2px solid rgba(61,128,224,0.4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'#7ab4f0' }}>
                   {initials || <User size={22} />}
                 </div>
               )}
@@ -193,17 +193,19 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
               <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:3 }}>
                 {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Utilisateur ORION'}
               </div>
-              <div style={{ fontSize:12, color:'#8aa0bd' }}>{role || 'Rôle non défini'} {clubName && `· 🏟️ ${clubName}`}</div>
+              <div style={{ fontSize:12, color:'#8aa0bd' }}>{role || 'Rôle non défini'}{clubName && ` · 🏟️ ${clubName}`}</div>
               <div style={{ fontSize:11, color:'#6b8199', marginTop:2 }}>{email}</div>
             </div>
             {/* Actions */}
-            <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+            <div style={{ display:'flex', gap:8, flexShrink:0, flexWrap:'wrap' }}>
               <button onClick={onBack} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:12, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>← Retour</button>
               <button onClick={handleSignOut} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(224,59,46,0.15)', border:'1.5px solid rgba(224,59,46,0.3)', borderRadius:999, fontSize:12, fontWeight:600, color:'#ff8a7a', cursor:'pointer' }}>
                 <LogOut size={13} /> Se déconnecter
               </button>
             </div>
           </div>
+        </div>
+
         {/* Messages */}
         {error && (
           <div className="flex items-start gap-3 bg-red-900/20 border border-red-800/50  p-3 mb-4">
@@ -457,8 +459,6 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
         )}
 
-      </div>
-      </div>
       </div>
     </div>
   );
