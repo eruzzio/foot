@@ -829,53 +829,52 @@ export default function MyTeam({ onBack }: MyTeamProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                   {players.map((player) => {
                     const isAssigned = positions.some(pos => pos.player_id === player.id);
+                    const pos = (player.position || '').toUpperCase();
+                    const circleColor = pos === 'GK' ? '#E6A817'
+                      : pos.startsWith('D') ? 'var(--orion-accent)'
+                      : pos.startsWith('M') ? 'var(--orion-green)'
+                      : pos.startsWith('A') || pos === 'BU' ? 'var(--orion-red)'
+                      : 'var(--orion-text-mute)';
                     return (
                       <div
                         key={player.id}
-                        className={`flex items-center justify-between p-3 border  transition-colors ${
-                          isAssigned ? 'bg-green-900/20 border-green-700' : 'bg-dark-tertiary border-orion-line'
-                        }`}
+                        style={{
+                          display:'flex', alignItems:'center', justifyContent:'space-between',
+                          padding:'12px 14px', borderRadius:10,
+                          background: isAssigned ? 'rgba(31,168,90,0.06)' : 'var(--orion-surface)',
+                          border: `1.5px solid ${isAssigned ? 'rgba(31,168,90,0.3)' : 'var(--orion-line)'}`,
+                          transition:'all .12s',
+                        }}
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <div style={{ display:'flex', alignItems:'center', gap:12, minWidth:0 }}>
                           {player.photo_url ? (
-                            <div className="relative w-10 h-10 flex-shrink-0">
-                              <img
-                                src={player.photo_url}
-                                alt={`${player.first_name} ${player.last_name}`}
-                                className="w-full h-full rounded-full object-cover border-2 border-orion-line shadow"
-                              />
-                              <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
-                                isAssigned ? 'bg-green-600' : 'bg-gray-600'
-                              }`}>
+                            <div style={{ position:'relative', flexShrink:0 }}>
+                              <img src={player.photo_url} alt={`${player.first_name} ${player.last_name}`}
+                                style={{ width:38, height:38, borderRadius:'50%', objectFit:'cover', border:'2px solid var(--orion-line)' }} />
+                              <div style={{ position:'absolute', bottom:-2, right:-2, width:18, height:18, borderRadius:'50%', background:circleColor, display:'flex', alignItems:'center', justifyContent:'center', fontSize:9, fontWeight:800, color:'#fff', border:'1.5px solid var(--orion-surface)' }}>
                                 {player.number}
                               </div>
                             </div>
                           ) : (
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white flex-shrink-0 ${
-                              isAssigned ? 'bg-green-600' : 'bg-gray-600'
-                            }`}>
+                            <div style={{ width:38, height:38, borderRadius:'50%', background:circleColor, display:'flex', alignItems:'center', justifyContent:'center', fontWeight:800, color:'#fff', flexShrink:0, fontSize:13, fontFamily:'var(--orion-font-mono)' }}>
                               {player.number}
                             </div>
                           )}
-                          <div className="min-w-0">
-                            <div className="font-semibold text-white truncate">
+                          <div style={{ minWidth:0 }}>
+                            <div style={{ fontWeight:700, color:'var(--orion-text)', fontSize:13, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                               {player.first_name} {player.last_name}
                             </div>
-                            <div className="text-xs text-gray-400">{player.position}</div>
+                            <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:2 }}>{player.position}</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1 flex-shrink-0">
-                          <button
-                            onClick={() => { setEditingPlayer(player); setShowPlayerForm(true); }}
-                            className="p-2 text-orion-accent hover:bg-orange-900/30 rounded transition-colors"
-                          >
-                            <Pencil size={16} />
+                        <div style={{ display:'flex', alignItems:'center', gap:4, flexShrink:0 }}>
+                          <button onClick={() => { setEditingPlayer(player); setShowPlayerForm(true); }}
+                            style={{ padding:6, borderRadius:6, border:'none', background:'none', cursor:'pointer', color:'var(--orion-accent)' }}>
+                            <Pencil size={15} />
                           </button>
-                          <button
-                            onClick={() => handleDeletePlayer(player.id)}
-                            className="p-2 text-red-400 hover:bg-red-900/30 rounded transition-colors"
-                          >
-                            <Trash2 size={16} />
+                          <button onClick={() => handleDeletePlayer(player.id)}
+                            style={{ padding:6, borderRadius:6, border:'none', background:'none', cursor:'pointer', color:'var(--orion-red)' }}>
+                            <Trash2 size={15} />
                           </button>
                         </div>
                       </div>
