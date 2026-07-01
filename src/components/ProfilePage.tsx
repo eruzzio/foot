@@ -241,23 +241,23 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {activeTab === 'identity' && (
           <div className="space-y-5">
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Informations personnelles</h3>
+              <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:14, fontFamily:"var(--orion-font-mono)" }}>Informations personnelles</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">Prénom</label>
+                  <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Prénom</label>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Lucas"
                     autoComplete="off"
                     style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">Nom</label>
+                  <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Nom</label>
                   <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Giovenco"
                     autoComplete="off"
                     style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-2">Rôle</label>
+                <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Rôle</label>
                 <div className="flex flex-wrap gap-2">
                   {ROLES.map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
@@ -296,7 +296,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Mail size={15} className="text-orange-primary" />
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Adresse email</h3>
+                <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10, fontFamily:"var(--orion-font-mono)" }}>Adresse email</h3>
               </div>
               <div className="flex gap-2">
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
@@ -313,22 +313,22 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Lock size={15} className="text-orange-primary" />
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mot de passe</h3>
+                <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10, fontFamily:"var(--orion-font-mono)" }}>Mot de passe</h3>
               </div>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">Nouveau mot de passe</label>
+                  <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Nouveau mot de passe</label>
                   <div className="relative">
                     <input type={showPw ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                       placeholder="8 caractères minimum"
                       style={{ width:"100%", padding:"8px 12px", paddingRight:40, background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
-                    <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-orion-text-mute">
                       {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1.5">Confirmer</label>
+                  <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Confirmer</label>
                   <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter"
                     style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
@@ -345,12 +345,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Smartphone size={15} className="text-orange-primary" />
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Session active</h3>
+                <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10, fontFamily:"var(--orion-font-mono)" }}>Session active</h3>
               </div>
               <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--orion-surface-2)", borderRadius:6 }}>
                 <div>
-                  <div className="text-sm text-white font-medium">Session actuelle</div>
-                  <div className="text-xs text-gray-500">Navigateur web · {new Date().toLocaleDateString('fr-FR')}</div>
+                  <div style={{ fontSize:13, fontWeight:500, color:"var(--orion-text)" }}>Session actuelle</div>
+                  <div className="text-xs text-orion-text-mute">Navigateur web · {new Date().toLocaleDateString('fr-FR')}</div>
                 </div>
                 <span className="w-2 h-2 rounded-full bg-green-500" />
               </div>
@@ -369,7 +369,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Bell size={15} className="text-orange-primary" />
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Notifications</h3>
+                <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10, fontFamily:"var(--orion-font-mono)" }}>Notifications</h3>
               </div>
               <div className="space-y-3">
                 {[
@@ -378,8 +378,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 ].map(n => (
                   <div key={n.label} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--orion-surface-2)", borderRadius:6 }}>
                     <div>
-                      <div className="text-sm text-white font-medium">{n.label}</div>
-                      <div className="text-xs text-gray-500">{n.desc}</div>
+                      <div style={{ fontSize:13, fontWeight:500, color:"var(--orion-text)" }}>{n.label}</div>
+                      <div className="text-xs text-orion-text-mute">{n.desc}</div>
                     </div>
                     <button onClick={() => n.set(!n.value)}
                       className={`w-11 h-6 rounded-full transition-all ${n.value ? 'bg-orange-primary' : 'bg-gray-700'}`}
@@ -395,7 +395,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Globe size={15} className="text-orange-primary" />
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Langue</h3>
+                <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:10, fontFamily:"var(--orion-font-mono)" }}>Langue</h3>
               </div>
               <div className="flex gap-2">
                 {[{ code: 'fr', label: '🇫🇷 Français' }, { code: 'en', label: '🇬🇧 English' }, { code: 'es', label: '🇪🇸 Español' }].map(l => (
@@ -421,8 +421,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
             {/* Déconnexion rapide */}
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Session</h3>
-              <p className="text-sm text-gray-400 mb-4">Vous êtes connecté en tant que <span className="text-white font-semibold">{email}</span></p>
+              <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:12, fontFamily:"var(--orion-font-mono)" }}>Session</h3>
+              <p style={{ fontSize:13, color:"var(--orion-text-mute)", marginBottom:16 }}>Vous êtes connecté en tant que <span style={{ color:"var(--orion-text)", fontWeight:600 }}>{email}</span></p>
               <button onClick={handleSignOut}
                 className="w-full py-3 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40  font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
                 <LogOut size={15} /> Se déconnecter
@@ -431,8 +431,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
 
             {/* Export données */}
             <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Mes données</h3>
-              <p className="text-sm text-gray-400 mb-4">Téléchargez toutes vos données ORION (matchs, stats, équipes) en format JSON.</p>
+              <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:12, fontFamily:"var(--orion-font-mono)" }}>Mes données</h3>
+              <p style={{ fontSize:13, color:"var(--orion-text-mute)", marginBottom:16 }}>Téléchargez toutes vos données ORION (matchs, stats, équipes) en format JSON.</p>
               <button style={{ width:"100%", padding:"10px", background:"var(--orion-surface-2)", border:"1.5px solid var(--orion-line)", borderRadius:8, fontSize:13, fontWeight:600, color:"var(--orion-text-dim)", cursor:"pointer" }}>
                 📦 Exporter mes données
               </button>
@@ -444,9 +444,9 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <Trash2 size={15} className="text-red-500" />
                 <h3 className="text-xs font-bold text-red-400 uppercase tracking-wider">Zone dangereuse</h3>
               </div>
-              <p className="text-sm text-gray-400 mb-4">La suppression de votre compte est <strong className="text-red-400">irréversible</strong>. Toutes vos données (matchs, équipes, stats) seront définitivement supprimées.</p>
+              <p style={{ fontSize:13, color:"var(--orion-text-mute)", marginBottom:16 }}>La suppression de votre compte est <strong className="text-red-400">irréversible</strong>. Toutes vos données (matchs, équipes, stats) seront définitivement supprimées.</p>
               <div className="mb-3">
-                <label className="block text-xs text-gray-500 mb-1.5">Confirmez en tapant votre email</label>
+                <label style={{ color:"var(--orion-text-dim)", fontSize:12, fontWeight:500 }}>Confirmez en tapant votre email</label>
                 <input type="email" value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                   placeholder={email}
                   style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid rgba(224,59,46,0.5)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
