@@ -1,4 +1,4 @@
-const CACHE_NAME = 'orion-v3';
+const CACHE_NAME = 'orion-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -27,8 +27,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Ne jamais cacher les requêtes Supabase API ou WebSocket
-  if (url.hostname.includes('supabase.co') || url.protocol === 'wss:' || url.protocol === 'ws:') {
+  // Ne jamais cacher les requêtes Supabase API, WebSocket, ou blob
+  if (url.hostname.includes('supabase.co') || url.protocol === 'wss:' || url.protocol === 'ws:' || url.protocol === 'blob:') {
     return;
   }
 
