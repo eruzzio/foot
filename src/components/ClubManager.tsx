@@ -212,11 +212,11 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
   if (loading) return null;
 
   return (
-    <div className="bg-dark-secondary border border-gray-800 rounded-xl p-5">
+    <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:18 }}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Building2 size={18} className="text-orange-primary" />
-          <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">Mon Club</h3>
+          <h3 style={{ fontSize:10, fontWeight:700, color:"var(--orion-text-mute)", textTransform:"uppercase", letterSpacing:"0.14em", fontFamily:"var(--orion-font-mono)" }}>Mon Club</h3>
         </div>
         {pendingMembers.length > 0 && (
           <span className="flex items-center gap-1 px-2 py-0.5 bg-yellow-600/20 text-yellow-400 border border-yellow-600/30 rounded-full text-xs font-bold">
@@ -238,8 +238,8 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
               </div>
             )}
             <div className="flex-1">
-              <div className="text-base font-black text-white">{club.name}</div>
-              {club.city && <div className="text-xs text-gray-400">📍 {club.city}</div>}
+              <div style={{ fontSize:15, fontWeight:800, color:"var(--orion-text)" }}>{club.name}</div>
+              {club.city && <div style={{ fontSize:11, color:"var(--orion-text-mute)" }}>📍 {club.city}</div>}
               {isOwner && <div className="text-xs text-orange-400 mt-0.5 font-semibold">👑 Administrateur</div>}
               {!isOwner && myMembership?.status === 'approved' && <div className="text-xs text-green-400 mt-0.5">✓ Membre approuvé</div>}
               {!isOwner && myMembership?.status === 'pending' && <div className="text-xs text-yellow-400 mt-0.5">⏳ En attente d'approbation</div>}
@@ -315,16 +315,16 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
       {/* Pas de club */}
       {!club && mode === 'view' && (
         <div className="space-y-3">
-          <p className="text-sm text-gray-500 mb-3">Créez votre club ou rejoignez-en un existant.</p>
+          <p style={{ fontSize:13, color:"var(--orion-text-mute)", marginBottom:12 }}>Créez votre club ou rejoignez-en un existant.</p>
           <button onClick={() => { setMode('create'); setError(''); }}
-            className="w-full flex items-center gap-3 p-4 bg-dark-tertiary hover:bg-gray-700/50 border border-gray-700 hover:border-orange-primary/50 rounded-xl transition-all text-left">
+            style={{ width:"100%", display:"flex", alignItems:"center", gap:12, padding:"14px 16px", background:"var(--orion-surface-2)", border:"1.5px solid var(--orion-line)", borderRadius:10, cursor:"pointer", textAlign:"left", transition:"all .12s" }}>
             <div className="w-10 h-10 bg-orange-primary/20 rounded-lg flex items-center justify-center flex-shrink-0"><Plus size={18} className="text-orange-primary" /></div>
-            <div><div className="text-sm font-bold text-white">Créer un club</div><div className="text-xs text-gray-500">Vous serez administrateur</div></div>
+            <div><div style={{ fontSize:13, fontWeight:700, color:"var(--orion-text)" }}>Créer un club</div><div style={{ fontSize:11, color:"var(--orion-text-mute)" }}>Vous serez administrateur</div></div>
           </button>
           <button onClick={() => { setMode('join'); setError(''); }}
-            className="w-full flex items-center gap-3 p-4 bg-dark-tertiary hover:bg-gray-700/50 border border-gray-700 hover:border-blue-500/50 rounded-xl transition-all text-left">
+            style={{ width:"100%", display:"flex", alignItems:"center", gap:12, padding:"14px 16px", background:"var(--orion-surface-2)", border:"1.5px solid var(--orion-line)", borderRadius:10, cursor:"pointer", textAlign:"left", transition:"all .12s" }}>
             <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0"><LogIn size={18} className="text-blue-400" /></div>
-            <div><div className="text-sm font-bold text-white">Rejoindre un club</div><div className="text-xs text-gray-500">Demande soumise à validation</div></div>
+            <div><div style={{ fontSize:13, fontWeight:700, color:"var(--orion-text)" }}>Rejoindre un club</div><div style={{ fontSize:11, color:"var(--orion-text-mute)" }}>Demande soumise à validation</div></div>
           </button>
         </div>
       )}
@@ -341,7 +341,7 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
       {/* Formulaire création */}
       {mode === 'create' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between"><span className="text-sm font-bold text-white">Créer un club</span><button onClick={() => setMode('view')} className="p-1 hover:bg-gray-700 rounded-lg"><X size={16} className="text-gray-400" /></button></div>
+          <div className="flex items-center justify-between"><span style={{ fontSize:13, fontWeight:700, color:"var(--orion-text)" }}>Créer un club</span><button onClick={() => setMode('view')} className="p-1 hover:bg-gray-700 rounded-lg"><X size={16} className="text-gray-400" /></button></div>
           <div className="flex items-center gap-4">
             <div onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-600 hover:border-orange-primary cursor-pointer flex items-center justify-center overflow-hidden transition-colors">
               {logoPreview ? <img src={logoPreview} className="w-full h-full object-contain" /> : <Upload size={20} className="text-gray-500" />}
@@ -352,8 +352,8 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
           <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Nom *</label><input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="AS Béziers" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" /></div>
           <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Ville</label><input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder="Béziers" className="w-full px-3 py-2 bg-dark-tertiary border border-gray-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" /></div>
           <div className="grid grid-cols-2 gap-3">
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Couleur principale</label><div className="flex items-center gap-2"><input type="color" value={colorPrimary} onChange={e => setColorPrimary(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-700 cursor-pointer" /><span className="text-xs text-gray-400">{colorPrimary}</span></div></div>
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Couleur secondaire</label><div className="flex items-center gap-2"><input type="color" value={colorSecondary} onChange={e => setColorSecondary(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-700 cursor-pointer" /><span className="text-xs text-gray-400">{colorSecondary}</span></div></div>
+            <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Couleur principale</label><div className="flex items-center gap-2"><input type="color" value={colorPrimary} onChange={e => setColorPrimary(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-700 cursor-pointer" /><span style={{ fontSize:11, color:"var(--orion-text-mute)" }}>{colorPrimary}</span></div></div>
+            <div><label className="block text-xs font-semibold text-gray-500 mb-1.5">Couleur secondaire</label><div className="flex items-center gap-2"><input type="color" value={colorSecondary} onChange={e => setColorSecondary(e.target.value)} className="w-10 h-10 rounded-lg border border-gray-700 cursor-pointer" /><span style={{ fontSize:11, color:"var(--orion-text-mute)" }}>{colorSecondary}</span></div></div>
           </div>
           {error && <p className="text-xs text-red-400">{error}</p>}
           <button onClick={handleCreate} disabled={saving} className="w-full py-2.5 bg-orange-primary hover:bg-orange-600 disabled:opacity-40 text-white rounded-lg font-semibold text-sm transition-colors">{saving ? 'Création...' : 'Créer le club'}</button>
@@ -363,7 +363,7 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
       {/* Formulaire rejoindre */}
       {mode === 'join' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between"><span className="text-sm font-bold text-white">Rejoindre un club</span><button onClick={() => setMode('view')} className="p-1 hover:bg-gray-700 rounded-lg"><X size={16} className="text-gray-400" /></button></div>
+          <div className="flex items-center justify-between"><span style={{ fontSize:13, fontWeight:700, color:"var(--orion-text)" }}>Rejoindre un club</span><button onClick={() => setMode('view')} className="p-1 hover:bg-gray-700 rounded-lg"><X size={16} className="text-gray-400" /></button></div>
           <div className="bg-blue-900/10 border border-blue-800/30 rounded-lg p-3 text-xs text-blue-300">
             ℹ️ Votre demande sera soumise à l'administrateur du club pour validation.
           </div>

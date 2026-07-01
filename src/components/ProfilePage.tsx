@@ -261,9 +261,11 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <div className="flex flex-wrap gap-2">
                   {ROLES.map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
-                      className={`px-3 py-1.5  text-xs font-semibold transition-all ${
-                        role === r ? 'bg-orange-primary text-white' : 'bg-surface text-orion-text border border-orion-line'
-                      }`}
+                      style={{ padding:'5px 14px', borderRadius:999, fontSize:12, fontWeight:600, cursor:'pointer', border:'1.5px solid', transition:'all .12s',
+                        background: role === r ? 'var(--orion-accent)' : 'var(--orion-surface)',
+                        borderColor: role === r ? 'var(--orion-accent)' : 'var(--orion-line-strong)',
+                        color: role === r ? '#fff' : 'var(--orion-text)'
+                      }}
                     >{r}</button>
                   ))}
                 </div>
@@ -280,9 +282,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             />
 
             <button onClick={handleSaveIdentity} disabled={saving}
-              className={`w-full py-3  font-semibold text-sm flex items-center justify-center gap-2 transition-all ${
-                saved ? 'bg-green-600 text-white' : 'bg-orange-primary hover:bg-orange-600 text-white'
-              }`}
+              style={{ width:'100%', padding:'12px', borderRadius:10, fontSize:14, fontWeight:700, border:'none', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:8, background: saved ? '#1FA85A' : 'var(--orion-accent)', color:'#fff' }}
             >
               {saved ? <><Check size={16} /> Sauvegardé</> : <><Save size={16} /> {saving ? 'Sauvegarde...' : 'Sauvegarder le profil'}</>}
             </button>
@@ -401,7 +401,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 {[{ code: 'fr', label: '🇫🇷 Français' }, { code: 'en', label: '🇬🇧 English' }, { code: 'es', label: '🇪🇸 Español' }].map(l => (
                   <button key={l.code} onClick={() => setLanguage(l.code)}
                     className={`flex-1 py-2  text-sm font-semibold transition-all ${
-                      language === l.code ? 'bg-orange-primary text-white' : 'bg-surface text-orion-text border border-orion-line'
+                      language === l.code ? 'bg-orange-primary text-white rounded-full' : 'rounded-full border border-orion-line text-orion-text'
                     }`}
                   >{l.label}</button>
                 ))}
