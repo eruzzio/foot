@@ -90,26 +90,31 @@ export default function PdfConfigModal({
     setGenerating(true);
     const globalEvents = globalTeam === 'both' ? events : events.filter(e => e.team === globalTeam);
 
-    exportToPdf({
-      events: globalEvents,
-      matchInfo: {
-        teamA: globalTeam === 'B' ? teamBName : teamAName,
-        teamB: globalTeam === 'B' ? '' : teamBName,
-        teamAColor: globalTeam === 'B' ? (teamBColor || '#f97316') : (teamAColor || '#22c55e'),
-        teamBColor: teamBColor || '#f97316',
-        date: matchDate || new Date().toLocaleDateString('fr-FR'),
-        scoreA, scoreB, duration, location, competition,
-        teamALogoUrl, teamBLogoUrl,
-      },
-      sections,
-      teamFilter: globalTeam,
-      heatmapFilters: {
-        field: heatmapFilters.heatmap_field.size > 0 ? Array.from(heatmapFilters.heatmap_field) : null,
-        zones: heatmapFilters.heatmap_zones.size > 0 ? Array.from(heatmapFilters.heatmap_zones) : null,
-        goal:  heatmapFilters.heatmap_goal.size > 0  ? Array.from(heatmapFilters.heatmap_goal)  : null,
-      },
-      heatmapTeams,
-    });
+    try {
+      exportToPdf({
+        events: globalEvents,
+        matchInfo: {
+          teamA: globalTeam === 'B' ? teamBName : teamAName,
+          teamB: globalTeam === 'B' ? '' : teamBName,
+          teamAColor: globalTeam === 'B' ? (teamBColor || '#f97316') : (teamAColor || '#22c55e'),
+          teamBColor: teamBColor || '#f97316',
+          date: matchDate || new Date().toLocaleDateString('fr-FR'),
+          scoreA, scoreB, duration, location, competition,
+          teamALogoUrl, teamBLogoUrl,
+        },
+        sections,
+        teamFilter: globalTeam,
+        heatmapFilters: {
+          field: heatmapFilters.heatmap_field.size > 0 ? Array.from(heatmapFilters.heatmap_field) : null,
+          zones: heatmapFilters.heatmap_zones.size > 0 ? Array.from(heatmapFilters.heatmap_zones) : null,
+          goal:  heatmapFilters.heatmap_goal.size > 0  ? Array.from(heatmapFilters.heatmap_goal)  : null,
+        },
+        heatmapTeams,
+      });
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      alert('Erreur génération PDF: ' + String(err));
+    }
     setTimeout(() => { setGenerating(false); onClose(); }, 500);
   };
 
