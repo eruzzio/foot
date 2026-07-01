@@ -96,8 +96,8 @@ export default function PdfConfigModal({
         matchInfo: {
           teamA: globalTeam === 'B' ? teamBName : teamAName,
           teamB: globalTeam === 'B' ? '' : teamBName,
-          teamAColor: globalTeam === 'B' ? (teamBColor || '#f97316') : (teamAColor || '#22c55e'),
-          teamBColor: teamBColor || '#f97316',
+          teamAColor: globalTeam === 'B' ? (teamBColor || '#E8920C') : (teamAColor || '#3D80E0'),
+          teamBColor: teamBColor || '#E8920C',
           date: matchDate || new Date().toLocaleDateString('fr-FR'),
           scoreA, scoreB, duration, location, competition,
           teamALogoUrl, teamBLogoUrl,
