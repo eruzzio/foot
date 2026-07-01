@@ -169,54 +169,41 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
     <div style={{ minHeight:"100vh", background:"var(--orion-bg)", color:"var(--orion-text)" }}>
       <div className="max-w-2xl mx-auto px-4 py-6">
 
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <button onClick={onBack} className="o-btn o-btn--ghost o-btn--sm">
-              ←
-            </button>
-            <div>
-              <h1 className="text-base font-medium text-white">Mon Compte</h1>
-              <p className="text-xs text-gray-500">{email}</p>
+        {/* Hero sombre */}
+        <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'22px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+          <div style={{ position:'absolute', top:0, right:0, width:280, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+          <div style={{ position:'relative', display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
+            {/* Avatar */}
+            <div style={{ position:'relative', flexShrink:0 }}>
+              {avatarPreview ? (
+                <img src={avatarPreview} style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', border:'2px solid rgba(61,128,224,0.5)' }} />
+              ) : (
+                <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(61,128,224,0.2)', border:'2px solid rgba(61,128,224,0.4)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'var(--orion-accent)' }}>
+                  {initials || <User size={22} />}
+                </div>
+              )}
+              <button onClick={() => fileRef.current?.click()} style={{ position:'absolute', bottom:-2, right:-2, width:22, height:22, borderRadius:'50%', background:'var(--orion-accent)', border:'none', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                <Camera size={11} style={{ color:'#fff' }} />
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatarSelect} style={{ display:'none' }} />
             </div>
-          </div>
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 px-4 py-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-800/40  text-sm font-semibold transition-colors"
-          >
-            <LogOut size={15} />
-            Se déconnecter
-          </button>
-        </div>
-
-        {/* Avatar + résumé */}
-        <div className="flex items-center gap-4 bg-dark-secondary border border-orion-line  p-5 mb-6">
-          <div className="relative">
-            {avatarPreview ? (
-              <img src={avatarPreview} className="w-16 h-16 rounded-full object-cover border-2 border-orion-accent" />
-            ) : (
-              <div className="w-16 h-16 rounded-full bg-orange-primary/20 border-2 border-orion-accent flex items-center justify-center text-xl font-black text-orion-accent">
-                {initials || <User size={24} />}
+            {/* Infos */}
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:6 }}>Mon Compte</div>
+              <div style={{ fontSize:20, fontWeight:800, color:'#fff', marginBottom:3 }}>
+                {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Utilisateur ORION'}
               </div>
-            )}
-            <button
-              onClick={() => fileRef.current?.click()}
-              className="absolute -bottom-1 -right-1 w-6 h-6 bg-orange-primary rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors"
-            >
-              <Camera size={12} className="text-white" />
-            </button>
-            <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatarSelect} className="hidden" />
-          </div>
-          <div>
-            <div className="text-base font-bold text-white">
-              {firstName || lastName ? `${firstName} ${lastName}`.trim() : 'Utilisateur ORION'}
+              <div style={{ fontSize:12, color:'#8aa0bd' }}>{role || 'Rôle non défini'} {clubName && `· 🏟️ ${clubName}`}</div>
+              <div style={{ fontSize:11, color:'#6b8199', marginTop:2 }}>{email}</div>
             </div>
-            <div className="text-xs text-gray-400">{role || 'Rôle non défini'}</div>
-            {clubName && <div className="text-xs text-orion-accent mt-0.5">🏟️ {clubName}</div>}
-            <div className="text-xs text-gray-600 mt-0.5">{email}</div>
+            {/* Actions */}
+            <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+              <button onClick={onBack} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:12, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>← Retour</button>
+              <button onClick={handleSignOut} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(224,59,46,0.15)', border:'1.5px solid rgba(224,59,46,0.3)', borderRadius:999, fontSize:12, fontWeight:600, color:'#ff8a7a', cursor:'pointer' }}>
+                <LogOut size={13} /> Se déconnecter
+              </button>
+            </div>
           </div>
-        </div>
-
         {/* Messages */}
         {error && (
           <div className="flex items-start gap-3 bg-red-900/20 border border-red-800/50  p-3 mb-4">
@@ -470,6 +457,8 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           </div>
         )}
 
+      </div>
+      </div>
       </div>
     </div>
   );
