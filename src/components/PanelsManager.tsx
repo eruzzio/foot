@@ -677,7 +677,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 panels.map((panel) => (
                   <div
                     key={panel.id}
-                    className="bg-dark-secondary  border border-orion-line p-4 flex items-center justify-between hover:border-gray-600 transition-colors group"
+                    style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line)", borderRadius:8, padding:"12px 16px", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer", transition:"border-color .15s" }}
                   >
                     <button
                       onClick={() => openPanel(panel)}
@@ -716,7 +716,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
               {selectedPanel ? 'Modifier le panneau' : 'Nouveau panneau'}
             </h1>
 
-            <div className="bg-dark-secondary  border border-orion-line p-6 space-y-4">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line)", borderRadius:8, padding:"20px 22px" }}>
               {error && (
                 <div className="p-3 bg-red-900/30 border border-red-700  text-red-400 text-sm">
                   {error}
@@ -768,56 +768,47 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
         {view === 'panel' && selectedPanel && (
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-medium" style={{ color:'var(--orion-text)' }}>{selectedPanel.name}</h1>
-                  {selectedPanel.is_default && (
-                    <span className="text-sm px-3 py-1 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
-                      Défaut
-                    </span>
+            {/* Hero sombre */}
+            <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'22px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+              <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+              <div style={{ position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+                <div>
+                  <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>Configuration</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                    <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:'#fff' }}>{selectedPanel.name}</h1>
+                    {selectedPanel.is_default && (
+                      <span style={{ padding:'3px 10px', borderRadius:999, fontSize:11, fontWeight:700, background:'rgba(232,146,12,0.2)', border:'1px solid rgba(232,146,12,0.4)', color:'#ffc15e' }}>Défaut</span>
+                    )}
+                  </div>
+                  {selectedPanel.description && <p style={{ margin:'6px 0 0', fontSize:13, color:'#8aa0bd' }}>{selectedPanel.description}</p>}
+                </div>
+                <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+                  {!selectedPanel.is_default && (
+                    <>
+                      <button onClick={() => startEdit(selectedPanel)} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:12, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>
+                        <Pencil size={13} /> Renommer
+                      </button>
+                      <button onClick={() => deletePanel(selectedPanel.id)} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(224,59,46,0.15)', border:'1.5px solid rgba(224,59,46,0.3)', borderRadius:999, fontSize:12, fontWeight:600, color:'#ff8a7a', cursor:'pointer' }}>
+                        <Trash2 size={13} /> Supprimer
+                      </button>
+                    </>
                   )}
                 </div>
-                {selectedPanel.description && (
-                  <p className="text-gray-500 mt-1">{selectedPanel.description}</p>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {!selectedPanel.is_default && (
-                  <>
-                    <button
-                      onClick={() => startEdit(selectedPanel)}
-                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-gray-300  border border-orion-line hover:bg-dark-tertiary transition-colors text-sm font-medium"
-                    >
-                      <Pencil size={15} />
-                      Renommer
-                    </button>
-                    <button
-                      onClick={() => deletePanel(selectedPanel.id)}
-                      className="flex items-center gap-2 px-3 py-2 bg-dark-secondary text-red-400  border border-orion-line hover:bg-red-900/20 transition-colors text-sm font-medium"
-                    >
-                      <Trash2 size={15} />
-                      Supprimer
-                    </button>
-                  </>
-                )}
               </div>
             </div>
 
-            <div className="bg-dark-secondary  border border-orion-line overflow-hidden">
-              <div className="flex border-b border-orion-line">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, overflow:"hidden" }}>
+              <div style={{ display:"flex", borderBottom:"1.5px solid var(--orion-line)" }}>
                 <button
                   onClick={() => setActiveTab('list')}
                   className={`flex-1 px-4 py-3.5 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                    activeTab === 'list'
-                      ? 'bg-dark-secondary text-white border-b-2 border-orion-accent'
-                      : 'bg-dark-tertiary/50 text-gray-500 hover:text-gray-300'
+                    activeTab === 'list' ? 'border-b-2 border-orion-accent text-orion-accent bg-white' : 'text-orion-text-mute bg-surface-2 hover:text-orion-text'
                   }`}
                 >
                   <LayoutGrid size={14} />
                   Mes boutons
                   <span className={`text-xs px-1.5 py-0.5 rounded-full font-mono ${
-                    activeTab === 'list' ? 'bg-orange-900/40 text-orion-accent' : 'bg-gray-800 text-gray-500'
+                    activeTab === 'list' ? 'bg-blue-100 text-orion-accent' : 'bg-gray-100 text-orion-text-mute'
                   }`}>
                     {rootButtons.length}
                   </span>
@@ -825,9 +816,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 <button
                   onClick={() => setActiveTab('layout')}
                   className={`flex-1 px-4 py-3.5 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
-                    activeTab === 'layout'
-                      ? 'bg-dark-secondary text-white border-b-2 border-orion-accent'
-                      : 'bg-dark-tertiary/50 text-gray-500 hover:text-gray-300'
+                    activeTab === 'layout' ? 'border-b-2 border-orion-accent text-orion-accent bg-white' : 'text-orion-text-mute bg-surface-2 hover:text-orion-text'
                   }`}
                 >
                   <Move size={14} />
