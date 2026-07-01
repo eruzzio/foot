@@ -632,27 +632,32 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         <div className="mb-6 flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-secondary text-gray-300 hover:bg-dark-tertiary  border border-orion-line transition-colors font-medium"
+            style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line)', borderRadius:8, fontSize:13, fontWeight:600, color:'var(--orion-text-dim)', cursor:'pointer' }}
           >
             ←
             {view === 'list' ? "Retour à l'accueil" : 'Retour'}
           </button>
           {view !== 'list' && selectedPanel && (
-            <span className="text-gray-500 text-sm">{selectedPanel.name}</span>
+            <span style={{ fontSize:13, color:'var(--orion-text-mute)' }}>{selectedPanel.name}</span>
           )}
         </div>
 
         {view === 'list' && (
           <div>
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-medium" style={{ color:'var(--orion-text)' }}>Mes Panneaux</h1>
-              <button
-                onClick={startCreate}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium shadow"
-              >
-                <Plus size={18} />
-                Nouveau panneau
-              </button>
+            {/* Hero sombre */}
+            <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'24px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+              <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+              <div style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+                <div>
+                  <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>Configuration</div>
+                  <h1 style={{ margin:0, fontSize:24, fontWeight:800, color:'#fff' }}>Mes Panneaux</h1>
+                  <p style={{ margin:'6px 0 0', fontSize:13, color:'#8aa0bd' }}>Les boutons que tu utilises pendant le codage live.</p>
+                </div>
+                <button onClick={startCreate} style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'10px 18px', background:'var(--orion-accent)', color:'#fff', border:'none', borderRadius:999, fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, boxShadow:'0 4px 14px rgba(61,128,224,0.4)' }}>
+                  <Plus size={15} />
+                  Nouveau panneau
+                </button>
+              </div>
             </div>
 
             <div className="space-y-3">
