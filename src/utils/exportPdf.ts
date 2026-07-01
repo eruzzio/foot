@@ -364,16 +364,27 @@ ${show('timeline') ? `<div><h2>Activité par période et par type</h2><div class
 
 <div style="padding-top:8px;border-top:1px solid #e1e7f0;display:flex;justify-content:space-between;"><span style="font-size:8px;color:#aab8cc;font-family:monospace;">ORION · Sports Video Analytics</span><span style="font-size:8px;color:#aab8cc;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span></div>
 
-</div><script>setTimeout(function() { window.print(); }, 800);</script></body></html>`;
+</div></body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.target = '_blank';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+
+  // Ouvrir dans une iframe cachée pour éviter le rechargement par le Service Worker
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => {
+    try {
+      iframe.contentWindow?.print();
+    } catch {
+      // Fallback : ouvrir dans un nouvel onglet
+      window.open(url, '_blank');
+    }
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      URL.revokeObjectURL(url);
+    }, 30000);
+  };
 }
 // rebuild Thu May 21 07:12:36 UTC 2026
