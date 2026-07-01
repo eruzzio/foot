@@ -110,20 +110,23 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
   }
 
   return (
-    <div className="min-h-screen bg-dark p-4 text-white">
+    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', padding:16 }}>
       <div className="max-w-5xl mx-auto">
-        <header className="mb-6 flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="o-btn o-btn--ghost o-btn--sm"
-          >
-            ←
-          </button>
-          <div>
-            <h1 className="text-2xl font-medium" style={{ color: 'var(--orion-text)' }}>Mes Stats</h1>
-            <p className="text-gray-400">Sélectionnez un match pour voir les statistiques</p>
+
+        {/* Hero sombre */}
+        <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'24px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+          <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+          <div style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+            <div>
+              <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>Analyse</div>
+              <h1 style={{ margin:0, fontSize:24, fontWeight:800, color:'#fff' }}>Mes Stats</h1>
+              <p style={{ margin:'6px 0 0', fontSize:13, color:'#8aa0bd' }}>Sélectionne un match pour ouvrir son rapport complet.</p>
+            </div>
+            <button onClick={onBack} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 16px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:13, fontWeight:600, color:'#dbe3ee', cursor:'pointer', flexShrink:0 }}>
+              ← Retour
+            </button>
           </div>
-        </header>
+        </div>
 
         {/* Search bar */}
         {matches.length > 0 && (
