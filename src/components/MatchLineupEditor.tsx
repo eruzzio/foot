@@ -89,93 +89,90 @@ export default function MatchLineupEditor({ matchId, teamAId, teamBId, teamAName
     { key: 'B' as const, name: teamBName, id: teamBId },
   ].filter(t => t.id);
 
+  // Couleur du cercle selon la position du joueur
+  const positionColor = (pos?: string | null) => {
+    if (!pos) return 'var(--orion-text-mute)';
+    const p = pos.toUpperCase();
+    if (p.includes('GK') || p.includes('G')) return '#E6A817';
+    if (p.includes('D') || p.includes('CB') || p.includes('LB') || p.includes('RB')) return 'var(--orion-accent)';
+    if (p.includes('M') || p.includes('MF')) return 'var(--orion-green)';
+    return 'var(--orion-red)';
+  };
+
   return (
-    <div style={{ padding: '16px 0' }}>
-      {/* Sélecteur équipe */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-        {teams.map(t => (
-          <button
-            key={t.key}
-            onClick={() => setSelectedTeam(t.key)}
-            style={{
-              padding: '8px 20px',
-              borderRadius: 6,
-              border: '1.5px solid',
-              borderColor: selectedTeam === t.key ? 'var(--orion-accent)' : 'var(--orion-line)',
-              background: selectedTeam === t.key ? 'var(--orion-accent)' : 'var(--orion-surface)',
-              color: selectedTeam === t.key ? '#fff' : 'var(--orion-text-mute)',
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: 'pointer',
-              transition: 'all 0.15s',
-            }}
-          >
-            {t.name}
-          </button>
-        ))}
+    <div style={{ background:'var(--orion-surface)', border:'1.5px solid var(--orion-line)', borderRadius:10, padding:20 }}>
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <h3 style={{ margin:0, fontSize:15, fontWeight:800, color:'var(--orion-text)' }}>Compositions</h3>
+        <div style={{ display:'flex', gap:2, background:'var(--orion-surface-2)', borderRadius:6, padding:2 }}>
+          {teams.map(t => (
+            <button
+              key={t.key}
+              onClick={() => setSelectedTeam(t.key)}
+              style={{
+                padding:'5px 12px', fontSize:11, fontWeight:600, border:'none', borderRadius:5, cursor:'pointer',
+                background: selectedTeam === t.key ? 'var(--orion-accent)' : 'transparent',
+                color: selectedTeam === t.key ? '#fff' : 'var(--orion-text-mute)',
+              }}
+            >
+              {t.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {!teamId ? (
-        <div style={{ fontSize: 13, color: 'var(--orion-text-mute)', padding: 12 }}>
-          Aucune équipe liée à ce match.
-        </div>
+        <div style={{ fontSize:13, color:'var(--orion-text-mute)', padding:12 }}>Aucune équipe liée à ce match.</div>
       ) : loading ? (
-        <div style={{ fontSize: 13, color: 'var(--orion-text-mute)', padding: 12 }}>Chargement…</div>
+        <div style={{ fontSize:13, color:'var(--orion-text-mute)', padding:12 }}>Chargement…</div>
       ) : players.length === 0 ? (
-        <div style={{ fontSize: 13, color: 'var(--orion-text-mute)', padding: 12 }}>
-          Aucun joueur dans cette équipe — ajoutez des joueurs dans Mes Équipes.
-        </div>
+        <div style={{ fontSize:13, color:'var(--orion-text-mute)', padding:12 }}>Aucun joueur dans cette équipe — ajoutez des joueurs dans Mes Équipes.</div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 8, marginBottom: 16 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:2, marginBottom:16 }}>
             {players.map(player => {
               const selected = selectedPlayerIds.has(player.id);
+              const circleColor = positionColor(player.position);
               return (
                 <button
                   key={player.id}
                   onClick={() => togglePlayer(player.id)}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    padding: '10px 12px',
-                    borderRadius: 8,
-                    border: '1.5px solid',
-                    borderColor: selected ? 'var(--orion-accent)' : 'var(--orion-line)',
-                    background: selected ? 'rgba(249,115,22,0.08)' : 'var(--orion-surface)',
-                    cursor: 'pointer',
-                    transition: 'all 0.15s',
-                    textAlign: 'left',
+                    display:'flex', alignItems:'center', gap:10,
+                    padding:'6px 8px', borderRadius:6,
+                    border: selected ? '1.5px solid var(--orion-accent)' : '1.5px solid transparent',
+                    background: selected ? 'rgba(61,128,224,0.06)' : 'transparent',
+                    cursor:'pointer', textAlign:'left', transition:'all 0.12s',
                   }}
                 >
-                  {player.photo_url ? (
-                    <img src={player.photo_url} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                  ) : (
-                    <div style={{ width: 32, height: 32, borderRadius: '50%', background: selected ? 'var(--orion-accent)' : 'var(--orion-surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: selected ? '#fff' : 'var(--orion-text)', flexShrink: 0 }}>
-                      {player.number}
-                    </div>
+                  <span style={{
+                    fontFamily:'var(--orion-font-mono)', fontSize:11, fontWeight:700, color:'#fff',
+                    background: selected ? circleColor : 'var(--orion-surface-3)',
+                    width:24, height:24, borderRadius:'50%',
+                    display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+                    transition:'background 0.12s',
+                  }}>
+                    {player.number ?? '?'}
+                  </span>
+                  <span style={{ flex:1, fontSize:13, color: selected ? 'var(--orion-text)' : 'var(--orion-text-dim)', fontWeight: selected ? 600 : 400, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
+                    {player.first_name} {player.last_name}
+                  </span>
+                  {player.position && (
+                    <span style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, color: selected ? circleColor : 'var(--orion-text-mute)', flexShrink:0 }}>
+                      {player.position}
+                    </span>
                   )}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: selected ? 'var(--orion-accent)' : 'var(--orion-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {player.first_name} {player.last_name}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--orion-text-mute)' }}>{player.position || `#${player.number}`}</div>
-                  </div>
-                  {selected && <Check size={14} style={{ color: 'var(--orion-accent)', flexShrink: 0 }} />}
                 </button>
               );
             })}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="o-btn o-btn--primary"
-              style={{ minWidth: 120 }}
-            >
+          <div style={{ display:'flex', alignItems:'center', gap:12, paddingTop:12, borderTop:'1px solid var(--orion-line)' }}>
+            <button onClick={handleSave} disabled={saving} className="o-btn o-btn--primary o-btn--sm">
               {saving ? 'Sauvegarde…' : 'Enregistrer'}
             </button>
-            {saved && <span style={{ fontSize: 12, color: 'var(--orion-green)' }}>✓ Composition sauvegardée</span>}
-            <span style={{ fontSize: 12, color: 'var(--orion-text-mute)' }}>{selectedPlayerIds.size} joueur{selectedPlayerIds.size > 1 ? 's' : ''} sélectionné{selectedPlayerIds.size > 1 ? 's' : ''}</span>
+            {saved && <span style={{ fontSize:12, color:'var(--orion-green)' }}>✓ Composition sauvegardée</span>}
+            <span style={{ fontSize:12, color:'var(--orion-text-mute)', marginLeft:'auto' }}>{selectedPlayerIds.size} joueur{selectedPlayerIds.size > 1 ? 's' : ''} sélectionné{selectedPlayerIds.size > 1 ? 's' : ''}</span>
           </div>
         </>
       )}
