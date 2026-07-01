@@ -401,9 +401,10 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
     return (
       <div key={button.id}>
         <div
-          className={`flex items-center gap-3 p-3  border bg-dark-tertiary/40 group transition-colors ${
-            dragOverId === button.id ? 'border-orion-accent bg-orange-900/10' : 'border-orion-line'
-          }`}
+style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borderRadius:8,
+            background: dragOverId === button.id ? 'rgba(61,128,224,0.06)' : 'var(--orion-surface)',
+            border: `1.5px solid ${dragOverId === button.id ? 'var(--orion-accent)' : 'var(--orion-line)'}`,
+            transition:'all .12s', cursor:'grab' }}
           draggable
           onDragStart={() => { dragItem.current = button.id; }}
           onDragOver={(e) => { e.preventDefault(); setDragOverId(button.id); }}
@@ -416,42 +417,42 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
           }}
           onDragEnd={() => { dragItem.current = null; setDragOverId(null); }}
         >
-          <GripVertical size={15} className="text-gray-500 flex-shrink-0 cursor-grab active:cursor-grabbing" />
+          <GripVertical size={15} style={{ color:"var(--orion-text-faint)", flexShrink:0, cursor:"grab" }} />
           <div
             className="w-3.5 h-3.5 rounded flex-shrink-0"
             style={{ backgroundColor: button.color }}
           />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-semibold text-white">{button.label}</span>
+              <span style={{ fontSize:13, fontWeight:600, color:"var(--orion-text)" }}>{button.label}</span>
               <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                 button.button_type === 'event'
-                  ? 'bg-red-900/40 text-red-400'
-                  : 'bg-blue-900/40 text-blue-400'
+                  ? 'bg-red-50 text-red-500 border border-red-200'
+                  : 'bg-blue-50 text-blue-500 border border-blue-200'
               }`}>
                 {button.button_type === 'event' ? 'Événement' : 'Qualificatif'}
               </span>
               {button.team_association && (
                 <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
                   button.team_association === 'A'
-                    ? 'bg-green-900/40 text-green-400'
-                    : 'bg-blue-900/40 text-blue-400'
+                    ? 'bg-green-50 text-green-600 border border-green-200'
+                    : 'bg-blue-50 text-blue-500 border border-blue-200'
                 }`}>
                   Équipe {button.team_association}
                 </span>
               )}
               {button.shortcut_key && (
-                <span className="text-[10px] font-mono text-gray-500 bg-gray-800 px-1 rounded">
+                <span style={{ fontSize:9, fontFamily:"var(--orion-font-mono)", color:"var(--orion-text-mute)", background:"var(--orion-surface-2)", padding:"1px 5px", borderRadius:4, border:"1px solid var(--orion-line)" }}>
                   {button.shortcut_key.toUpperCase()}
                 </span>
               )}
               {button.event_type ? (
-                <span className="text-[10px] text-gray-500">({button.event_type.name})</span>
+                <span style={{ fontSize:10, color:"var(--orion-text-faint)" }}>({button.event_type.name})</span>
               ) : (
                 <span className="text-[10px] text-amber-500 italic">Non assigné</span>
               )}
               {subButtons.length > 0 && (
-                <span className="text-[10px] text-gray-500">
+                <span style={{ fontSize:10, color:"var(--orion-text-faint)" }}>
                   {subButtons.length} sous-bouton{subButtons.length > 1 ? 's' : ''}
                 </span>
               )}
@@ -557,7 +558,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             {subButtons.map((sub) => (
               <div
                 key={sub.id}
-                className="flex items-center gap-3 p-2.5  border border-orion-line/60 bg-dark-tertiary/20 group"
+                style={{ display:"flex", alignItems:"center", gap:10, padding:"8px 12px", borderRadius:6, background:"var(--orion-surface-2)", border:"1px solid var(--orion-line)" }}
               >
                 <div
                   className="w-3 h-3 rounded flex-shrink-0"
@@ -584,7 +585,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       </span>
                     )}
                     {sub.shortcut_key && (
-                      <span className="text-[9px] font-mono text-gray-600 bg-gray-800 px-1 rounded">
+                      <span style={{ fontSize:9, fontFamily:"var(--orion-font-mono)", color:"var(--orion-text-faint)", background:"var(--orion-surface-3)", padding:"1px 4px", borderRadius:3 }}>
                         {sub.shortcut_key.toUpperCase()}
                       </span>
                     )}
