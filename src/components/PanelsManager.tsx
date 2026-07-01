@@ -645,7 +645,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
         {view === 'list' && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-medium text-white">Mes Panneaux</h1>
+              <h1 className="text-2xl font-medium" style={{ color:'var(--orion-text)' }}>Mes Panneaux</h1>
               <button
                 onClick={startCreate}
                 className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium shadow"
@@ -680,7 +680,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-white">{panel.name}</h3>
+                          <h3 className="font-semibold" style={{ color:'var(--orion-text)' }}>{panel.name}</h3>
                           {panel.is_default && (
                             <span className="text-xs px-2 py-0.5 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
                               Défaut
@@ -707,7 +707,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
         {view === 'create' && (
           <div>
-            <h1 className="text-2xl font-medium text-white mb-6">
+            <h1 className="text-2xl font-medium mb-6" style={{ color:'var(--orion-text)' }}>
               {selectedPanel ? 'Modifier le panneau' : 'Nouveau panneau'}
             </h1>
 
@@ -718,7 +718,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 </div>
               )}
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                   Nom du panneau <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -730,7 +730,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                   Description <span className="text-gray-500 font-normal text-xs">(optionnel)</span>
                 </label>
                 <textarea
@@ -766,7 +766,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-medium text-white">{selectedPanel.name}</h1>
+                  <h1 className="text-2xl font-medium" style={{ color:'var(--orion-text)' }}>{selectedPanel.name}</h1>
                   {selectedPanel.is_default && (
                     <span className="text-sm px-3 py-1 bg-orange-900/40 text-orion-accent rounded-full font-medium border border-orange-800/50">
                       Défaut
@@ -923,7 +923,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                             : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                         }`}
                       >
-                        <div className="text-sm font-bold text-white mb-0.5">Événement</div>
+                        <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Événement</div>
                         <div className="text-xs text-gray-400">Crée un événement horodaté</div>
                       </button>
                       <button
@@ -937,14 +937,14 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                             : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                         }`}
                       >
-                        <div className="text-sm font-bold text-white mb-0.5">Qualificatif</div>
+                        <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Qualificatif</div>
                         <div className="text-xs text-gray-400">Précise le dernier événement</div>
                       </button>
                     </div>
 
                     {!parentButtonId && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Localisation</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color:'var(--orion-text-dim)' }}>Localisation</label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           <button
                             onClick={() => { setLocationMode('none'); setIsZone(false); }}
@@ -954,7 +954,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                                 : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
-                            <div className="text-sm font-bold text-white mb-0.5">Normal</div>
+                            <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Normal</div>
                             <div className="text-[10px] text-gray-400">Pas de localisation</div>
                           </button>
                           <button
@@ -965,7 +965,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                                 : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
-                            <div className="text-sm font-bold text-white mb-0.5">3 Zones</div>
+                            <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>3 Zones</div>
                             <div className="text-[10px] text-gray-400">Déf / Méd / Off</div>
                           </button>
                           <button
@@ -976,7 +976,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                                 : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
-                            <div className="text-sm font-bold text-white mb-0.5">Position</div>
+                            <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Position</div>
                             <div className="text-[10px] text-gray-400">Terrain cliquable</div>
                           </button>
                           <button
@@ -987,7 +987,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                                 : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
                             }`}
                           >
-                            <div className="text-sm font-bold text-white mb-0.5">Position + But</div>
+                            <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Position + But</div>
                             <div className="text-[10px] text-gray-400">Terrain + cage</div>
                           </button>
                         </div>
@@ -995,7 +995,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     )}
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                         Étiquette <span className="text-red-400">*</span>
                       </label>
                       <input
@@ -1008,7 +1008,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                         Type d'événement <span className="text-gray-500 font-normal text-xs">(optionnel)</span>
                       </label>
                       <select
@@ -1029,7 +1029,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Couleur</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color:'var(--orion-text-dim)' }}>Couleur</label>
                         <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 mb-2">
                           {PRESET_COLORS.map((c) => (
                             <button
@@ -1054,7 +1054,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Aperçu</label>
+                        <label className="block text-sm font-medium mb-2" style={{ color:'var(--orion-text-dim)' }}>Aperçu</label>
                         <div
                           className="relative flex flex-col items-center justify-center gap-1  text-white"
                           style={{ backgroundColor: buttonColor, minHeight: '72px', padding: '10px 8px' }}
@@ -1077,7 +1077,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                     <div className="grid grid-cols-2 gap-4">
                       {!parentBtnForForm && (
                         <div>
-                          <label className="block text-sm font-medium text-gray-300 mb-1">
+                          <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                             Page
                           </label>
                           <div className="flex gap-2">
@@ -1098,7 +1098,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
                         </div>
                       )}
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                        <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                           Raccourci clavier <span className="text-gray-500 font-normal text-xs">(1 touche)</span>
                         </label>
                         <input
@@ -1114,7 +1114,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
                     {!parentBtnForForm && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                        <label className="block text-sm font-medium mb-1" style={{ color:'var(--orion-text-dim)' }}>
                           Groupe <span className="text-gray-500 font-normal text-xs">(optionnel)</span>
                         </label>
                         <input
@@ -1135,7 +1135,7 @@ export default function PanelsManager({ onBack }: PanelsManagerProps) {
 
                     {!parentBtnForForm && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium mb-2" style={{ color:'var(--orion-text-dim)' }}>
                           Équipe <span className="text-gray-500 font-normal text-xs">(optionnel)</span>
                         </label>
                         <div className="flex gap-2">

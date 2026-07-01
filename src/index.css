@@ -114,3 +114,18 @@ button { touch-action: manipulation; }
 .rounded-full {
   border-radius: 999px !important;
 }
+
+/* ===== FIX GLOBAL TEXTES INVISIBLES SUR FOND CLAIR ===== */
+/* Force la couleur de texte sur toutes les pages de contenu (hors zones .orion) */
+:root .text-white:not(.orion *),
+body > * .text-white:not(.orion .text-white) {
+  color: var(--orion-text) !important;
+}
+
+/* Plus simple et plus fiable : appliquer via le parent de contenu */
+.max-w-5xl .text-white,
+.max-w-4xl .text-white,
+[style*="orion-bg"] .text-white,
+[style*="orion-surface"] .text-white {
+  color: var(--orion-text) !important;
+}
