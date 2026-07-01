@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Clock, TrendingUp, BarChart3, Users, Video, Tag } 
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import Statistics from './Statistics';
+import MatchLineupFree from './MatchLineupFree';
 import { calculateTeamXG, getShotEvents } from '../utils/xg';
 import Timeline from './Timeline';
 import ExportButton from './ExportButton';
@@ -391,10 +392,8 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
         )}
 
         {activeTab === 'composition' && (
-          <MatchLineupEditor
+          <MatchLineupFree
             matchId={match.id}
-            teamAId={match.team_a_id ?? null}
-            teamBId={match.team_b_id ?? null}
             teamAName={match.team_a_name}
             teamBName={match.team_b_name}
           />
