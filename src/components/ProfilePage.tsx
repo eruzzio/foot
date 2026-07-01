@@ -240,20 +240,20 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {/* Tab Profil */}
         {activeTab === 'identity' && (
           <div className="space-y-5">
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Informations personnelles</h3>
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Prénom</label>
                   <input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Lucas"
                     autoComplete="off"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Nom</label>
                   <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Giovenco"
                     autoComplete="off"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
               </div>
               <div>
@@ -262,7 +262,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   {ROLES.map(r => (
                     <button key={r} type="button" onClick={() => setRole(r)}
                       className={`px-3 py-1.5  text-xs font-semibold transition-all ${
-                        role === r ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'
+                        role === r ? 'bg-orange-primary text-white' : 'bg-surface text-orion-text border border-orion-line'
                       }`}
                     >{r}</button>
                   ))}
@@ -293,14 +293,14 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {activeTab === 'security' && (
           <div className="space-y-5">
             {/* Email */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Mail size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Adresse email</h3>
               </div>
               <div className="flex gap-2">
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                  style={{ flex:1, padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 <button onClick={handleUpdateEmail} disabled={newEmail === email || saving}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white  text-sm font-semibold transition-colors">
                   Modifier
@@ -310,7 +310,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Mot de passe */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Lock size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Mot de passe</h3>
@@ -321,7 +321,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   <div className="relative">
                     <input type={showPw ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                       placeholder="8 caractères minimum"
-                      className="w-full px-3 py-2 pr-10 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                      style={{ width:"100%", padding:"8px 12px", paddingRight:40, background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                     <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
                       {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                     </button>
@@ -330,7 +330,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <div>
                   <label className="block text-xs text-gray-500 mb-1.5">Confirmer</label>
                   <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Répéter"
-                    className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary" />
+                    style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 </div>
                 {newPassword && confirmPassword && newPassword !== confirmPassword && <p className="text-xs text-red-400">Les mots de passe ne correspondent pas</p>}
                 {newPassword.length >= 8 && newPassword === confirmPassword && <p className="text-xs text-green-400">✓ Mot de passe valide</p>}
@@ -342,12 +342,12 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Sessions */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Smartphone size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Session active</h3>
               </div>
-              <div className="flex items-center justify-between p-3 bg-dark-tertiary ">
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--orion-surface-2)", borderRadius:6 }}>
                 <div>
                   <div className="text-sm text-white font-medium">Session actuelle</div>
                   <div className="text-xs text-gray-500">Navigateur web · {new Date().toLocaleDateString('fr-FR')}</div>
@@ -366,7 +366,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
         {activeTab === 'preferences' && (
           <div className="space-y-5">
             {/* Notifications */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Bell size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Notifications</h3>
@@ -376,7 +376,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                   { label: 'Rapports de match générés', value: notifMatchReport, set: setNotifMatchReport, desc: 'Recevoir une notification quand un rapport est prêt' },
                   { label: 'Demandes d\'adhésion club', value: notifClubRequests, set: setNotifClubRequests, desc: 'Être notifié quand quelqu\'un veut rejoindre votre club' },
                 ].map(n => (
-                  <div key={n.label} className="flex items-center justify-between p-3 bg-dark-tertiary ">
+                  <div key={n.label} style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"10px 14px", background:"var(--orion-surface-2)", borderRadius:6 }}>
                     <div>
                       <div className="text-sm text-white font-medium">{n.label}</div>
                       <div className="text-xs text-gray-500">{n.desc}</div>
@@ -392,7 +392,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Langue */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <div className="flex items-center gap-2 mb-4">
                 <Globe size={15} className="text-orange-primary" />
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Langue</h3>
@@ -401,7 +401,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 {[{ code: 'fr', label: '🇫🇷 Français' }, { code: 'en', label: '🇬🇧 English' }, { code: 'es', label: '🇪🇸 Español' }].map(l => (
                   <button key={l.code} onClick={() => setLanguage(l.code)}
                     className={`flex-1 py-2  text-sm font-semibold transition-all ${
-                      language === l.code ? 'bg-orange-primary text-white' : 'bg-dark-tertiary text-gray-400 border border-orion-line hover:text-white'
+                      language === l.code ? 'bg-orange-primary text-white' : 'bg-surface text-orion-text border border-orion-line'
                     }`}
                   >{l.label}</button>
                 ))}
@@ -420,7 +420,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
           <div className="space-y-5">
 
             {/* Déconnexion rapide */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Session</h3>
               <p className="text-sm text-gray-400 mb-4">Vous êtes connecté en tant que <span className="text-white font-semibold">{email}</span></p>
               <button onClick={handleSignOut}
@@ -430,10 +430,10 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             {/* Export données */}
-            <div className="bg-dark-secondary border border-orion-line  p-5">
+            <div style={{ background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:10, padding:"18px 20px", marginBottom:12 }}>
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Mes données</h3>
               <p className="text-sm text-gray-400 mb-4">Téléchargez toutes vos données ORION (matchs, stats, équipes) en format JSON.</p>
-              <button className="w-full py-2.5 bg-dark-tertiary hover:bg-dark-tertiary text-gray-300 border border-orion-line  text-sm font-semibold transition-colors">
+              <button style={{ width:"100%", padding:"10px", background:"var(--orion-surface-2)", border:"1.5px solid var(--orion-line)", borderRadius:8, fontSize:13, fontWeight:600, color:"var(--orion-text-dim)", cursor:"pointer" }}>
                 📦 Exporter mes données
               </button>
             </div>
@@ -449,7 +449,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <label className="block text-xs text-gray-500 mb-1.5">Confirmez en tapant votre email</label>
                 <input type="email" value={deleteConfirm} onChange={e => setDeleteConfirm(e.target.value)}
                   placeholder={email}
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-red-800/50 text-white  text-sm focus:outline-none focus:ring-2 focus:ring-red-500" />
+                  style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid rgba(224,59,46,0.5)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
               </div>
               <button onClick={handleDeleteAccount} disabled={deleteConfirm !== email}
                 className="w-full py-2.5 bg-red-700/30 hover:bg-red-700/50 disabled:opacity-30 text-red-400 border border-red-700/50  text-sm font-semibold transition-colors">
