@@ -887,20 +887,25 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                 )}
 
                 {showCreateForm && activeTab === 'list' && !editingButtonId && (
-                  <div className="max-w-lg space-y-5">
+                  <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:16 }} onClick={() => { resetButtonForm(); setShowCreateForm(false); }}>
+                    <div style={{ background:'var(--orion-surface)', borderRadius:14, padding:24, width:'100%', maxWidth:520, maxHeight:'90vh', overflowY:'auto', boxShadow:'0 24px 60px rgba(0,0,0,0.3)' }} onClick={e => e.stopPropagation()}>
+                      
+                      {/* Header modale */}
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20 }}>
+                        <h2 style={{ margin:0, fontSize:17, fontWeight:800, color:'var(--orion-text)' }}>
+                          {parentBtnForForm ? `Sous-bouton de "${parentBtnForForm.label}"` : 'Nouveau bouton'}
+                        </h2>
+                        <button onClick={() => { resetButtonForm(); setShowCreateForm(false); }} style={{ display:'flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', color:'var(--orion-text-mute)' }}>
+                          <X size={16} />
+                        </button>
+                      </div>
+
+                    <div className="max-w-lg space-y-5">
                     {parentBtnForForm && (
-                      <div className="flex items-center gap-2 px-3 py-2  border border-green-800/50 bg-green-900/10">
-                        <div
-                          className="w-3 h-3 rounded flex-shrink-0"
-                          style={{ backgroundColor: parentBtnForForm.color }}
-                        />
-                        <span className="text-xs text-green-400 font-medium">
-                          Sous-bouton de : {parentBtnForForm.label}
-                        </span>
-                        <button
-                          onClick={() => { setParentButtonId(null); setButtonType('event'); setButtonColor('#dc2626'); }}
-                          className="ml-auto text-gray-500 hover:text-gray-300"
-                        >
+                      <div style={{ display:'flex', alignItems:'center', gap:8, padding:'8px 12px', borderRadius:6, border:'1px solid rgba(31,168,90,0.3)', background:'rgba(31,168,90,0.06)' }}>
+                        <div className="w-3 h-3 rounded flex-shrink-0" style={{ backgroundColor: parentBtnForForm.color }} />
+                        <span style={{ fontSize:12, color:'#1FA85A', fontWeight:500 }}>Sous-bouton de : {parentBtnForForm.label}</span>
+                        <button onClick={() => { setParentButtonId(null); setButtonType('event'); setButtonColor('#dc2626'); }} style={{ marginLeft:'auto', background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)' }}>
                           <X size={12} />
                         </button>
                       </div>
@@ -1168,26 +1173,24 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                       </div>
                     )}
 
-                    <div className="flex gap-3 pt-2">
+                    <div style={{ display:'flex', gap:10, paddingTop:8 }}>
                       <button
                         onClick={addButton}
                         disabled={saving || !buttonLabel.trim()}
-                        className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white  transition-colors text-sm font-medium disabled:opacity-50"
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 20px', background:'var(--orion-accent)', color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:700, cursor:'pointer', opacity: (saving || !buttonLabel.trim()) ? 0.5 : 1 }}
                       >
                         <Check size={14} />
-                        {editingButtonId ? (
-                          saving ? 'Sauvegarde...' : 'Mettre à jour'
-                        ) : (
-                          saving ? 'Création...' : (parentBtnForForm ? 'Créer le sous-bouton' : 'Créer le bouton')
-                        )}
+                        {editingButtonId ? (saving ? 'Sauvegarde...' : 'Mettre à jour') : (saving ? 'Création...' : (parentBtnForForm ? 'Créer le sous-bouton' : 'Créer le bouton'))}
                       </button>
                       <button
                         onClick={() => { resetButtonForm(); setShowCreateForm(false); }}
-                        className="flex items-center gap-2 px-5 py-2 bg-dark-tertiary text-gray-300  hover:bg-dark-tertiary transition-colors text-sm font-medium"
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 16px', background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:8, fontSize:13, fontWeight:600, color:'var(--orion-text-dim)', cursor:'pointer' }}
                       >
                         <X size={14} />
                         Annuler
                       </button>
+                    </div>
+                    </div>
                     </div>
                   </div>
                 )}
