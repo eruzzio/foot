@@ -277,6 +277,8 @@ export function exportToPdf(data: PdfExportData): void {
     return `<tr><td style="padding:5px 8px;font-weight:700;font-size:12px;border-bottom:1px solid #f1f5f9;width:60px;">${p.label}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:${colorA};border-bottom:1px solid #f1f5f9;width:30px;">${p.teamA}</td><td style="padding:5px 6px;text-align:center;font-weight:700;color:${colorB};border-bottom:1px solid #f1f5f9;width:30px;">${p.teamB}</td><td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;">${tags}</td></tr>`;
   }).join('');
 
+  const scoreA = data.matchInfo.scoreA;
+  const scoreB = data.matchInfo.scoreB;
   const resultLabel = scoreA !== undefined && scoreB !== undefined
     ? (scoreA > scoreB ? 'VICTOIRE' : scoreA < scoreB ? 'DÉFAITE' : 'NUL')
     : '';
