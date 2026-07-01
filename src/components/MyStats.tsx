@@ -152,67 +152,81 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {filteredMatches.length === 0 && (
               <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--orion-text-mute)', fontSize: 13 }}>
                 Aucun match ne correspond à "{searchQuery}"
               </div>
             )}
-            {filteredMatches.map((match) => (
+            {filteredMatches.map((match) => {
+              const scoreA = match.team_a_score ?? 0;
+              const scoreB = match.team_b_score ?? 0;
+              const isWin = scoreA > scoreB;
+              const isDraw = scoreA === scoreB;
+              const resultColor = isWin ? '#1FA85A' : isDraw ? '#E8920C' : '#E03B2E';
+              const resultLabel = isWin ? 'VICTOIRE' : isDraw ? 'NUL' : 'DÉFAITE';
+              return (
               <div key={match.id}>
                 <div
-                  className="w-full bg-dark-secondary border border-orion-line  shadow-2xl p-6 hover:border-orion-accent/50 transition-all group flex items-center justify-between"
+                  onClick={() => setSelectedMatchId(match.id)}
+                  style={{
+                    display:'flex', alignItems:'center', gap:16,
+                    background:'var(--orion-surface)',
+                    border:'1.5px solid var(--orion-line)',
+                    borderLeft:`4px solid ${resultColor}`,
+                    borderRadius:10, padding:'14px 16px',
+                    cursor:'pointer', transition:'all .15s',
+                    position:'relative', overflow:'hidden',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--orion-accent)')}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.borderLeftColor = resultColor; }}
                 >
-                  <button
-                    onClick={() => setSelectedMatchId(match.id)}
-                    className="flex-1 text-left"
-                  >
-                    <h3 className="text-base font-medium mb-2 group-hover:text-orange-primary transition-colors" style={{ color: 'var(--orion-text)' }}>
-                      {match.team_a_name} vs {match.team_b_name}
-                    </h3>
-                    <div className="flex items-center gap-1 text-sm text-gray-400">
-                      <Calendar size={16} />
-                      {new Date(match.match_date).toLocaleDateString('fr-FR', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
+                  {/* Score */}
+                  <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:22, fontWeight:900, color:'var(--orion-text)', lineHeight:1, minWidth:52, textAlign:'center', letterSpacing:'-0.02em' }}>
+                    {scoreA}–{scoreB}
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:'var(--orion-text)', marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {match.team_a_name} <span style={{ color:'var(--orion-text-mute)', fontWeight:400 }}>vs</span> {match.team_b_name}
                     </div>
-                  </button>
-                  <div className="flex items-center gap-3 ml-4">
-                    <ChevronRight size={24} className="text-gray-600 group-hover:text-orange-primary transition-colors" />
+                    <div style={{ display:'flex', alignItems:'center', gap:8, fontSize:12, color:'var(--orion-text-mute)' }}>
+                      <Calendar size={12} />
+                      {new Date(match.match_date).toLocaleDateString('fr-FR', { weekday:'short', day:'2-digit', month:'long', year:'numeric' })}
+                      {match.tag_competition && <span style={{ color:'var(--orion-text-faint)' }}>· {match.tag_competition}</span>}
+                    </div>
+                  </div>
+
+                  {/* Badge résultat */}
+                  <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
+                    <span style={{ padding:'3px 9px', borderRadius:999, fontSize:9, fontWeight:800, letterSpacing:'0.06em', background:`${resultColor}18`, border:`1px solid ${resultColor}50`, color:resultColor }}>
+                      {resultLabel}
+                    </span>
+                    <ChevronRight size={16} style={{ color:'var(--orion-text-faint)' }} />
                     <button
                       onClick={(e) => handleDeleteClick(match.id, e)}
-                      className="p-2 hover:bg-red-900/30  transition-colors text-gray-400 hover:text-red-400"
-                      title="Supprimer ce rapport"
+                      style={{ padding:6, borderRadius:6, border:'none', background:'none', cursor:'pointer', color:'var(--orion-text-faint)' }}
+                      onMouseEnter={e => (e.currentTarget.style.color = '#E03B2E')}
+                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--orion-text-faint)')}
+                      title="Supprimer"
                     >
-                      <Trash2 size={20} />
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
                 {deleteConfirmId === match.id && (
-                  <div className="mt-2 bg-red-900/20 border border-red-700/50  p-4 flex items-center justify-between">
-                    <p className="text-red-300 text-sm">Êtes-vous sûr ? Cette action est irréversible.</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setDeleteConfirmId(null)}
-                        className="px-3 py-1 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
-                      >
-                        Annuler
-                      </button>
-                      <button
-                        onClick={() => deleteMatch(match.id)}
-                        disabled={isDeleting}
-                        className="px-3 py-1 text-sm bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded transition-colors"
-                      >
-                        {isDeleting ? 'Suppression...' : 'Supprimer'}
-                      </button>
+                  <div style={{ marginTop:4, background:'rgba(224,59,46,0.08)', border:'1.5px solid rgba(224,59,46,0.3)', borderRadius:8, padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12 }}>
+                    <p style={{ fontSize:13, color:'#E03B2E' }}>Êtes-vous sûr ? Cette action est irréversible.</p>
+                    <div style={{ display:'flex', gap:8 }}>
+                      <button onClick={() => setDeleteConfirmId(null)} style={{ padding:'5px 12px', fontSize:12, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface)', color:'var(--orion-text-dim)', cursor:'pointer' }}>Annuler</button>
+                      <button onClick={() => deleteMatch(match.id)} disabled={isDeleting} style={{ padding:'5px 12px', fontSize:12, borderRadius:6, border:'none', background:'#E03B2E', color:'#fff', cursor:'pointer', opacity: isDeleting ? 0.5 : 1 }}>{isDeleting ? 'Suppression...' : 'Supprimer'}</button>
                     </div>
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
