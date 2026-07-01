@@ -364,7 +364,7 @@ ${show('timeline') ? `<div><h2>Activité par période et par type</h2><div class
 
 <div style="padding-top:8px;border-top:1px solid #e1e7f0;display:flex;justify-content:space-between;"><span style="font-size:8px;color:#aab8cc;font-family:monospace;">ORION · Sports Video Analytics</span><span style="font-size:8px;color:#aab8cc;">Généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span></div>
 
-</div><script>window.onload = function() { window.print(); };</script></body></html>`;
+</div><script>setTimeout(function() { window.print(); }, 800);</script></body></html>`;
 
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
   const url = URL.createObjectURL(blob);
