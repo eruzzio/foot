@@ -504,7 +504,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
             <div className="max-w-lg space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-300 mb-1">Étiquette</label>
-                <input type="text" value={buttonLabel} onChange={(e) => setButtonLabel(e.target.value)} className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500" />
+                <input type="text" value={buttonLabel} onChange={(e) => setButtonLabel(e.target.value)} style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none", boxSizing:"border-box" }} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -544,7 +544,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                   <Check size={14} />
                   {saving ? 'Sauvegarde...' : 'Mettre à jour'}
                 </button>
-                <button onClick={() => { resetButtonForm(); setShowCreateForm(false); }} className="flex items-center gap-2 px-5 py-2 bg-dark-tertiary text-gray-300 hover:bg-dark-tertiary transition-colors text-sm font-medium">
+                <button onClick={() => { resetButtonForm(); setShowCreateForm(false); }} style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"8px 16px", background:"var(--orion-surface-2)", border:"1.5px solid var(--orion-line)", borderRadius:8, fontSize:13, fontWeight:600, color:"var(--orion-text-dim)", cursor:"pointer" }}>
                   <X size={14} />
                   Annuler
                 </button>
@@ -732,7 +732,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: Panneau football"
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500"
+                  style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none", boxSizing:"border-box" }}
                 />
               </div>
               <div>
@@ -849,9 +849,9 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                           </p>
                           <button
                             onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                            className="flex items-center gap-1.5 px-3 py-1.5 bg-orange-primary hover-orange text-white  text-xs font-medium flex-shrink-0 ml-4"
+                            style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-accent)', color:'#fff', border:'none', borderRadius:999, fontSize:12, fontWeight:700, cursor:'pointer', flexShrink:0 }}
                           >
-                            <Plus size={12} />
+                            <Plus size={13} />
                             Bouton
                           </button>
                         </div>
@@ -914,8 +914,8 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                         }}
                         className={`p-3  border-2 transition-all text-left ${
                           buttonType === 'event'
-                            ? 'border-red-500 bg-red-900/20'
-                            : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
+                            ? 'border-red-400 bg-red-50'
+                            : 'border-orion-line bg-surface hover:border-gray-400'
                         }`}
                       >
                         <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Événement</div>
@@ -928,8 +928,8 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                         }}
                         className={`p-3  border-2 transition-all text-left ${
                           buttonType === 'keyword'
-                            ? 'border-blue-500 bg-blue-900/20'
-                            : 'border-orion-line bg-dark-tertiary hover:border-gray-600'
+                            ? 'border-blue-400 bg-blue-50'
+                            : 'border-orion-line bg-surface hover:border-gray-400'
                         }`}
                       >
                         <div className="text-sm font-bold mb-0.5" style={{ color:'var(--orion-text)' }}>Qualificatif</div>
@@ -998,7 +998,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                         value={buttonLabel}
                         onChange={(e) => setButtonLabel(e.target.value)}
                         placeholder="Nom du bouton"
-                        className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none", boxSizing:"border-box" }}
                       />
                     </div>
 
@@ -1118,7 +1118,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                           onChange={(e) => setButtonGroup(e.target.value)}
                           placeholder="Ex: Attaque, Défense..."
                           list="group-suggestions"
-                          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          style={{ width:"100%", padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none", boxSizing:"border-box" }}
                         />
                         {existingGroups.length > 0 && (
                           <datalist id="group-suggestions">
