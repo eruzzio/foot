@@ -571,67 +571,41 @@ export default function MyTeam({ onBack }: MyTeamProps) {
 
   if (view === 'detail' && selectedTeam) {
     return (
-      <div className="min-h-screen bg-dark p-4 text-white">
+      <div style={{ minHeight:'100vh', background:'var(--orion-bg)', padding:16 }}>
         <div className="max-w-7xl mx-auto">
-          <header className="mb-6">
-            <div className="flex items-center gap-4 mb-4">
-              <button
-                onClick={() => { setView('list'); setSelectedTeam(null); }}
-                className="o-btn o-btn--ghost o-btn--sm"
-              >
-                ←
-              </button>
-              <div className="flex-1">
-                <h1 className="text-2xl font-medium text-white">{selectedTeam.name}</h1>
-                {selectedTeam.category && (
-                  <p className="text-orion-accent text-sm font-medium">{selectedTeam.category}</p>
-                )}
-              </div>
-              <button
-                onClick={() => { setEditingTeamId(selectedTeam.id); setShowTeamSettings(true); }}
-                className="flex items-center gap-2 px-4 py-2 bg-dark-tertiary text-white  hover:bg-dark-tertiary transition-colors"
-              >
-                <Settings size={18} />
-                Paramètres
-              </button>
-              <button
-                onClick={handleExportTeamPdf}
-                className="flex items-center gap-2 px-4 py-2 bg-orange-primary text-white  hover:bg-orange-600 transition-colors"
-              >
-                <Download size={18} />
-                Fiche PDF
-              </button>
-            </div>
-
-            <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-4 md:p-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                {selectedTeam.logo_url ? (
-                  <img
-                    src={selectedTeam.logo_url}
-                    alt={selectedTeam.name}
-                    className="w-20 h-20 sm:w-16 sm:h-16  object-cover border-2 border-orion-line flex-shrink-0"
-                  />
-                ) : (
-                  <div className="w-16 h-16  bg-dark-tertiary border-2 border-orion-line flex items-center justify-center flex-shrink-0">
-                    <Shield size={28} className="text-gray-500" />
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                    <h2 className="text-xl sm:text-2xl font-medium text-white truncate">{selectedTeam.name}</h2>
-                    {selectedTeam.category && (
-                      <span className="px-3 py-1 bg-orange-primary/20 text-orion-accent rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
-                        {selectedTeam.category}
-                      </span>
-                    )}
-                  </div>
-                  {selectedTeam.description && (
-                    <p className="text-xs text-white-mute line-clamp-2">{selectedTeam.description}</p>
+          {/* Hero sombre */}
+          <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'22px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+            <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+            <div style={{ position:'relative', display:'flex', alignItems:'center', gap:16, flexWrap:'wrap' }}>
+              {/* Logo équipe */}
+              {selectedTeam.logo_url ? (
+                <img src={selectedTeam.logo_url} alt={selectedTeam.name} style={{ width:56, height:56, borderRadius:12, objectFit:'cover', border:'2px solid rgba(255,255,255,0.15)', flexShrink:0 }} />
+              ) : (
+                <div style={{ width:56, height:56, borderRadius:12, background:'rgba(61,128,224,0.2)', border:'2px solid rgba(61,128,224,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <Shield size={24} style={{ color:'var(--orion-accent)' }} />
+                </div>
+              )}
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:6 }}>Mes Équipes</div>
+                <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                  <h1 style={{ margin:0, fontSize:22, fontWeight:800, color:'#fff' }}>{selectedTeam.name}</h1>
+                  {selectedTeam.category && (
+                    <span style={{ padding:'3px 10px', borderRadius:999, fontSize:11, fontWeight:700, background:'rgba(61,128,224,0.2)', border:'1px solid rgba(61,128,224,0.4)', color:'#7ab4f0' }}>{selectedTeam.category}</span>
                   )}
                 </div>
+                {selectedTeam.description && <p style={{ margin:'4px 0 0', fontSize:12, color:'#8aa0bd' }}>{selectedTeam.description}</p>}
+              </div>
+              <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+                <button onClick={() => { setView('list'); setSelectedTeam(null); }} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:12, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>← Retour</button>
+                <button onClick={() => { setEditingTeamId(selectedTeam.id); setShowTeamSettings(true); }} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:12, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>
+                  <Settings size={14} /> Paramètres
+                </button>
+                <button onClick={handleExportTeamPdf} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-accent)', border:'none', borderRadius:999, fontSize:12, fontWeight:700, color:'#fff', cursor:'pointer', boxShadow:'0 4px 14px rgba(61,128,224,0.4)' }}>
+                  <Download size={14} /> Fiche PDF
+                </button>
               </div>
             </div>
-          </header>
+          </div>
 
           <div className="flex gap-1 mb-6 bg-dark-secondary border border-orion-line  p-1">
             {([
@@ -945,29 +919,25 @@ export default function MyTeam({ onBack }: MyTeamProps) {
   }
 
   return (
-    <div className="min-h-screen bg-dark p-4 text-white">
+    <div style={{ minHeight:'100vh', background:'var(--orion-bg)', padding:16 }}>
       <div className="max-w-4xl mx-auto">
-        <header className="mb-8">
-          <div className="flex items-center gap-4 mb-2">
-            <button
-              onClick={onBack}
-              className="o-btn o-btn--ghost o-btn--sm"
-            >
-              ←
-            </button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-medium text-white">Mes Équipes</h1>
-              <p className="text-gray-400">Gérez vos équipes, effectifs et compositions tactiques</p>
+        {/* Hero sombre */}
+        <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'24px 24px 20px', color:'#fff', marginBottom:20, boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+          <div style={{ position:'absolute', top:0, right:0, width:320, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+          <div style={{ position:'relative', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+            <div>
+              <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>Gestion</div>
+              <h1 style={{ margin:0, fontSize:24, fontWeight:800, color:'#fff' }}>Mes Équipes</h1>
+              <p style={{ margin:'6px 0 0', fontSize:13, color:'#8aa0bd' }}>Gérez vos équipes, effectifs et compositions tactiques</p>
             </div>
-            <button
-              onClick={() => { setEditingTeamId(null); setShowTeamSettings(true); }}
-              className="flex items-center gap-2 px-5 py-2.5 bg-orange-primary text-white  hover-orange transition-colors font-medium"
-            >
-              <Plus size={18} />
-              Créer une équipe
-            </button>
+            <div style={{ display:'flex', gap:8, flexShrink:0 }}>
+              <button onClick={onBack} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 16px', background:'rgba(255,255,255,0.08)', border:'1.5px solid rgba(255,255,255,0.15)', borderRadius:999, fontSize:13, fontWeight:600, color:'#dbe3ee', cursor:'pointer' }}>← Retour</button>
+              <button onClick={() => { setEditingTeamId(null); setShowTeamSettings(true); }} style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'10px 18px', background:'var(--orion-accent)', border:'none', borderRadius:999, fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer', boxShadow:'0 4px 14px rgba(61,128,224,0.4)' }}>
+                <Plus size={15} /> Créer une équipe
+              </button>
+            </div>
           </div>
-        </header>
+        </div>
 
         {loadingTeams ? (
           <div className="flex items-center justify-center py-20">
