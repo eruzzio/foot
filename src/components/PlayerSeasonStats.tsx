@@ -352,7 +352,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
   };
 
   const SortBtn = ({ label, sKey }: { label: string; sKey: SortKey }) => (
-    <button onClick={() => handleSort(sKey)} className={`flex items-center gap-1 text-xs font-semibold transition-colors ${sortKey === sKey ? 'text-orange-400' : 'text-gray-500 hover:text-gray-300'}`}>
+    <button onClick={() => handleSort(sKey)} style={{ display:'flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, fontFamily:'var(--orion-font-mono)', textTransform:'uppercase', letterSpacing:'0.08em', background:'none', border:'none', cursor:'pointer', color: sortKey === sKey ? 'var(--orion-accent)' : 'var(--orion-text-mute)' }}>
       {label}{sortKey === sKey ? (sortAsc ? <ChevronUp size={12} /> : <ChevronDown size={12} />) : null}
     </button>
   );
@@ -367,8 +367,8 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
     />
   );
 
-  if (loading) return <div className="flex items-center justify-center py-16"><div className="text-gray-400 text-sm">Chargement…</div></div>;
-  if (stats.length === 0) return <div className="flex flex-col items-center justify-center py-16 text-center"><Activity size={40} className="text-gray-600 mb-3" /><p className="text-gray-400 text-sm">Aucun joueur dans l'effectif</p></div>;
+  if (loading) return <div className="flex items-center justify-center py-16"><div style={{ color:"var(--orion-text-mute)", fontSize:13 }}>Chargement…</div></div>;
+  if (stats.length === 0) return <div className="flex flex-col items-center justify-center py-16 text-center"><Activity size={40} className="text-gray-600 mb-3" /><p style={{ color:"var(--orion-text-mute)", fontSize:13 }}>Aucun joueur dans l'effectif</p></div>;
 
   const totalMatches = Math.max(...stats.map(s => s.matchesPlayed), 0);
 
@@ -431,14 +431,14 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
           <table className="w-full min-w-[700px]">
             <thead>
               <tr style={{ borderBottom:"1.5px solid var(--orion-line)", background:"var(--orion-surface-2)" }}>
-                <th className="text-left px-4 py-2"><SortBtn label="Joueur" sKey="name" /></th>
-                <th className="text-center px-2 py-2"><SortBtn label="MJ" sKey="matchesPlayed" /></th>
-                <th className="text-center px-2 py-2"><SortBtn label="Buts" sKey="goals" /></th>
-                <th className="text-center px-2 py-2"><SortBtn label="PD" sKey="assists" /></th>
-                <th className="text-center px-2 py-2"><SortBtn label="Mins" sKey="minutesPlayed" /></th>
-                <th className="text-center px-2 py-2 text-yellow-400 text-xs font-semibold">🟨</th>
-                <th className="text-center px-2 py-2 text-red-400 text-xs font-semibold">🟥</th>
-                <th className="text-center px-2 py-2"><SortBtn label="Actions" sKey="totalEvents" /></th>
+                <th style={{ textAlign:"left", padding:"8px 14px" }}><SortBtn label="Joueur" sKey="name" /></th>
+                <th style={{ textAlign:"center", padding:"8px 6px" }}><SortBtn label="MJ" sKey="matchesPlayed" /></th>
+                <th style={{ textAlign:"center", padding:"8px 6px" }}><SortBtn label="Buts" sKey="goals" /></th>
+                <th style={{ textAlign:"center", padding:"8px 6px" }}><SortBtn label="PD" sKey="assists" /></th>
+                <th style={{ textAlign:"center", padding:"8px 6px" }}><SortBtn label="Mins" sKey="minutesPlayed" /></th>
+                <th style={{ textAlign:"center", padding:"8px 6px", color:"#f59e0b", fontSize:12 }}>🟨</th>
+                <th style={{ textAlign:"center", padding:"8px 6px", color:"var(--orion-red)", fontSize:12 }}>🟥</th>
+                <th style={{ textAlign:"center", padding:"8px 6px" }}><SortBtn label="Actions" sKey="totalEvents" /></th>
 
                 {statDefinitions.map(def => (
                   <th key={def.id} style={{ textAlign:"center", padding:"8px 6px", fontSize:10, color:"var(--orion-text-mute)", fontWeight:700, fontFamily:"var(--orion-font-mono)", textTransform:"uppercase", letterSpacing:"0.08em" }}>{def.name}</th>
@@ -451,7 +451,7 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
                 const playerMatchStats = matchStats[player.id] ?? [];
                 return (
                   <>
-                    <tr key={player.id} onClick={() => handleTogglePlayer(player.id)} className="hover:bg-dark-tertiary/40 transition-colors cursor-pointer">
+                    <tr key={player.id} onClick={() => handleTogglePlayer(player.id)} style={{ cursor:"pointer", transition:"background .1s" }} onMouseEnter={e => (e.currentTarget as HTMLTableRowElement).style.background="var(--orion-surface-2)"} onMouseLeave={e => (e.currentTarget as HTMLTableRowElement).style.background=""}>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           {player.photo_url ? (
@@ -467,12 +467,12 @@ export default function PlayerSeasonStats({ teamId }: PlayerSeasonStatsProps) {
                         </div>
                       </td>
                       <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, fontWeight:600, color:"var(--orion-text-dim)" }}>{player.matchesPlayed}</td>
-                      <td className="text-center px-2 py-3 text-sm font-bold text-green-400">{player.goals || '–'}</td>
-                      <td className="text-center px-2 py-3 text-sm font-bold text-blue-400">{player.assists || '–'}</td>
+                      <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, fontWeight:700, color:"var(--orion-green)" }}>{player.goals || '–'}</td>
+                      <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, fontWeight:700, color:"var(--orion-accent)" }}>{player.assists || '–'}</td>
                       <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, color:"var(--orion-text-dim)" }}>{player.minutesPlayed ? `${player.minutesPlayed}'` : '–'}</td>
-                      <td className="text-center px-2 py-3 text-sm text-yellow-400">{player.yellowCards || '–'}</td>
-                      <td className="text-center px-2 py-3 text-sm text-red-400">{player.redCards || '–'}</td>
-                      <td className="text-center px-2 py-3 text-sm font-semibold text-orange-400">{player.totalEvents}</td>
+                      <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, color:"#f59e0b" }}>{player.yellowCards || '–'}</td>
+                      <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, color:"var(--orion-red)" }}>{player.redCards || '–'}</td>
+                      <td style={{ textAlign:"center", padding:"10px 6px", fontSize:13, fontWeight:600, color:"var(--orion-amber)" }}>{player.totalEvents}</td>
 
                       {statDefinitions.map(def => (
                         <td key={def.id} style={{ textAlign:"center", padding:"10px 6px", fontSize:13, color:"var(--orion-text-dim)" }}>
