@@ -236,34 +236,37 @@ export default function HomePage({ onNavigate, isAdmin = false, isPro = false }:
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
 
-              {/* Header */}
-              <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', gap:20, flexWrap:'wrap' }}>
-                <div>
-                  <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'var(--orion-text-mute)', marginBottom:7 }}>
-                    Tableau de bord
+              {/* Hero sombre */}
+              <div style={{ position:'relative', overflow:'hidden', background:'linear-gradient(135deg, #0d1117 0%, #16243a 100%)', borderRadius:14, padding:'28px 24px 24px', color:'#fff', boxShadow:'0 16px 40px -16px rgba(13,17,23,0.4)' }}>
+                <div style={{ position:'absolute', top:0, right:0, width:360, height:'100%', background:'radial-gradient(circle at 80% 30%, rgba(61,128,224,0.2), transparent 60%)', pointerEvents:'none' }} />
+                <div style={{ position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:16, flexWrap:'wrap', marginBottom:20 }}>
+                  <div>
+                    <div style={{ fontFamily:'var(--orion-font-mono)', fontSize:10, letterSpacing:'0.16em', textTransform:'uppercase', color:'#8aa0bd', marginBottom:8 }}>
+                      Tableau de bord · Saison
+                    </div>
+                    <h1 style={{ margin:0, fontSize:26, fontWeight:800, letterSpacing:'-0.02em', color:'#fff' }}>
+                      {userName ? `Salut, ${userName}` : 'Salut !'}
+                    </h1>
                   </div>
-                  <h1 style={{ margin:0, fontSize:24, fontWeight:800, letterSpacing:'-0.02em', color:'var(--orion-text)' }}>
-                    {userName ? `Salut, ${userName}` : 'Salut !'}
-                  </h1>
+                  <button onClick={() => onNavigate('live')} style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'11px 20px', background:'var(--orion-accent)', color:'#fff', border:'none', borderRadius:999, fontSize:13, fontWeight:700, cursor:'pointer', flexShrink:0, boxShadow:'0 4px 14px rgba(61,128,224,0.4)' }}>
+                    <Radio size={15} /> Démarrer un codage live
+                  </button>
                 </div>
-                <button onClick={() => onNavigate('live')} style={{ display:'inline-flex', alignItems:'center', gap:8, padding:'11px 18px', background:'var(--orion-accent)', color:'#fff', border:'1.5px solid var(--orion-accent)', borderRadius:999, fontSize:13, fontWeight:700, cursor:'pointer' }}>
-                  <Radio size={15} /> Démarrer un codage live
-                </button>
-              </div>
 
-              {/* KPIs */}
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(140px, 1fr))', gap:0, background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, overflow:'hidden' }}>
-                {[
-                  { label:'Matchs', value: matches.length, sub:`${stats.wins}V · ${stats.draws}N · ${stats.losses}D` },
-                  { label:'Buts', value: stats.goalsFor, sub:`${stats.goalsAgainst} encaissés`, accent: true },
-                  { label:'xG Saison', value: stats.xgFor.toFixed(1), sub:'expected goals' },
-                ].map((k, i, arr) => (
-                  <div key={i} style={{ padding:'18px 20px', borderRight: i < arr.length-1 ? '1px solid var(--orion-line)' : 'none' }}>
-                    <div style={{ fontSize:10, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'var(--orion-text-mute)', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:8 }}>{k.label}</div>
-                    <div style={{ fontSize:34, fontWeight:800, lineHeight:1, color: k.accent ? 'var(--orion-accent)' : 'var(--orion-text)', letterSpacing:'-0.02em' }}>{k.value}</div>
-                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:6 }}>{k.sub}</div>
-                  </div>
-                ))}
+                {/* KPIs dans le hero */}
+                <div style={{ position:'relative', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(110px, 1fr))', gap:0, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:10, overflow:'hidden' }}>
+                  {[
+                    { label:'Matchs', value: matches.length, sub:`${stats.wins}V · ${stats.draws}N · ${stats.losses}D` },
+                    { label:'Buts', value: stats.goalsFor, sub:`${stats.goalsAgainst} encaissés`, accent: '#3d80e0' },
+                    { label:'xG Saison', value: stats.xgFor.toFixed(1), sub:'expected goals' },
+                  ].map((k, i, arr) => (
+                    <div key={i} style={{ padding:'16px 18px', borderRight: i < arr.length-1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+                      <div style={{ fontSize:10, fontFamily:'var(--orion-font-mono)', fontWeight:600, color:'#8aa0bd', textTransform:'uppercase', letterSpacing:'0.12em', marginBottom:6 }}>{k.label}</div>
+                      <div style={{ fontSize:30, fontWeight:800, lineHeight:1, color: k.accent || '#fff', letterSpacing:'-0.02em' }}>{k.value}</div>
+                      <div style={{ fontSize:11, color:'#6b8199', marginTop:5 }}>{k.sub}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Match cards */}
