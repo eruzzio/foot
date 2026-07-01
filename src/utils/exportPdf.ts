@@ -366,16 +366,10 @@ ${show('timeline') ? `<div><h2>Activité par période et par type</h2><div class
 
 </div><script>setTimeout(function(){window.print();},600);</script></body></html>`;
 
-  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const w = window.open(url, '_blank');
-  if (!w) {
-    // Popup bloqué - fallback download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `rapport-${Date.now()}.html`;
-    a.click();
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
   }
-  setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 // rebuild Thu May 21 07:12:36 UTC 2026
