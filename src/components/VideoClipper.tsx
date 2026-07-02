@@ -58,7 +58,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
       const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
       if (!stream) { setError('Utilisez Chrome pour cette fonctionnalité.'); setProcessing(false); return; }
       const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 });
       const chunks: BlobPart[] = [];
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
       const clip_duration = clipEnd - clipStart;
@@ -67,6 +67,14 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
         recorder.onerror = () => reject(new Error('Erreur'));
         video.currentTime = clipStart;
         video.muted = true;
+        // Forcer résolution native pour la capture (évite downscale du lecteur HTML)
+        video.style.width = video.videoWidth + 'px';
+        video.style.height = video.videoHeight + 'px';
+        video.style.maxHeight = 'none';
+        video.style.position = 'fixed';
+        video.style.opacity = '0';
+        video.style.pointerEvents = 'none';
+        video.style.zIndex = '-1';
         video.onseeked = () => {
           recorder.start(100);
           video.play();
@@ -77,6 +85,14 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
         };
       });
       video.muted = false;
+      // Rétablir le style normal
+      video.style.width = '';
+      video.style.height = '';
+      video.style.maxHeight = '240px';
+      video.style.position = '';
+      video.style.opacity = '';
+      video.style.pointerEvents = '';
+      video.style.zIndex = '';
       // Blob WebM téléchargé en .mp4 — lu par VLC, QuickTime, navigateurs modernes
       const blob = new Blob(chunks, { type: 'video/mp4' });
       setClipUrl(URL.createObjectURL(blob));
