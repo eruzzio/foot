@@ -37,20 +37,18 @@ export default function VideoClipper({ matchDuration, onClose, pendingClip, init
   // État ffmpeg
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [ffmpegLoading, setFfmpegLoading] = useState(false);
-
-  // Charger ffmpeg automatiquement si vidéo déjà disponible
-  useEffect(() => {
-    if (initialVideoFile) loadFFmpeg();
-  }, []);
-  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
-  const [ffmpegLoading, setFfmpegLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [clipUrl, setClipUrl] = useState('');
   const [error, setError] = useState('');
 
-  // Offset vidéo/match : timestamp vidéo du coup d'envoi
+  // Offset vidéo/match
   const [videoOffset, setVideoOffset] = useState(initialVideoOffset);
+
+  // Charger ffmpeg automatiquement si vidéo déjà disponible
+  useEffect(() => {
+    if (initialVideoFile) loadFFmpeg();
+  }, []);
 
   // Appliquer le clip demandé depuis la timeline
   useEffect(() => {
