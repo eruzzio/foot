@@ -485,7 +485,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                   onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
                 >
-                  <Scissors size={11} />
+                  <Download size={11} />
                 </button>
               )}
 
