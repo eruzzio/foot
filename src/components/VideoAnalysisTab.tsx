@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, X, Link } from 'lucide-react';
+import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, X, Link, Download, Scissors } from 'lucide-react';
 import { Match, MatchEventWithDetails } from '../types/database';
 import { buildVeoTimestampUrl } from '../utils/veoParser';
+import VideoClipper from './VideoClipper';
 
 interface VideoAnalysisTabProps {
   match: Match & { events: MatchEventWithDetails[] };
@@ -23,10 +24,12 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [clipBefore, setClipBefore] = useState(3);  // secondes avant (global)
-  const [clipAfter, setClipAfter] = useState(5);   // secondes après (global)
-  const [clipOffsets, setClipOffsets] = useState<Record<string, number>>({}); // offset individuel par action
-  const [offset, setOffset] = useState(0);          // décalage sync vidéo
+  const [clipBefore, setClipBefore] = useState(3);
+  const [clipAfter, setClipAfter] = useState(5);
+  const [clipOffsets, setClipOffsets] = useState<Record<string, number>>({});
+  const [offset, setOffset] = useState(0);
+  const [pendingClip, setPendingClip] = useState<{ timestamp: number; label: string; team: string } | null>(null);
+  const [showClipper, setShowClipper] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -469,6 +472,23 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orion-red)', background: 'var(--orion-red-dim)', padding: '2px 7px', borderRadius: 3, flexShrink: 0 }}>RATÉ</span>
               )}
 
+              {/* Bouton export clip */}
+              {videoSource?.type === 'local' && (
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setPendingClip({ timestamp: event.timestamp + offset, label: event.event_type?.name || event.label || 'Action', team: event.team || 'A' });
+                    setShowClipper(true);
+                  }}
+                  style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'var(--orion-text-mute)', flexShrink:0 }}
+                  title="Exporter ce clip en MP4"
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
+                >
+                  <Scissors size={11} />
+                </button>
+              )}
+
               {/* Icône play si vidéo */}
               {videoSource && (
                 <Play size={12} style={{ color: isActive ? 'var(--orion-accent)' : 'var(--orion-text-faint)', flexShrink: 0 }} />
@@ -483,6 +503,15 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         <div style={{ marginTop: 12, padding: '10px 14px', background: 'var(--orion-surface)', border: '1px solid var(--orion-line)', borderRadius: 4, fontSize: 11, color: 'var(--orion-text-mute)' }}>
           💡 <strong style={{ color: 'var(--orion-text-dim)' }}>Décalage</strong> — si la vidéo commence avant le coup d'envoi, ajuste le décalage pour synchroniser les timestamps ORION avec la vidéo.
         </div>
+      )}
+
+      {/* VideoClipper modale */}
+      {showClipper && (
+        <VideoClipper
+          matchDuration={match.match_time || 5400}
+          pendingClip={pendingClip}
+          onClose={() => { setShowClipper(false); setPendingClip(null); }}
+        />
       )}
     </div>
   );
