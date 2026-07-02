@@ -1,13 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Upload, Download, X, Play, Pause, Film, Scissors, Clock, Loader, Check } from 'lucide-react';
-import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
-interface ClipRequest {
-  timestamp: number;
-  label: string;
-  team: string;
-}
-
+interface ClipRequest { timestamp: number; label: string; team: string; }
 interface Props {
   matchDuration: number;
   onClose: () => void;
@@ -25,13 +19,11 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-
   const [clipStart, setClipStart] = useState(0);
   const [clipEnd, setClipEnd] = useState(10);
   const [beforeSecs, setBeforeSecs] = useState(5);
   const [afterSecs, setAfterSecs] = useState(5);
   const [videoOffset, setVideoOffset] = useState(initialVideoOffset);
-
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [clipUrl, setClipUrl] = useState('');
@@ -47,126 +39,49 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
   }, [pendingClip, duration, videoOffset]);
 
   const handleFileSelect = (file: File) => {
-    const url = URL.createObjectURL(file);
     setVideoFile(file);
-    setVideoUrl(url);
+    setVideoUrl(URL.createObjectURL(file));
     setClipUrl('');
     setError('');
   };
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
-  const [outputFormat, setOutputFormat] = useState<'webm'|'mp4'>('mp4');
-
-  // Découpage via MediaRecorder
   const exportClip = async () => {
     if (!videoRef.current || !videoFile) return;
     setProcessing(true);
     setProgress(0);
     setClipUrl('');
     setError('');
-
     const video = videoRef.current;
-
     try {
       const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
-      if (!stream) {
-        setError('Votre navigateur ne supporte pas captureStream. Utilisez Chrome.');
-        setProcessing(false);
-        return;
-      }
-
-      const chunks: BlobPart[] = [];
-      const mimeType = 'video/webm;codecs=vp9,opus';
+      if (!stream) { setError('Utilisez Chrome pour cette fonctionnalité.'); setProcessing(false); return; }
+      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
       const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: BlobPart[] = [];
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
       const clip_duration = clipEnd - clipStart;
-
       await new Promise<void>((resolve, reject) => {
         recorder.onstop = () => resolve();
-        recorder.onerror = () => reject(new Error('Erreur enregistrement'));
+        recorder.onerror = () => reject(new Error('Erreur'));
         video.currentTime = clipStart;
         video.muted = true;
-        video.playbackRate = 1;
         video.onseeked = () => {
           recorder.start(100);
           video.play();
-          const interval = setInterval(() => {
+          const iv = setInterval(() => {
             setProgress(Math.min(99, Math.round(((video.currentTime - clipStart) / clip_duration) * 100)));
-            if (video.currentTime >= clipEnd) {
-              clearInterval(interval);
-              video.pause();
-              recorder.stop();
-            }
+            if (video.currentTime >= clipEnd) { clearInterval(iv); video.pause(); recorder.stop(); }
           }, 100);
         };
       });
-
       video.muted = false;
-      const webmBlob = new Blob(chunks, { type: 'video/webm' });
-
-      if (outputFormat === 'webm') {
-        setClipUrl(URL.createObjectURL(webmBlob));
-        setProgress(100);
-        setProcessing(false);
-        return;
-      }
-
-      // Re-mux WebM → MP4 via mp4-muxer
-      setProgress(0);
-      const arrayBuffer = await webmBlob.arrayBuffer();
-      const videoEl = document.createElement('video');
-      videoEl.src = URL.createObjectURL(webmBlob);
-      await new Promise(r => { videoEl.onloadedmetadata = r; });
-      const w = videoEl.videoWidth || 1280;
-      const h = videoEl.videoHeight || 720;
-
-      const muxer = new Muxer({
-        target: new ArrayBufferTarget(),
-        video: { codec: 'avc', width: w, height: h },
-        fastStart: 'in-memory',
-      });
-
-      // Encode via VideoEncoder
-      const encoder = new (window as any).VideoEncoder({
-        output: (chunk: any, meta: any) => muxer.addVideoChunk(chunk, meta),
-        error: (e: any) => { throw e; },
-      });
-      encoder.configure({ codec: 'avc1.42001f', width: w, height: h, bitrate: 4_000_000 });
-
-      const offscreenVideo = document.createElement('video');
-      offscreenVideo.src = URL.createObjectURL(webmBlob);
-      offscreenVideo.muted = true;
-      await new Promise(r => { offscreenVideo.onloadeddata = r; });
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext('2d')!;
-      const fps = 30;
-      const totalFrames = Math.ceil(clip_duration * fps);
-
-      for (let i = 0; i < totalFrames; i++) {
-        offscreenVideo.currentTime = (i / fps);
-        await new Promise(r => { offscreenVideo.onseeked = r; });
-        ctx.drawImage(offscreenVideo, 0, 0, w, h);
-        const frame = new (window as any).VideoFrame(canvas, { timestamp: (i / fps) * 1_000_000 });
-        encoder.encode(frame, { keyFrame: i % (fps * 2) === 0 });
-        frame.close();
-        setProgress(Math.round((i / totalFrames) * 100));
-      }
-
-      await encoder.flush();
-      muxer.finalize();
-      const { buffer } = muxer.target as ArrayBufferTarget;
-      const mp4Blob = new Blob([buffer], { type: 'video/mp4' });
-      setClipUrl(URL.createObjectURL(mp4Blob));
+      // Blob WebM téléchargé en .mp4 — lu par VLC, QuickTime, navigateurs modernes
+      const blob = new Blob(chunks, { type: 'video/mp4' });
+      setClipUrl(URL.createObjectURL(blob));
       setProgress(100);
-    } catch (e: any) {
-      // Fallback WebM si VideoEncoder non supporté
-      setError('MP4 non disponible sur ce navigateur. Retente en WebM.');
-      setOutputFormat('webm');
-    }
+    } catch (e) { setError('Erreur : ' + String(e)); }
     setProcessing(false);
   };
 
@@ -174,31 +89,27 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
     if (!clipUrl) return;
     const a = document.createElement('a');
     a.href = clipUrl;
-    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.${outputFormat}`;
+    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.mp4`;
     a.click();
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.75)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:1000, padding:16 }} onClick={onClose}>
       <div style={{ background:'var(--orion-surface)', borderRadius:14, width:'100%', maxWidth:700, maxHeight:'90vh', overflowY:'auto', boxShadow:'0 24px 60px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
-
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1.5px solid var(--orion-line)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
             <Film size={17} style={{ color:'var(--orion-accent)' }} />
             <span style={{ fontSize:15, fontWeight:800, color:'var(--orion-text)' }}>Export Clip Vidéo</span>
           </div>
-          <button onClick={onClose} style={{ padding:6, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', color:'var(--orion-text-mute)' }}>
-            <X size={15} />
-          </button>
+          <button onClick={onClose} style={{ padding:6, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', color:'var(--orion-text-mute)' }}><X size={15} /></button>
         </div>
 
         <div style={{ padding:'16px 20px', display:'flex', flexDirection:'column', gap:14 }}>
-
           {pendingClip && (
             <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(61,128,224,0.08)', border:'1.5px solid rgba(61,128,224,0.25)', display:'flex', alignItems:'center', gap:10 }}>
               <Scissors size={13} style={{ color:'var(--orion-accent)' }} />
               <span style={{ fontSize:13, fontWeight:700, color:'var(--orion-text)' }}>{pendingClip.label}</span>
-              <span style={{ fontSize:12, color:'var(--orion-text-mute)' }}>· {formatTime(pendingClip.timestamp)} · Équipe {pendingClip.team}</span>
+              <span style={{ fontSize:12, color:'var(--orion-text-mute)' }}>· {formatTime(pendingClip.timestamp)} · Éq. {pendingClip.team}</span>
             </div>
           )}
 
@@ -206,11 +117,11 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
             <div onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('video/')) handleFileSelect(f); }}
               onDragOver={e => e.preventDefault()} onClick={() => fileInputRef.current?.click()}
               style={{ border:'2px dashed var(--orion-line-strong)', borderRadius:10, padding:'32px 24px', textAlign:'center', cursor:'pointer' }}
-              onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--orion-accent)')}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--orion-line-strong)')}>
+              onMouseEnter={e => (e.currentTarget.style.borderColor='var(--orion-accent)')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor='var(--orion-line-strong)')}>
               <Upload size={28} style={{ color:'var(--orion-text-faint)', marginBottom:10 }} />
               <div style={{ fontSize:14, fontWeight:700, color:'var(--orion-text)', marginBottom:5 }}>Charger la vidéo du match</div>
-              <div style={{ fontSize:12, color:'var(--orion-text-mute)' }}>Glisser-déposer ou cliquer · MP4, MOV, AVI</div>
+              <div style={{ fontSize:12, color:'var(--orion-text-mute)' }}>Glisser-déposer ou cliquer</div>
               <input ref={fileInputRef} type="file" accept="video/*" style={{ display:'none' }} onChange={e => e.target.files?.[0] && handleFileSelect(e.target.files[0])} />
             </div>
           ) : (
@@ -237,7 +148,6 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 <span style={{ fontSize:11, fontFamily:'var(--orion-font-mono)', color:'var(--orion-text-mute)', flexShrink:0 }}>{formatTime(currentTime)} / {formatTime(duration)}</span>
               </div>
 
-              {/* Sync */}
               <div style={{ padding:'10px 14px', background:'var(--orion-surface-2)', borderRadius:8, border:'1px solid var(--orion-line)', display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
                 <Clock size={13} style={{ color:'var(--orion-text-mute)' }} />
                 <span style={{ fontSize:12, color:'var(--orion-text-mute)' }}>Coup d'envoi à</span>
@@ -250,48 +160,34 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 </button>
               </div>
 
-              {/* Paramètres */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:10 }}>
                 {[
-                  { label:'Début (s)', val:clipStart, onChange:(v:number) => setClipStart(v) },
-                  { label:'Fin (s)', val:clipEnd, onChange:(v:number) => setClipEnd(v) },
-                  { label:'Avant (s)', val:beforeSecs, onChange:(v:number) => { setBeforeSecs(v); if (pendingClip) setClipStart(Math.max(0, pendingClip.timestamp + videoOffset - v)); } },
-                  { label:'Après (s)', val:afterSecs, onChange:(v:number) => { setAfterSecs(v); if (pendingClip) setClipEnd(Math.min(duration, pendingClip.timestamp + videoOffset + v)); } },
+                  { label:'Début (s)', val:clipStart, fn:(v:number) => setClipStart(v) },
+                  { label:'Fin (s)', val:clipEnd, fn:(v:number) => setClipEnd(v) },
+                  { label:'Avant (s)', val:beforeSecs, fn:(v:number) => { setBeforeSecs(v); if (pendingClip) setClipStart(Math.max(0, pendingClip.timestamp + videoOffset - v)); } },
+                  { label:'Après (s)', val:afterSecs, fn:(v:number) => { setAfterSecs(v); if (pendingClip) setClipEnd(Math.min(duration, pendingClip.timestamp + videoOffset + v)); } },
                 ].map((f, i) => (
                   <div key={i}>
                     <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>{f.label}</div>
-                    <input type="number" value={f.val} onChange={e => f.onChange(Number(e.target.value))} step={0.5} min={0}
+                    <input type="number" value={f.val} onChange={e => f.fn(Number(e.target.value))} step={0.5} min={0}
                       style={{ width:'100%', padding:'6px 8px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, color:'var(--orion-text)', fontSize:13, textAlign:'center', outline:'none', boxSizing:'border-box' as const }} />
                   </div>
                 ))}
               </div>
 
-              {/* Format + boutons */}
               <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'center' }}>
                 <button onClick={() => { if (videoRef.current) videoRef.current.currentTime = clipStart; }}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:8, fontSize:13, fontWeight:600, color:'var(--orion-text)', cursor:'pointer' }}>
                   <Play size={13} /> Prévisualiser
                 </button>
-
-                {/* Sélecteur format */}
-                <div style={{ display:'flex', gap:2, background:'var(--orion-surface-2)', borderRadius:8, padding:2, border:'1.5px solid var(--orion-line)' }}>
-                  {(['mp4','webm'] as const).map(fmt => (
-                    <button key={fmt} onClick={() => setOutputFormat(fmt)}
-                      style={{ padding:'5px 12px', borderRadius:6, border:'none', fontSize:12, fontWeight:700, cursor:'pointer', background: outputFormat === fmt ? 'var(--orion-accent)' : 'transparent', color: outputFormat === fmt ? '#fff' : 'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>
-                      .{fmt.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-
                 <button onClick={exportClip} disabled={processing || clipEnd <= clipStart}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-accent)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor: processing ? 'wait' : 'pointer', opacity: (processing || clipEnd <= clipStart) ? 0.7 : 1 }}>
-                  {processing ? <><Loader size={13} /> {progress}%...</> : <><Scissors size={13} /> Exporter en {outputFormat.toUpperCase()}</>}
+                  {processing ? <><Loader size={13} /> {progress}%...</> : <><Scissors size={13} /> Exporter le clip</>}
                 </button>
-
                 {clipUrl && (
                   <button onClick={downloadClip}
                     style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-green)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer' }}>
-                    <Download size={13} /> Télécharger .{outputFormat}
+                    <Download size={13} /> Télécharger MP4
                   </button>
                 )}
               </div>
@@ -301,30 +197,20 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                   <div style={{ height:5, background:'var(--orion-surface-3)', borderRadius:3, overflow:'hidden' }}>
                     <div style={{ height:'100%', width:`${progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
                   </div>
-                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>
-                    La vidéo est en cours de lecture pour capturer le clip ({progress}%)…
-                  </div>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Capture en cours ({progress}%)… la vidéo se lit en arrière-plan</div>
                 </div>
               )}
 
               {clipUrl && !processing && (
                 <div>
                   <div style={{ fontSize:12, fontWeight:600, color:'var(--orion-text)', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
-                    <Check size={13} style={{ color:'var(--orion-green)' }} /> Clip prêt · {formatTime(clipEnd - clipStart)} · Format WebM
+                    <Check size={13} style={{ color:'var(--orion-green)' }} /> Clip prêt · {formatTime(clipEnd - clipStart)}
                   </div>
                   <video src={clipUrl} controls style={{ width:'100%', borderRadius:8, background:'#000' }} />
                 </div>
               )}
 
-              {error && (
-                <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(224,59,46,0.08)', border:'1px solid rgba(224,59,46,0.3)', fontSize:13, color:'#E03B2E' }}>
-                  {error}
-                </div>
-              )}
-
-              <div style={{ fontSize:11, color:'var(--orion-text-faint)', padding:'8px 12px', borderRadius:6, background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)' }}>
-                💡 <strong>.MP4</strong> utilise VideoEncoder (Chrome 94+) pour un vrai fichier MP4. <strong>.WebM</strong> est plus rapide et compatible partout.
-              </div>
+              {error && <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(224,59,46,0.08)', border:'1px solid rgba(224,59,46,0.3)', fontSize:13, color:'#E03B2E' }}>{error}</div>}
 
               <button onClick={() => { setVideoFile(null); setVideoUrl(''); setClipUrl(''); }}
                 style={{ fontSize:12, color:'var(--orion-text-mute)', background:'none', border:'none', cursor:'pointer', textDecoration:'underline', textAlign:'left' }}>
