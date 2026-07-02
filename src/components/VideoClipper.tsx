@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
 import { Upload, Download, X, Play, Pause, Film, Scissors, Clock, Loader } from 'lucide-react';
 
 interface ClipRequest {
@@ -71,15 +71,14 @@ export default function VideoClipper({ matchDuration, onClose, pendingClip, init
     try {
       const ffmpeg = new FFmpeg();
       ffmpeg.on('progress', ({ progress: p }) => setProgress(Math.round(p * 100)));
-      const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd';
       await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+        coreURL: '/ffmpeg/ffmpeg-core.js',
+        wasmURL: '/ffmpeg/ffmpeg-core.wasm',
       });
       ffmpegRef.current = ffmpeg;
       setFfmpegLoaded(true);
     } catch (e) {
-      setError('Impossible de charger FFmpeg. Vérifiez votre connexion.');
+      setError('Impossible de charger FFmpeg : ' + String(e));
     }
     setFfmpegLoading(false);
   };
