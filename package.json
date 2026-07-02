@@ -11,8 +11,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
-    "@ffmpeg/core": "^0.12.6",
-    "@ffmpeg/ffmpeg": "^0.12.15",
+    "@ffmpeg/core": "^0.11.0",
+    "@ffmpeg/ffmpeg": "^0.11.6",
     "@ffmpeg/util": "^0.12.2",
     "@supabase/supabase-js": "^2.57.4",
     "lucide-react": "^0.344.0",
