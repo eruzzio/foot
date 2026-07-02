@@ -93,10 +93,34 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
       video.style.opacity = '';
       video.style.pointerEvents = '';
       video.style.zIndex = '';
-      // Blob WebM téléchargé en .mp4 — lu par VLC, QuickTime, navigateurs modernes
-      const blob = new Blob(chunks, { type: 'video/mp4' });
-      setClipUrl(URL.createObjectURL(blob));
-      setProgress(100);
+
+      // Envoyer le WebM au serveur pour conversion MP4 H.264
+      const webmBlob = new Blob(chunks, { type: 'video/webm' });
+      setError('');
+      setProgress(0);
+
+      try {
+        const formData = new FormData();
+        formData.append('video', webmBlob, 'clip.webm');
+        formData.append('start', '0');
+        formData.append('duration', String(clipEnd - clipStart));
+
+        const response = await fetch('/api/clip-video', { method: 'POST', body: formData });
+
+        if (response.ok) {
+          const mp4Blob = await response.blob();
+          setClipUrl(URL.createObjectURL(mp4Blob));
+          setProgress(100);
+        } else {
+          // Fallback WebM si serveur indisponible
+          setClipUrl(URL.createObjectURL(webmBlob));
+          setProgress(100);
+        }
+      } catch {
+        // Fallback WebM
+        setClipUrl(URL.createObjectURL(webmBlob));
+        setProgress(100);
+      }
     } catch (e) { setError('Erreur : ' + String(e)); }
     setProcessing(false);
   };
@@ -213,7 +237,9 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                   <div style={{ height:5, background:'var(--orion-surface-3)', borderRadius:3, overflow:'hidden' }}>
                     <div style={{ height:'100%', width:`${progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
                   </div>
-                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>Capture en cours ({progress}%)… la vidéo se lit en arrière-plan</div>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>
+                    {progress < 99 ? `Capture en cours (${progress}%)…` : 'Conversion MP4 en cours…'}
+                  </div>
                 </div>
               )}
 
