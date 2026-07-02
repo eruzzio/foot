@@ -53,10 +53,13 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
 
   // Charger un fichier local
+  const [localFile, setLocalFile] = useState<File | null>(null);
+
   const handleFileLoad = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
+    setLocalFile(file);
     setVideoSource({ type: 'local', url, name: file.name });
   };
 
@@ -510,6 +513,8 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         <VideoClipper
           matchDuration={match.match_time || 5400}
           pendingClip={pendingClip}
+          initialVideoFile={localFile}
+          initialVideoOffset={offset}
           onClose={() => { setShowClipper(false); setPendingClip(null); }}
         />
       )}

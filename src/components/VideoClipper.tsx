@@ -10,18 +10,20 @@ interface ClipRequest {
 }
 
 interface Props {
-  matchDuration: number; // durée totale du match en secondes
+  matchDuration: number;
   onClose: () => void;
-  pendingClip?: ClipRequest | null; // action demandée depuis la timeline
+  pendingClip?: ClipRequest | null;
+  initialVideoFile?: File | null;
+  initialVideoOffset?: number;
 }
 
-export default function VideoClipper({ matchDuration, onClose, pendingClip }: Props) {
+export default function VideoClipper({ matchDuration, onClose, pendingClip, initialVideoFile, initialVideoOffset = 0 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const ffmpegRef = useRef<FFmpeg | null>(null);
 
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [videoFile, setVideoFile] = useState<File | null>(initialVideoFile || null);
+  const [videoUrl, setVideoUrl] = useState<string>(initialVideoFile ? URL.createObjectURL(initialVideoFile) : '');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -35,13 +37,20 @@ export default function VideoClipper({ matchDuration, onClose, pendingClip }: Pr
   // État ffmpeg
   const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
   const [ffmpegLoading, setFfmpegLoading] = useState(false);
+
+  // Charger ffmpeg automatiquement si vidéo déjà disponible
+  useEffect(() => {
+    if (initialVideoFile) loadFFmpeg();
+  }, []);
+  const [ffmpegLoaded, setFfmpegLoaded] = useState(false);
+  const [ffmpegLoading, setFfmpegLoading] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [clipUrl, setClipUrl] = useState('');
   const [error, setError] = useState('');
 
   // Offset vidéo/match : timestamp vidéo du coup d'envoi
-  const [videoOffset, setVideoOffset] = useState(0);
+  const [videoOffset, setVideoOffset] = useState(initialVideoOffset);
 
   // Appliquer le clip demandé depuis la timeline
   useEffect(() => {
