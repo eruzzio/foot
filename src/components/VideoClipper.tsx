@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Upload, Download, X, Play, Pause, Film, Scissors, Clock, Loader, Check } from 'lucide-react';
+import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
 interface ClipRequest {
   timestamp: number;
@@ -55,7 +56,9 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
-  // Découpage via MediaRecorder — lecture accélérée de clipStart à clipEnd puis enregistrement
+  const [outputFormat, setOutputFormat] = useState<'webm'|'mp4'>('mp4');
+
+  // Découpage via MediaRecorder
   const exportClip = async () => {
     if (!videoRef.current || !videoFile) return;
     setProcessing(true);
@@ -63,10 +66,10 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
     setClipUrl('');
     setError('');
 
-    try {
-      const video = videoRef.current;
-      const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
+    const video = videoRef.current;
 
+    try {
+      const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
       if (!stream) {
         setError('Votre navigateur ne supporte pas captureStream. Utilisez Chrome.');
         setProcessing(false);
@@ -74,30 +77,22 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
       }
 
       const chunks: BlobPart[] = [];
-      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-        ? 'video/webm;codecs=vp9'
-        : 'video/webm';
+      const mimeType = 'video/webm;codecs=vp9,opus';
       const recorder = new MediaRecorder(stream, { mimeType });
-
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-
-      const duration_clip = clipEnd - clipStart;
+      const clip_duration = clipEnd - clipStart;
 
       await new Promise<void>((resolve, reject) => {
         recorder.onstop = () => resolve();
         recorder.onerror = () => reject(new Error('Erreur enregistrement'));
-
         video.currentTime = clipStart;
         video.muted = true;
         video.playbackRate = 1;
-
         video.onseeked = () => {
           recorder.start(100);
           video.play();
-
           const interval = setInterval(() => {
-            const elapsed = video.currentTime - clipStart;
-            setProgress(Math.min(99, Math.round((elapsed / duration_clip) * 100)));
+            setProgress(Math.min(99, Math.round(((video.currentTime - clipStart) / clip_duration) * 100)));
             if (video.currentTime >= clipEnd) {
               clearInterval(interval);
               video.pause();
@@ -107,12 +102,70 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
         };
       });
 
-      const blob = new Blob(chunks, { type: mimeType });
-      setClipUrl(URL.createObjectURL(blob));
-      setProgress(100);
       video.muted = false;
-    } catch (e) {
-      setError('Erreur : ' + String(e));
+      const webmBlob = new Blob(chunks, { type: 'video/webm' });
+
+      if (outputFormat === 'webm') {
+        setClipUrl(URL.createObjectURL(webmBlob));
+        setProgress(100);
+        setProcessing(false);
+        return;
+      }
+
+      // Re-mux WebM → MP4 via mp4-muxer
+      setProgress(0);
+      const arrayBuffer = await webmBlob.arrayBuffer();
+      const videoEl = document.createElement('video');
+      videoEl.src = URL.createObjectURL(webmBlob);
+      await new Promise(r => { videoEl.onloadedmetadata = r; });
+      const w = videoEl.videoWidth || 1280;
+      const h = videoEl.videoHeight || 720;
+
+      const muxer = new Muxer({
+        target: new ArrayBufferTarget(),
+        video: { codec: 'avc', width: w, height: h },
+        fastStart: 'in-memory',
+      });
+
+      // Encode via VideoEncoder
+      const encoder = new (window as any).VideoEncoder({
+        output: (chunk: any, meta: any) => muxer.addVideoChunk(chunk, meta),
+        error: (e: any) => { throw e; },
+      });
+      encoder.configure({ codec: 'avc1.42001f', width: w, height: h, bitrate: 4_000_000 });
+
+      const offscreenVideo = document.createElement('video');
+      offscreenVideo.src = URL.createObjectURL(webmBlob);
+      offscreenVideo.muted = true;
+      await new Promise(r => { offscreenVideo.onloadeddata = r; });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d')!;
+      const fps = 30;
+      const totalFrames = Math.ceil(clip_duration * fps);
+
+      for (let i = 0; i < totalFrames; i++) {
+        offscreenVideo.currentTime = (i / fps);
+        await new Promise(r => { offscreenVideo.onseeked = r; });
+        ctx.drawImage(offscreenVideo, 0, 0, w, h);
+        const frame = new (window as any).VideoFrame(canvas, { timestamp: (i / fps) * 1_000_000 });
+        encoder.encode(frame, { keyFrame: i % (fps * 2) === 0 });
+        frame.close();
+        setProgress(Math.round((i / totalFrames) * 100));
+      }
+
+      await encoder.flush();
+      muxer.finalize();
+      const { buffer } = muxer.target as ArrayBufferTarget;
+      const mp4Blob = new Blob([buffer], { type: 'video/mp4' });
+      setClipUrl(URL.createObjectURL(mp4Blob));
+      setProgress(100);
+    } catch (e: any) {
+      // Fallback WebM si VideoEncoder non supporté
+      setError('MP4 non disponible sur ce navigateur. Retente en WebM.');
+      setOutputFormat('webm');
     }
     setProcessing(false);
   };
@@ -121,7 +174,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
     if (!clipUrl) return;
     const a = document.createElement('a');
     a.href = clipUrl;
-    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.webm`;
+    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.${outputFormat}`;
     a.click();
   };
 
@@ -213,22 +266,32 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 ))}
               </div>
 
-              {/* Boutons */}
+              {/* Format + boutons */}
               <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'center' }}>
                 <button onClick={() => { if (videoRef.current) videoRef.current.currentTime = clipStart; }}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:8, fontSize:13, fontWeight:600, color:'var(--orion-text)', cursor:'pointer' }}>
-                  <Play size={13} /> Prévisualiser depuis le début
+                  <Play size={13} /> Prévisualiser
                 </button>
+
+                {/* Sélecteur format */}
+                <div style={{ display:'flex', gap:2, background:'var(--orion-surface-2)', borderRadius:8, padding:2, border:'1.5px solid var(--orion-line)' }}>
+                  {(['mp4','webm'] as const).map(fmt => (
+                    <button key={fmt} onClick={() => setOutputFormat(fmt)}
+                      style={{ padding:'5px 12px', borderRadius:6, border:'none', fontSize:12, fontWeight:700, cursor:'pointer', background: outputFormat === fmt ? 'var(--orion-accent)' : 'transparent', color: outputFormat === fmt ? '#fff' : 'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>
+                      .{fmt.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
 
                 <button onClick={exportClip} disabled={processing || clipEnd <= clipStart}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-accent)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor: processing ? 'wait' : 'pointer', opacity: (processing || clipEnd <= clipStart) ? 0.7 : 1 }}>
-                  {processing ? <><Loader size={13} /> Enregistrement {progress}%...</> : <><Scissors size={13} /> Exporter le clip</>}
+                  {processing ? <><Loader size={13} /> {progress}%...</> : <><Scissors size={13} /> Exporter en {outputFormat.toUpperCase()}</>}
                 </button>
 
                 {clipUrl && (
                   <button onClick={downloadClip}
                     style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-green)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer' }}>
-                    <Download size={13} /> Télécharger
+                    <Download size={13} /> Télécharger .{outputFormat}
                   </button>
                 )}
               </div>
@@ -260,7 +323,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
               )}
 
               <div style={{ fontSize:11, color:'var(--orion-text-faint)', padding:'8px 12px', borderRadius:6, background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)' }}>
-                💡 Le clip est généré en WebM (lecture réelle de la vidéo). Pour un MP4, convertis le fichier après téléchargement avec VLC ou Handbrake.
+                💡 <strong>.MP4</strong> utilise VideoEncoder (Chrome 94+) pour un vrai fichier MP4. <strong>.WebM</strong> est plus rapide et compatible partout.
               </div>
 
               <button onClick={() => { setVideoFile(null); setVideoUrl(''); setClipUrl(''); }}
