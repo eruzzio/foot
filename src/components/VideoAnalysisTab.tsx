@@ -30,6 +30,19 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [offset, setOffset] = useState(0);
   const [pendingClip, setPendingClip] = useState<{ timestamp: number; label: string; team: string } | null>(null);
   const [showClipper, setShowClipper] = useState(false);
+  const [playlist, setPlaylist] = useState<{ id: string; timestamp: number; label: string; team: string }[]>([]);
+  const [showPlaylistExport, setShowPlaylistExport] = useState(false);
+
+  const addToPlaylist = (event: any) => {
+    const item = {
+      id: event.id || `${event.timestamp}-${Math.random()}`,
+      timestamp: event.timestamp + offset,
+      label: event.event_type?.name || event.label || 'Action',
+      team: event.team || 'A',
+    };
+    setPlaylist(prev => prev.some(p => p.id === item.id) ? prev : [...prev, item]);
+  };
+  const removeFromPlaylist = (id: string) => setPlaylist(prev => prev.filter(p => p.id !== id));
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -475,21 +488,35 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orion-red)', background: 'var(--orion-red-dim)', padding: '2px 7px', borderRadius: 3, flexShrink: 0 }}>RATÉ</span>
               )}
 
-              {/* Bouton export clip */}
+              {/* Boutons export clip + playlist */}
               {videoSource?.type === 'local' && (
-                <button
-                  onClick={e => {
-                    e.stopPropagation();
-                    setPendingClip({ timestamp: event.timestamp + offset, label: event.event_type?.name || event.label || 'Action', team: event.team || 'A' });
-                    setShowClipper(true);
-                  }}
-                  style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'var(--orion-text-mute)', flexShrink:0 }}
-                  title="Exporter ce clip en MP4"
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
-                >
-                  <Download size={11} />
-                </button>
+                <>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      addToPlaylist(event);
+                    }}
+                    style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background: playlist.some(p => p.id === (event.id || '')) ? 'var(--orion-accent)' : 'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color: playlist.some(p => p.id === (event.id || '')) ? '#fff' : 'var(--orion-text-mute)', flexShrink:0, fontSize:13, fontWeight:700, lineHeight:1 }}
+                    title="Ajouter à la playlist"
+                    onMouseEnter={e => { if (!playlist.some(p => p.id === (event.id || ''))) { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; } }}
+                    onMouseLeave={e => { if (!playlist.some(p => p.id === (event.id || ''))) { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; } }}
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={e => {
+                      e.stopPropagation();
+                      setPendingClip({ timestamp: event.timestamp + offset, label: event.event_type?.name || event.label || 'Action', team: event.team || 'A' });
+                      setShowClipper(true);
+                    }}
+                    style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'var(--orion-text-mute)', flexShrink:0 }}
+                    title="Exporter ce clip"
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
+                  >
+                    <Download size={11} />
+                  </button>
+                </>
               )}
 
               {/* Icône play si vidéo */}
@@ -508,7 +535,40 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         </div>
       )}
 
-      {/* VideoClipper modale */}
+      {/* Barre de playlist flottante */}
+      {playlist.length > 0 && (
+        <div style={{ position:'sticky', bottom:0, marginTop:16, background:'var(--orion-surface)', border:'1.5px solid var(--orion-accent)', borderRadius:10, padding:'12px 14px', boxShadow:'0 -4px 20px rgba(0,0,0,0.12)', zIndex:50 }}>
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10, flexWrap:'wrap', gap:8 }}>
+            <span style={{ fontSize:13, fontWeight:700, color:'var(--orion-text)' }}>
+              🎬 Playlist — {playlist.length} séquence{playlist.length > 1 ? 's' : ''}
+            </span>
+            <div style={{ display:'flex', gap:8 }}>
+              <button onClick={() => setPlaylist([])}
+                style={{ padding:'6px 12px', borderRadius:7, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', fontSize:12, fontWeight:600, color:'var(--orion-text-dim)' }}>
+                Vider
+              </button>
+              <button onClick={() => setShowPlaylistExport(true)}
+                style={{ padding:'6px 14px', borderRadius:7, border:'none', background:'var(--orion-accent)', cursor:'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6 }}>
+                <Download size={13} /> Exporter la playlist
+              </button>
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+            {playlist.map((p, i) => (
+              <div key={p.id} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'4px 8px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:6, fontSize:11 }}>
+                <span style={{ color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>{i+1}.</span>
+                <span style={{ color:'var(--orion-text)', fontWeight:600 }}>{p.label}</span>
+                <span style={{ color:'var(--orion-text-mute)' }}>{formatTime(p.timestamp - offset)}</span>
+                <button onClick={() => removeFromPlaylist(p.id)} style={{ border:'none', background:'none', cursor:'pointer', color:'var(--orion-text-faint)', padding:0, display:'flex' }}>
+                  <X size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* VideoClipper modale (export unitaire) */}
       {showClipper && (
         <VideoClipper
           matchDuration={match.match_time || 5400}
@@ -516,6 +576,17 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           initialVideoFile={localFile}
           initialVideoOffset={offset}
           onClose={() => { setShowClipper(false); setPendingClip(null); }}
+        />
+      )}
+
+      {/* VideoClipper modale (export playlist) */}
+      {showPlaylistExport && (
+        <VideoClipper
+          matchDuration={match.match_time || 5400}
+          playlist={playlist}
+          initialVideoFile={localFile}
+          initialVideoOffset={offset}
+          onClose={() => setShowPlaylistExport(false)}
         />
       )}
     </div>

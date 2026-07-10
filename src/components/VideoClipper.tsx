@@ -1,16 +1,20 @@
 import { useRef, useState, useEffect } from 'react';
-import { Upload, Download, X, Play, Pause, Film, Scissors, Clock, Loader, Check } from 'lucide-react';
+import { Upload, Download, X, Play, Pause, Film, Scissors, Clock, Loader, Check, ListVideo, Package, Film as FilmIcon } from 'lucide-react';
+import JSZip from 'jszip';
 
 interface ClipRequest { timestamp: number; label: string; team: string; }
+interface PlaylistItem { id: string; timestamp: number; label: string; team: string; }
 interface Props {
   matchDuration: number;
   onClose: () => void;
   pendingClip?: ClipRequest | null;
+  playlist?: PlaylistItem[];
   initialVideoFile?: File | null;
   initialVideoOffset?: number;
 }
 
-export default function VideoClipper({ onClose, pendingClip, initialVideoFile, initialVideoOffset = 0 }: Props) {
+export default function VideoClipper({ onClose, pendingClip, playlist, initialVideoFile, initialVideoOffset = 0 }: Props) {
+  const isPlaylistMode = !!playlist && playlist.length > 0;
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +35,77 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
   const [outputFormat, setOutputFormat] = useState<'mp4' | 'webm'>('mp4');
   const [converting, setConverting] = useState(false);
 
+  // Playlist
+  const [plBefore, setPlBefore] = useState(5);
+  const [plAfter, setPlAfter] = useState(5);
+  const [plMode, setPlMode] = useState<'single' | 'zip'>('single');
+  const [plCurrentIdx, setPlCurrentIdx] = useState(0);
+  const [plDone, setPlDone] = useState(false);
+  const [plResultUrl, setPlResultUrl] = useState('');
+  const [plResultName, setPlResultName] = useState('');
+
+  const exportPlaylist = async () => {
+    if (!videoRef.current || !videoFile || !playlist) return;
+    setProcessing(true); setError(''); setPlDone(false); setPlResultUrl('');
+
+    try {
+      // 1. Capturer chaque séquence en WebM
+      const segments: { blob: Blob; label: string }[] = [];
+      for (let i = 0; i < playlist.length; i++) {
+        setPlCurrentIdx(i);
+        setProgress(0);
+        const item = playlist[i];
+        const vTs = item.timestamp + videoOffset;
+        const s = Math.max(0, vTs - plBefore);
+        const e = Math.min(duration, vTs + plAfter);
+        const webm = await captureSegment(s, e, setProgress);
+        segments.push({ blob: webm, label: item.label });
+      }
+
+      setConverting(true);
+
+      if (plMode === 'zip') {
+        // 2a. Convertir chacun en MP4 puis zipper
+        const zip = new JSZip();
+        let anyWebm = false;
+        for (let i = 0; i < segments.length; i++) {
+          setPlCurrentIdx(i);
+          const { blob, format } = await convertToMp4(segments[i].blob);
+          if (format === 'webm') anyWebm = true;
+          const safe = segments[i].label.replace(/[^a-z0-9]/gi, '_');
+          zip.file(`${String(i + 1).padStart(2, '0')}_${safe}.${format}`, blob);
+        }
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        setPlResultUrl(URL.createObjectURL(zipBlob));
+        setPlResultName('playlist_clips.zip');
+        setOutputFormat(anyWebm ? 'webm' : 'mp4');
+        if (anyWebm) setError('Certains clips sont en WebM (conversion MP4 partielle).');
+      } else {
+        // 2b. Concaténer les WebM en un seul fichier, puis convertir en MP4
+        const merged = new Blob(segments.map(s => s.blob), { type: 'video/webm' });
+        const { blob, format, error: convErr } = await convertToMp4(merged);
+        setPlResultUrl(URL.createObjectURL(blob));
+        setPlResultName(`playlist_montage.${format}`);
+        setOutputFormat(format);
+        if (convErr) setError(`Conversion MP4 indisponible (${convErr}). Montage disponible en WebM.`);
+      }
+
+      setConverting(false);
+      setPlDone(true);
+    } catch (e: any) {
+      setError('Erreur playlist : ' + (e?.message || String(e)));
+    }
+    setProcessing(false);
+  };
+
+  const downloadPlaylistResult = () => {
+    if (!plResultUrl) return;
+    const a = document.createElement('a');
+    a.href = plResultUrl;
+    a.download = plResultName;
+    a.click();
+  };
+
   useEffect(() => {
     if (pendingClip && videoFile && duration > 0) {
       const videoTs = pendingClip.timestamp + videoOffset;
@@ -49,95 +124,79 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
 
   const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
-  const exportClip = async () => {
-    if (!videoRef.current || !videoFile) return;
-    setProcessing(true);
-    setProgress(0);
-    setClipUrl('');
-    setError('');
-    const video = videoRef.current;
-    try {
+  // Capture une séquence [start,end] du lecteur en WebM (MediaRecorder)
+  const captureSegment = (start: number, end: number, onProg?: (p: number) => void): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const video = videoRef.current;
+      if (!video) { reject(new Error('Pas de vidéo')); return; }
       const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
-      if (!stream) { setError('Utilisez Chrome pour cette fonctionnalité.'); setProcessing(false); return; }
+      if (!stream) { reject(new Error('captureStream non supporté (utilisez Chrome)')); return; }
       const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm';
       const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 8_000_000 });
       const chunks: BlobPart[] = [];
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      const clip_duration = clipEnd - clipStart;
-      await new Promise<void>((resolve, reject) => {
-        recorder.onstop = () => resolve();
-        recorder.onerror = () => reject(new Error('Erreur'));
-        video.currentTime = clipStart;
-        video.muted = true;
-        // Forcer résolution native pour la capture (évite downscale du lecteur HTML)
-        video.style.width = video.videoWidth + 'px';
-        video.style.height = video.videoHeight + 'px';
-        video.style.maxHeight = 'none';
-        video.style.position = 'fixed';
-        video.style.opacity = '0';
-        video.style.pointerEvents = 'none';
-        video.style.zIndex = '-1';
-        video.onseeked = () => {
-          recorder.start(100);
-          video.play();
-          const iv = setInterval(() => {
-            setProgress(Math.min(99, Math.round(((video.currentTime - clipStart) / clip_duration) * 100)));
-            if (video.currentTime >= clipEnd) { clearInterval(iv); video.pause(); recorder.stop(); }
-          }, 100);
-        };
-      });
-      video.muted = false;
-      // Rétablir le style normal
-      video.style.width = '';
-      video.style.height = '';
-      video.style.maxHeight = '240px';
-      video.style.position = '';
-      video.style.opacity = '';
-      video.style.pointerEvents = '';
-      video.style.zIndex = '';
+      const dur = end - start;
+      recorder.onstop = () => {
+        video.muted = false;
+        video.style.width = ''; video.style.height = ''; video.style.maxHeight = '240px';
+        video.style.position = ''; video.style.opacity = ''; video.style.pointerEvents = ''; video.style.zIndex = '';
+        resolve(new Blob(chunks, { type: 'video/webm' }));
+      };
+      recorder.onerror = () => reject(new Error('Erreur enregistrement'));
+      video.currentTime = start;
+      video.muted = true;
+      video.style.width = video.videoWidth + 'px';
+      video.style.height = video.videoHeight + 'px';
+      video.style.maxHeight = 'none'; video.style.position = 'fixed';
+      video.style.opacity = '0'; video.style.pointerEvents = 'none'; video.style.zIndex = '-1';
+      video.onseeked = () => {
+        video.onseeked = null;
+        recorder.start(100);
+        video.play();
+        const iv = setInterval(() => {
+          if (onProg) onProg(Math.min(99, Math.round(((video.currentTime - start) / dur) * 100)));
+          if (video.currentTime >= end) { clearInterval(iv); video.pause(); recorder.stop(); }
+        }, 100);
+      };
+    });
+  };
 
-      // Le WebM est déjà découpé côté navigateur. On l'envoie au serveur pour transcodage MP4.
-      const webmBlob = new Blob(chunks, { type: 'video/webm' });
-      setError('');
-      setProgress(100);
-      setConverting(true);
-
-      try {
-        const formData = new FormData();
-        formData.append('video', webmBlob, 'clip.webm');
-
-        // Timeout de 90s côté client (au cas où le serveur ne répond pas)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 90000);
-
-        const response = await fetch('/api/clip-video', {
-          method: 'POST',
-          body: formData,
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const mp4Blob = await response.blob();
-          setClipUrl(URL.createObjectURL(mp4Blob));
-          setOutputFormat('mp4');
-        } else {
-          // Le serveur a répondu mais en erreur → fallback WebM
-          const msg = await response.json().catch(() => ({}));
-          setClipUrl(URL.createObjectURL(webmBlob));
-          setOutputFormat('webm');
-          setError('Conversion MP4 indisponible (' + (msg.error || response.status) + '). Clip téléchargeable en WebM.');
-        }
-      } catch (e: any) {
-        // Serveur injoignable ou timeout → fallback WebM
-        setClipUrl(URL.createObjectURL(webmBlob));
-        setOutputFormat('webm');
-        setError(e?.name === 'AbortError'
-          ? 'La conversion MP4 a pris trop de temps. Clip disponible en WebM.'
-          : 'Serveur de conversion injoignable. Clip disponible en WebM.');
+  // Convertit un WebM en MP4 via le serveur. Renvoie {blob, format}
+  const convertToMp4 = async (webmBlob: Blob): Promise<{ blob: Blob; format: 'mp4' | 'webm'; error?: string }> => {
+    try {
+      const fd = new FormData();
+      fd.append('video', webmBlob, 'clip.webm');
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 90000);
+      const resp = await fetch('/api/clip-video', { method: 'POST', body: fd, signal: controller.signal });
+      clearTimeout(tid);
+      const ctype = resp.headers.get('content-type') || '';
+      if (resp.ok && ctype.includes('video')) {
+        const mp4 = await resp.blob();
+        if (mp4.size > 1000) return { blob: mp4, format: 'mp4' };
+        return { blob: webmBlob, format: 'webm', error: 'MP4 vide' };
       }
+      let detail = String(resp.status);
+      try { const j = await resp.json(); if (j?.error) detail = j.error; }
+      catch { try { const t = await resp.text(); if (t) detail = t.slice(0, 120); } catch {} }
+      return { blob: webmBlob, format: 'webm', error: detail };
+    } catch (e: any) {
+      return { blob: webmBlob, format: 'webm', error: e?.name === 'AbortError' ? 'timeout' : 'serveur injoignable' };
+    }
+  };
+
+  const exportClip = async () => {
+    if (!videoRef.current || !videoFile) return;
+    setProcessing(true); setProgress(0); setClipUrl(''); setError('');
+    try {
+      const webmBlob = await captureSegment(clipStart, clipEnd, setProgress);
+      setProgress(100); setConverting(true);
+      const { blob, format, error: convErr } = await convertToMp4(webmBlob);
+      setClipUrl(URL.createObjectURL(blob));
+      setOutputFormat(format);
+      if (convErr) setError(`Conversion MP4 indisponible (${convErr}). Clip disponible en WebM.`);
       setConverting(false);
-    } catch (e) { setError('Erreur : ' + String(e)); }
+    } catch (e: any) { setError('Erreur : ' + (e?.message || String(e))); }
     setProcessing(false);
   };
 
@@ -154,8 +213,8 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
       <div style={{ background:'var(--orion-surface)', borderRadius:14, width:'100%', maxWidth:700, maxHeight:'90vh', overflowY:'auto', boxShadow:'0 24px 60px rgba(0,0,0,0.4)' }} onClick={e => e.stopPropagation()}>
         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', borderBottom:'1.5px solid var(--orion-line)' }}>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <Film size={17} style={{ color:'var(--orion-accent)' }} />
-            <span style={{ fontSize:15, fontWeight:800, color:'var(--orion-text)' }}>Export Clip Vidéo</span>
+            {isPlaylistMode ? <ListVideo size={17} style={{ color:'var(--orion-accent)' }} /> : <Film size={17} style={{ color:'var(--orion-accent)' }} />}
+            <span style={{ fontSize:15, fontWeight:800, color:'var(--orion-text)' }}>{isPlaylistMode ? `Export Playlist · ${playlist!.length} séquences` : 'Export Clip Vidéo'}</span>
           </div>
           <button onClick={onClose} style={{ padding:6, borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', color:'var(--orion-text-mute)' }}><X size={15} /></button>
         </div>
@@ -216,6 +275,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 </button>
               </div>
 
+              {!isPlaylistMode && (
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr', gap:10 }}>
                 {[
                   { label:'Début (s)', val:clipStart, fn:(v:number) => setClipStart(v) },
@@ -230,7 +290,92 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                   </div>
                 ))}
               </div>
+              )}
 
+              {/* ─── MODE PLAYLIST ─── */}
+              {isPlaylistMode && (
+                <>
+                  {/* Liste des séquences */}
+                  <div style={{ maxHeight:130, overflowY:'auto', border:'1.5px solid var(--orion-line)', borderRadius:8, padding:8, display:'flex', flexDirection:'column', gap:4 }}>
+                    {playlist!.map((p, i) => (
+                      <div key={p.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 8px', background: plCurrentIdx === i && processing ? 'rgba(61,128,224,0.1)' : 'var(--orion-surface-2)', borderRadius:5, fontSize:12 }}>
+                        <span style={{ color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', minWidth:20 }}>{i+1}.</span>
+                        <span style={{ color:'var(--orion-text)', fontWeight:600, flex:1 }}>{p.label}</span>
+                        <span style={{ color:'var(--orion-text-mute)' }}>{formatTime(p.timestamp)}</span>
+                        {plCurrentIdx === i && processing && <Loader size={12} style={{ color:'var(--orion-accent)' }} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Réglages avant/après globaux */}
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                    <div>
+                      <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes avant chaque action</div>
+                      <input type="number" value={plBefore} onChange={e => setPlBefore(Number(e.target.value))} step={0.5} min={0}
+                        style={{ width:'100%', padding:'6px 8px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, color:'var(--orion-text)', fontSize:13, textAlign:'center', outline:'none', boxSizing:'border-box' as const }} />
+                    </div>
+                    <div>
+                      <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes après chaque action</div>
+                      <input type="number" value={plAfter} onChange={e => setPlAfter(Number(e.target.value))} step={0.5} min={0}
+                        style={{ width:'100%', padding:'6px 8px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, color:'var(--orion-text)', fontSize:13, textAlign:'center', outline:'none', boxSizing:'border-box' as const }} />
+                    </div>
+                  </div>
+
+                  {/* Choix du format de sortie */}
+                  <div>
+                    <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:6, fontWeight:600 }}>Format de sortie</div>
+                    <div style={{ display:'flex', gap:8 }}>
+                      <button onClick={() => setPlMode('single')}
+                        style={{ flex:1, display:'flex', alignItems:'center', gap:8, padding:'10px 12px', borderRadius:8, cursor:'pointer', border:`1.5px solid ${plMode==='single'?'var(--orion-accent)':'var(--orion-line)'}`, background: plMode==='single'?'rgba(61,128,224,0.06)':'var(--orion-surface)' }}>
+                        <FilmIcon size={16} style={{ color: plMode==='single'?'var(--orion-accent)':'var(--orion-text-mute)' }} />
+                        <div style={{ textAlign:'left' }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-text)' }}>Un seul fichier</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)' }}>Montage bout à bout</div>
+                        </div>
+                      </button>
+                      <button onClick={() => setPlMode('zip')}
+                        style={{ flex:1, display:'flex', alignItems:'center', gap:8, padding:'10px 12px', borderRadius:8, cursor:'pointer', border:`1.5px solid ${plMode==='zip'?'var(--orion-accent)':'var(--orion-line)'}`, background: plMode==='zip'?'rgba(61,128,224,0.06)':'var(--orion-surface)' }}>
+                        <Package size={16} style={{ color: plMode==='zip'?'var(--orion-accent)':'var(--orion-text-mute)' }} />
+                        <div style={{ textAlign:'left' }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-text)' }}>Fichiers séparés</div>
+                          <div style={{ fontSize:10, color:'var(--orion-text-mute)' }}>Un .zip de clips</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bouton export playlist / téléchargement */}
+                  <div style={{ display:'flex', gap:10, alignItems:'center', flexWrap:'wrap' }}>
+                    {!plDone ? (
+                      <button onClick={exportPlaylist} disabled={processing}
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 18px', background:'var(--orion-accent)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor: processing ? 'wait' : 'pointer', opacity: processing ? 0.7 : 1 }}>
+                        {processing
+                          ? <><Loader size={13} /> {converting ? `Conversion ${plCurrentIdx+1}/${playlist!.length}…` : `Capture ${plCurrentIdx+1}/${playlist!.length} (${progress}%)`}</>
+                          : <><Download size={13} /> Générer la playlist</>}
+                      </button>
+                    ) : (
+                      <button onClick={downloadPlaylistResult}
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 18px', background:'var(--orion-green)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer' }}>
+                        <Download size={13} /> Télécharger ({plResultName.endsWith('zip') ? 'ZIP' : outputFormat.toUpperCase()})
+                      </button>
+                    )}
+                  </div>
+
+                  {processing && (
+                    <div style={{ height:5, background:'var(--orion-surface-3)', borderRadius:3, overflow:'hidden' }}>
+                      <div style={{ height:'100%', width:`${converting ? ((plCurrentIdx+1)/playlist!.length)*100 : progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
+                    </div>
+                  )}
+
+                  {plDone && !processing && (
+                    <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'var(--orion-green)', fontWeight:600 }}>
+                      <Check size={14} /> Playlist prête · {playlist!.length} séquences
+                    </div>
+                  )}
+                </>
+              )}
+
+              {!isPlaylistMode && (
               <div style={{ display:'flex', gap:10, flexWrap:'wrap', alignItems:'center' }}>
                 <button onClick={() => { if (videoRef.current) videoRef.current.currentTime = clipStart; }}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 14px', background:'var(--orion-surface-2)', border:'1.5px solid var(--orion-line)', borderRadius:8, fontSize:13, fontWeight:600, color:'var(--orion-text)', cursor:'pointer' }}>
@@ -247,8 +392,9 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                   </button>
                 )}
               </div>
+              )}
 
-              {processing && (
+              {!isPlaylistMode && processing && (
                 <div>
                   <div style={{ height:5, background:'var(--orion-surface-3)', borderRadius:3, overflow:'hidden' }}>
                     <div style={{ height:'100%', width:`${converting ? 100 : progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
@@ -261,7 +407,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 </div>
               )}
 
-              {clipUrl && !processing && (
+              {!isPlaylistMode && clipUrl && !processing && (
                 <div>
                   <div style={{ fontSize:12, fontWeight:600, color:'var(--orion-text)', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
                     <Check size={13} style={{ color:'var(--orion-green)' }} /> Clip prêt · {formatTime(clipEnd - clipStart)} · Format {outputFormat.toUpperCase()}
