@@ -28,6 +28,8 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
   const [progress, setProgress] = useState(0);
   const [clipUrl, setClipUrl] = useState('');
   const [error, setError] = useState('');
+  const [outputFormat, setOutputFormat] = useState<'mp4' | 'webm'>('mp4');
+  const [converting, setConverting] = useState(false);
 
   useEffect(() => {
     if (pendingClip && videoFile && duration > 0) {
@@ -94,33 +96,47 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
       video.style.pointerEvents = '';
       video.style.zIndex = '';
 
-      // Envoyer le WebM au serveur pour conversion MP4 H.264
+      // Le WebM est déjà découpé côté navigateur. On l'envoie au serveur pour transcodage MP4.
       const webmBlob = new Blob(chunks, { type: 'video/webm' });
       setError('');
-      setProgress(0);
+      setProgress(100);
+      setConverting(true);
 
       try {
         const formData = new FormData();
         formData.append('video', webmBlob, 'clip.webm');
-        formData.append('start', '0');
-        formData.append('duration', String(clipEnd - clipStart));
 
-        const response = await fetch('/api/clip-video', { method: 'POST', body: formData });
+        // Timeout de 90s côté client (au cas où le serveur ne répond pas)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
+
+        const response = await fetch('/api/clip-video', {
+          method: 'POST',
+          body: formData,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const mp4Blob = await response.blob();
           setClipUrl(URL.createObjectURL(mp4Blob));
-          setProgress(100);
+          setOutputFormat('mp4');
         } else {
-          // Fallback WebM si serveur indisponible
+          // Le serveur a répondu mais en erreur → fallback WebM
+          const msg = await response.json().catch(() => ({}));
           setClipUrl(URL.createObjectURL(webmBlob));
-          setProgress(100);
+          setOutputFormat('webm');
+          setError('Conversion MP4 indisponible (' + (msg.error || response.status) + '). Clip téléchargeable en WebM.');
         }
-      } catch {
-        // Fallback WebM
+      } catch (e: any) {
+        // Serveur injoignable ou timeout → fallback WebM
         setClipUrl(URL.createObjectURL(webmBlob));
-        setProgress(100);
+        setOutputFormat('webm');
+        setError(e?.name === 'AbortError'
+          ? 'La conversion MP4 a pris trop de temps. Clip disponible en WebM.'
+          : 'Serveur de conversion injoignable. Clip disponible en WebM.');
       }
+      setConverting(false);
     } catch (e) { setError('Erreur : ' + String(e)); }
     setProcessing(false);
   };
@@ -129,7 +145,7 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
     if (!clipUrl) return;
     const a = document.createElement('a');
     a.href = clipUrl;
-    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.mp4`;
+    a.download = `clip_${(pendingClip?.label || 'sequence').replace(/\s/g, '_')}_${formatTime(clipStart)}.${outputFormat}`;
     a.click();
   };
 
@@ -222,12 +238,12 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
                 </button>
                 <button onClick={exportClip} disabled={processing || clipEnd <= clipStart}
                   style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-accent)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor: processing ? 'wait' : 'pointer', opacity: (processing || clipEnd <= clipStart) ? 0.7 : 1 }}>
-                  {processing ? <><Loader size={13} /> {progress}%...</> : <><Scissors size={13} /> Exporter le clip</>}
+                  {processing ? <><Loader size={13} /> {converting ? 'Conversion…' : `${progress}%`}</> : <><Scissors size={13} /> Exporter le clip</>}
                 </button>
                 {clipUrl && (
                   <button onClick={downloadClip}
                     style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 16px', background:'var(--orion-green)', border:'none', borderRadius:8, fontSize:13, fontWeight:700, color:'#fff', cursor:'pointer' }}>
-                    <Download size={13} /> Télécharger MP4
+                    <Download size={13} /> Télécharger {outputFormat.toUpperCase()}
                   </button>
                 )}
               </div>
@@ -235,10 +251,12 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
               {processing && (
                 <div>
                   <div style={{ height:5, background:'var(--orion-surface-3)', borderRadius:3, overflow:'hidden' }}>
-                    <div style={{ height:'100%', width:`${progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
+                    <div style={{ height:'100%', width:`${converting ? 100 : progress}%`, background:'var(--orion-accent)', transition:'width .3s' }} />
                   </div>
                   <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginTop:4 }}>
-                    {progress < 99 ? `Capture en cours (${progress}%)…` : 'Conversion MP4 en cours…'}
+                    {converting
+                      ? 'Conversion MP4 sur le serveur… (peut prendre jusqu\'à une minute)'
+                      : `Capture de la séquence en cours (${progress}%)…`}
                   </div>
                 </div>
               )}
@@ -246,13 +264,17 @@ export default function VideoClipper({ onClose, pendingClip, initialVideoFile, i
               {clipUrl && !processing && (
                 <div>
                   <div style={{ fontSize:12, fontWeight:600, color:'var(--orion-text)', marginBottom:6, display:'flex', alignItems:'center', gap:6 }}>
-                    <Check size={13} style={{ color:'var(--orion-green)' }} /> Clip prêt · {formatTime(clipEnd - clipStart)}
+                    <Check size={13} style={{ color:'var(--orion-green)' }} /> Clip prêt · {formatTime(clipEnd - clipStart)} · Format {outputFormat.toUpperCase()}
                   </div>
                   <video src={clipUrl} controls style={{ width:'100%', borderRadius:8, background:'#000' }} />
                 </div>
               )}
 
-              {error && <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(224,59,46,0.08)', border:'1px solid rgba(224,59,46,0.3)', fontSize:13, color:'#E03B2E' }}>{error}</div>}
+              {error && (
+                clipUrl
+                  ? <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(217,119,6,0.08)', border:'1px solid rgba(217,119,6,0.3)', fontSize:12.5, color:'#b45309' }}>⚠ {error}</div>
+                  : <div style={{ padding:'9px 13px', borderRadius:8, background:'rgba(224,59,46,0.08)', border:'1px solid rgba(224,59,46,0.3)', fontSize:13, color:'#E03B2E' }}>{error}</div>
+              )}
 
               <button onClick={() => { setVideoFile(null); setVideoUrl(''); setClipUrl(''); }}
                 style={{ fontSize:12, color:'var(--orion-text-mute)', background:'none', border:'none', cursor:'pointer', textDecoration:'underline', textAlign:'left' }}>
