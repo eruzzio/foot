@@ -16,6 +16,7 @@ import AppLayout from './components/AppLayout';
 import AdminPanel from './components/AdminPanel';
 import ConfirmEmail from './components/ConfirmEmail';
 import SharedReport from './components/SharedReport';
+import SharedPlaylist from './components/SharedPlaylist';
 import PricingPage from './components/PricingPage';
 import MentionsLegales from './components/MentionsLegales';
 import CGU from './components/CGU';
@@ -101,6 +102,10 @@ function App() {
   }
 
   // Rapport partagé public
+  if (window.location.pathname.startsWith('/playlist/')) {
+    return <SharedPlaylist />;
+  }
+
   if (window.location.pathname.startsWith('/share/')) {
     return <SharedReport />;
   }

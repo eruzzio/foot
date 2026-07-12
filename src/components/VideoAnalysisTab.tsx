@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, X, Link, Download, Scissors } from 'lucide-react';
+import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, X, Link, Download, Scissors, Share2, Check, ListVideo } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import { buildVeoTimestampUrl } from '../utils/veoParser';
 import VideoClipper from './VideoClipper';
@@ -30,19 +31,67 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [offset, setOffset] = useState(0);
   const [pendingClip, setPendingClip] = useState<{ timestamp: number; label: string; team: string } | null>(null);
   const [showClipper, setShowClipper] = useState(false);
-  const [playlist, setPlaylist] = useState<{ id: string; timestamp: number; label: string; team: string }[]>([]);
+  const [playlist, setPlaylist] = useState<{ id: string; timestamp: number; matchSeconds?: number; label: string; team: string }[]>([]);
   const [showPlaylistExport, setShowPlaylistExport] = useState(false);
 
   const addToPlaylist = (event: any) => {
     const item = {
-      id: event.id || `${event.timestamp}-${Math.random()}`,
-      timestamp: event.timestamp + offset,
+      id: event.id,
+      timestamp: event.timestamp + offset,   // seconde dans la vidéo
+      matchSeconds: event.timestamp,          // seconde de match (pour l'affichage)
       label: event.event_type?.name || event.label || 'Action',
       team: event.team || 'A',
     };
     setPlaylist(prev => prev.some(p => p.id === item.id) ? prev : [...prev, item]);
   };
   const removeFromPlaylist = (id: string) => setPlaylist(prev => prev.filter(p => p.id !== id));
+
+  // Partage de playlist (lien public, séquences cliquables vers la vidéo VEO)
+  const [sharingPl, setSharingPl] = useState(false);
+  const [plShareUrl, setPlShareUrl] = useState('');
+  const [plShareCopied, setPlShareCopied] = useState(false);
+
+  const sharePlaylist = async () => {
+    if (playlist.length === 0) return;
+    setSharingPl(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setSharingPl(false); return; }
+
+      const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      const payload = {
+        items: playlist.map(p => ({
+          label: p.label,
+          timestamp: p.timestamp,
+          team: p.team,
+          minute: formatTime(p.matchSeconds ?? (p.timestamp - offset)),
+        })),
+        video_url: match.video_url || '',
+        team_a: match.team_a_name,
+        team_b: match.team_b_name,
+        score_a: match.team_a_score ?? null,
+        score_b: match.team_b_score ?? null,
+        match_date: match.match_date || null,
+      };
+
+      const { error } = await supabase.from('playlists').insert({
+        user_id: user.id,
+        match_id: match.id,
+        name: `${match.team_a_name} vs ${match.team_b_name}`,
+        items_json: JSON.stringify(payload),
+        share_token: token,
+      });
+
+      if (!error) {
+        const url = `${window.location.origin}/playlist/${token}`;
+        setPlShareUrl(url);
+        navigator.clipboard.writeText(url);
+        setPlShareCopied(true);
+        setTimeout(() => setPlShareCopied(false), 3000);
+      }
+    } catch {}
+    setSharingPl(false);
+  };
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -488,35 +537,35 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--orion-red)', background: 'var(--orion-red-dim)', padding: '2px 7px', borderRadius: 3, flexShrink: 0 }}>RATÉ</span>
               )}
 
-              {/* Boutons export clip + playlist */}
+              {/* Bouton + playlist : dispo dès qu'il y a une vidéo (local OU veo) */}
+              {videoSource && (() => {
+                const inPl = playlist.some(p => p.id === event.id);
+                return (
+                  <button
+                    onClick={e => { e.stopPropagation(); inPl ? removeFromPlaylist(event.id) : addToPlaylist(event); }}
+                    style={{ padding:'3px 8px', borderRadius:6, border:`1.5px solid ${inPl ? 'var(--orion-accent)' : 'var(--orion-line)'}`, background: inPl ? 'var(--orion-accent)' : 'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color: inPl ? '#fff' : 'var(--orion-text-mute)', flexShrink:0, fontSize:13, fontWeight:700, lineHeight:1 }}
+                    title={inPl ? 'Retirer de la playlist' : 'Ajouter à la playlist'}
+                  >
+                    {inPl ? '✓' : '+'}
+                  </button>
+                );
+              })()}
+
+              {/* Bouton export fichier : uniquement en vidéo locale */}
               {videoSource?.type === 'local' && (
-                <>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      addToPlaylist(event);
-                    }}
-                    style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background: playlist.some(p => p.id === (event.id || '')) ? 'var(--orion-accent)' : 'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color: playlist.some(p => p.id === (event.id || '')) ? '#fff' : 'var(--orion-text-mute)', flexShrink:0, fontSize:13, fontWeight:700, lineHeight:1 }}
-                    title="Ajouter à la playlist"
-                    onMouseEnter={e => { if (!playlist.some(p => p.id === (event.id || ''))) { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; } }}
-                    onMouseLeave={e => { if (!playlist.some(p => p.id === (event.id || ''))) { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; } }}
-                  >
-                    +
-                  </button>
-                  <button
-                    onClick={e => {
-                      e.stopPropagation();
-                      setPendingClip({ timestamp: event.timestamp + offset, label: event.event_type?.name || event.label || 'Action', team: event.team || 'A' });
-                      setShowClipper(true);
-                    }}
-                    style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'var(--orion-text-mute)', flexShrink:0 }}
-                    title="Exporter ce clip"
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
-                  >
-                    <Download size={11} />
-                  </button>
-                </>
+                <button
+                  onClick={e => {
+                    e.stopPropagation();
+                    setPendingClip({ timestamp: event.timestamp + offset, label: event.event_type?.name || event.label || 'Action', team: event.team || 'A' });
+                    setShowClipper(true);
+                  }}
+                  style={{ padding:'3px 8px', borderRadius:6, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', display:'flex', alignItems:'center', gap:4, color:'var(--orion-text-mute)', flexShrink:0 }}
+                  title="Exporter ce clip en fichier"
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orion-accent)'; e.currentTarget.style.color = 'var(--orion-accent)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--orion-line)'; e.currentTarget.style.color = 'var(--orion-text-mute)'; }}
+                >
+                  <Download size={11} />
+                </button>
               )}
 
               {/* Icône play si vidéo */}
@@ -539,20 +588,40 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
       {playlist.length > 0 && (
         <div style={{ position:'sticky', bottom:0, marginTop:16, background:'var(--orion-surface)', border:'1.5px solid var(--orion-accent)', borderRadius:10, padding:'12px 14px', boxShadow:'0 -4px 20px rgba(0,0,0,0.12)', zIndex:50 }}>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10, flexWrap:'wrap', gap:8 }}>
-            <span style={{ fontSize:13, fontWeight:700, color:'var(--orion-text)' }}>
-              🎬 Playlist — {playlist.length} séquence{playlist.length > 1 ? 's' : ''}
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'var(--orion-text)' }}>
+              <ListVideo size={15} style={{ color:'var(--orion-accent)' }} />
+              Playlist — {playlist.length} séquence{playlist.length > 1 ? 's' : ''}
             </span>
-            <div style={{ display:'flex', gap:8 }}>
-              <button onClick={() => setPlaylist([])}
+            <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+              <button onClick={() => { setPlaylist([]); setPlShareUrl(''); }}
                 style={{ padding:'6px 12px', borderRadius:7, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', fontSize:12, fontWeight:600, color:'var(--orion-text-dim)' }}>
                 Vider
               </button>
-              <button onClick={() => setShowPlaylistExport(true)}
-                style={{ padding:'6px 14px', borderRadius:7, border:'none', background:'var(--orion-accent)', cursor:'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6 }}>
-                <Download size={13} /> Exporter la playlist
+
+              {/* Export fichier : seulement en vidéo locale */}
+              {videoSource?.type === 'local' && (
+                <button onClick={() => setShowPlaylistExport(true)}
+                  style={{ padding:'6px 12px', borderRadius:7, border:'1.5px solid var(--orion-line)', background:'var(--orion-surface-2)', cursor:'pointer', fontSize:12, fontWeight:600, color:'var(--orion-text-dim)', display:'inline-flex', alignItems:'center', gap:6 }}>
+                  <Download size={13} /> Exporter en fichier
+                </button>
+              )}
+
+              {/* Partage par lien : nécessite une vidéo en ligne */}
+              <button onClick={sharePlaylist} disabled={sharingPl || !match.video_url}
+                title={!match.video_url ? "Ajoutez d'abord une URL vidéo (VEO) au match" : 'Créer un lien de partage'}
+                style={{ padding:'6px 14px', borderRadius:7, border:'none', background: plShareCopied ? 'var(--orion-green)' : 'var(--orion-accent)', cursor: (sharingPl || !match.video_url) ? 'not-allowed' : 'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6, opacity: (!match.video_url) ? 0.5 : 1 }}>
+                {plShareCopied ? <><Check size={13} /> Lien copié !</> : <><Share2 size={13} /> {sharingPl ? 'Création…' : 'Partager la playlist'}</>}
               </button>
             </div>
           </div>
+
+          {/* Lien généré */}
+          {plShareUrl && (
+            <div style={{ marginBottom:10, padding:'8px 12px', background:'rgba(61,128,224,0.06)', border:'1.5px solid rgba(61,128,224,0.3)', borderRadius:8, display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+              <span style={{ fontSize:11, color:'var(--orion-text-mute)', flexShrink:0 }}>Lien public :</span>
+              <a href={plShareUrl} target="_blank" rel="noreferrer" style={{ fontSize:12, color:'var(--orion-accent)', fontWeight:600, wordBreak:'break-all' }}>{plShareUrl}</a>
+            </div>
+          )}
           <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
             {playlist.map((p, i) => (
               <div key={p.id} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'4px 8px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:6, fontSize:11 }}>
