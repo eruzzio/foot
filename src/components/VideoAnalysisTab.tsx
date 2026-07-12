@@ -46,6 +46,26 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   };
   const removeFromPlaylist = (id: string) => setPlaylist(prev => prev.filter(p => p.id !== id));
 
+  // Sauvegarde l'URL vidéo (VEO) en base pour qu'elle soit réutilisable et partageable
+  const [savingUrl, setSavingUrl] = useState(false);
+  const [localVideoUrl, setLocalVideoUrl] = useState<string>(match.video_url || '');
+
+  const saveVideoUrl = async (url: string) => {
+    setSavingUrl(true);
+    const clean = url.trim();
+    const { error } = await supabase
+      .from('matches')
+      .update({ video_url: clean, video_provider: 'veo' })
+      .eq('id', match.id);
+    if (!error) {
+      setLocalVideoUrl(clean);
+      (match as any).video_url = clean;   // maj immédiate de l'objet local
+      setVideoSource({ type: 'veo', url: clean });
+      setShowUrlInput(false);
+    }
+    setSavingUrl(false);
+  };
+
   // Partage de playlist (lien public, séquences cliquables vers la vidéo VEO)
   const [sharingPl, setSharingPl] = useState(false);
   const [plShareUrl, setPlShareUrl] = useState('');
@@ -66,7 +86,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           team: p.team,
           minute: formatTime(p.matchSeconds ?? (p.timestamp - offset)),
         })),
-        video_url: match.video_url || '',
+        video_url: localVideoUrl || match.video_url || '',
         team_a: match.team_a_name,
         team_b: match.team_b_name,
         score_a: match.team_a_score ?? null,
@@ -135,8 +155,8 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
       videoRef.current.currentTime = Math.max(0, videoTs - clipBefore);
       videoRef.current.play();
       setIsPlaying(true);
-    } else if (videoSource?.type === 'veo' && match.video_url) {
-      const link = buildVeoTimestampUrl(match.video_url, videoTs);
+    } else if (videoSource?.type === 'veo' && (localVideoUrl || match.video_url)) {
+      const link = buildVeoTimestampUrl(localVideoUrl || match.video_url!, videoTs);
       window.open(link, '_blank');
     }
   };
@@ -451,10 +471,10 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
               type="text" value={urlInput} onChange={e => setUrlInput(e.target.value)}
               placeholder="https://veo.co/shared-videos/..."
               style={{ flex: 1, padding: '7px 10px', background: 'var(--orion-surface-2)', border: '1.5px solid var(--orion-line-strong)', borderRadius: 4, color: 'var(--orion-text)', fontSize: 12, outline: 'none', fontFamily: 'var(--orion-font-mono)' }}
-              onKeyDown={e => { if (e.key === 'Enter' && urlInput) { setVideoSource({ type: 'veo', url: urlInput }); setShowUrlInput(false); } }}
+              onKeyDown={e => { if (e.key === 'Enter' && urlInput) saveVideoUrl(urlInput); }}
             />
-            <button onClick={() => { if (urlInput) { setVideoSource({ type: 'veo', url: urlInput }); setShowUrlInput(false); } }} className="o-btn o-btn--primary o-btn--sm">
-              Charger
+            <button onClick={() => { if (urlInput) saveVideoUrl(urlInput); }} className="o-btn o-btn--primary o-btn--sm" disabled={savingUrl}>
+              {savingUrl ? '…' : 'Charger'}
             </button>
             <button onClick={() => setShowUrlInput(false)} className="o-btn o-btn--ghost o-btn--sm"><X size={13} /></button>
           </div>
@@ -607,9 +627,9 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
               )}
 
               {/* Partage par lien : nécessite une vidéo en ligne */}
-              <button onClick={sharePlaylist} disabled={sharingPl || !match.video_url}
-                title={!match.video_url ? "Ajoutez d'abord une URL vidéo (VEO) au match" : 'Créer un lien de partage'}
-                style={{ padding:'6px 14px', borderRadius:7, border:'none', background: plShareCopied ? 'var(--orion-green)' : 'var(--orion-accent)', cursor: (sharingPl || !match.video_url) ? 'not-allowed' : 'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6, opacity: (!match.video_url) ? 0.5 : 1 }}>
+              <button onClick={sharePlaylist} disabled={sharingPl || !localVideoUrl}
+                title={!localVideoUrl ? "Ajoutez d'abord une URL vidéo (VEO) au match" : 'Créer un lien de partage'}
+                style={{ padding:'6px 14px', borderRadius:7, border:'none', background: plShareCopied ? 'var(--orion-green)' : 'var(--orion-accent)', cursor: (sharingPl || !localVideoUrl) ? 'not-allowed' : 'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6, opacity: (!localVideoUrl) ? 0.5 : 1 }}>
                 {plShareCopied ? <><Check size={13} /> Lien copié !</> : <><Share2 size={13} /> {sharingPl ? 'Création…' : 'Partager la playlist'}</>}
               </button>
             </div>
