@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import { buildVeoTimestampUrl } from '../utils/veoParser';
 import VideoClipper from './VideoClipper';
+import PlaylistPublisher from './PlaylistPublisher';
 
 interface VideoAnalysisTabProps {
   match: Match & { events: MatchEventWithDetails[] };
@@ -33,6 +34,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [showClipper, setShowClipper] = useState(false);
   const [playlist, setPlaylist] = useState<{ id: string; timestamp: number; matchSeconds?: number; label: string; team: string }[]>([]);
   const [showPlaylistExport, setShowPlaylistExport] = useState(false);
+  const [showPublisher, setShowPublisher] = useState(false);
 
   const addToPlaylist = (event: any) => {
     const item = {
@@ -621,22 +623,15 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 </button>
               )}
 
-              {/* Partage par lien : nécessite une vidéo en ligne */}
-              <button onClick={sharePlaylist} disabled={sharingPl || !localVideoUrl}
-                title={!localVideoUrl ? "Ajoutez d'abord une URL vidéo (VEO) au match" : 'Créer un lien de partage'}
-                style={{ padding:'6px 14px', borderRadius:7, border:'none', background: plShareCopied ? 'var(--orion-green)' : 'var(--orion-accent)', cursor: (sharingPl || !localVideoUrl) ? 'not-allowed' : 'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6, opacity: (!localVideoUrl) ? 0.5 : 1 }}>
-                {plShareCopied ? <><Check size={13} /> Lien copié !</> : <><Share2 size={13} /> {sharingPl ? 'Création…' : 'Partager la playlist'}</>}
+              {/* Partage par lien : capture + héberge les clips (nécessite la vidéo locale) */}
+              <button onClick={() => setShowPublisher(true)} disabled={videoSource?.type !== 'local'}
+                title={videoSource?.type !== 'local' ? 'Chargez la vidéo du match (fichier local) pour publier une playlist' : 'Publier et obtenir un lien de partage'}
+                style={{ padding:'6px 14px', borderRadius:7, border:'none', background:'var(--orion-accent)', cursor: videoSource?.type !== 'local' ? 'not-allowed' : 'pointer', fontSize:12, fontWeight:700, color:'#fff', display:'inline-flex', alignItems:'center', gap:6, opacity: videoSource?.type !== 'local' ? 0.5 : 1 }}>
+                <Share2 size={13} /> Partager la playlist
               </button>
             </div>
           </div>
 
-          {/* Lien généré */}
-          {plShareUrl && (
-            <div style={{ marginBottom:10, padding:'8px 12px', background:'rgba(61,128,224,0.06)', border:'1.5px solid rgba(61,128,224,0.3)', borderRadius:8, display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-              <span style={{ fontSize:11, color:'var(--orion-text-mute)', flexShrink:0 }}>Lien public :</span>
-              <a href={plShareUrl} target="_blank" rel="noreferrer" style={{ fontSize:12, color:'var(--orion-accent)', fontWeight:600, wordBreak:'break-all' }}>{plShareUrl}</a>
-            </div>
-          )}
           <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
             {playlist.map((p, i) => (
               <div key={p.id} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'4px 8px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:6, fontSize:11 }}>
@@ -660,6 +655,17 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
           initialVideoFile={localFile}
           initialVideoOffset={offset}
           onClose={() => { setShowClipper(false); setPendingClip(null); }}
+        />
+      )}
+
+      {/* Publication de playlist (capture + upload + lien) */}
+      {showPublisher && localFile && (
+        <PlaylistPublisher
+          playlist={playlist}
+          videoFile={localFile}
+          videoOffset={offset}
+          match={match}
+          onClose={() => setShowPublisher(false)}
         />
       )}
 
