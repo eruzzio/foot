@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo } from 'lucide-react';
 
@@ -34,6 +34,11 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [ready, setReady] = useState(false);
+
+  // URL de la vidéo créée UNE SEULE FOIS (sinon la vidéo se recharge en boucle à chaque render)
+  const videoUrl = useMemo(() => (videoFile ? URL.createObjectURL(videoFile) : ''), [videoFile]);
+  useEffect(() => () => { if (videoUrl) URL.revokeObjectURL(videoUrl); }, [videoUrl]);
 
   // ── Capture d'une séquence en WebM depuis le lecteur ──────────────────────
   const captureSegment = (start: number, end: number): Promise<Blob> =>
@@ -48,24 +53,52 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5_000_000 });
       const chunks: BlobPart[] = [];
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-      const dur = end - start;
+      const dur = Math.max(0.1, end - start);
+      let iv: any = null;
+      let safety: any = null;
+      let done = false;
+
+      const finish = (ok: boolean, err?: string) => {
+        if (done) return;
+        done = true;
+        if (iv) clearInterval(iv);
+        if (safety) clearTimeout(safety);
+        try { video.pause(); } catch {}
+        video.muted = false;
+        if (recorder.state !== 'inactive') { try { recorder.stop(); } catch {} }
+        if (!ok) reject(new Error(err || 'Capture échouée'));
+      };
 
       recorder.onstop = () => {
+        if (!done) { done = true; if (iv) clearInterval(iv); if (safety) clearTimeout(safety); }
         video.muted = false;
         resolve(new Blob(chunks, { type: 'video/webm' }));
       };
-      recorder.onerror = () => reject(new Error('Erreur de capture'));
+      recorder.onerror = () => finish(false, 'Erreur de capture (MediaRecorder)');
 
-      video.currentTime = start;
       video.muted = true;
+      video.currentTime = start;
       video.onseeked = () => {
         video.onseeked = null;
         recorder.start(100);
-        video.play();
-        const iv = setInterval(() => {
+        const playPromise = video.play();
+        // Si le navigateur refuse de lire (onglet en arrière-plan, autoplay bloqué)
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(() => finish(false, 'Lecture bloquée par le navigateur — gardez cet onglet au premier plan'));
+        }
+        iv = setInterval(() => {
           setProgress(Math.min(99, Math.round(((video.currentTime - start) / dur) * 100)));
-          if (video.currentTime >= end) { clearInterval(iv); video.pause(); recorder.stop(); }
+          if (video.currentTime >= end) { video.pause(); recorder.stop(); }
         }, 100);
+        // Garde-fou : la capture ne doit jamais durer plus que (durée + 8s)
+        safety = setTimeout(() => {
+          if (video.currentTime > start + 0.3) {
+            // On a capturé quelque chose, on arrête proprement
+            video.pause(); recorder.stop();
+          } else {
+            finish(false, 'La vidéo n\'a pas démarré (onglet en arrière-plan ?)');
+          }
+        }, (dur + 8) * 1000);
       };
     });
 
@@ -193,13 +226,15 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
         <div style={{ padding:'16px 20px', display:'flex', flexDirection:'column', gap:14 }}>
 
-          {/* Lecteur caché (nécessaire pour la capture) */}
-          {videoFile && (
+          {/* Lecteur nécessaire pour la capture (URL stable, pas recréée à chaque render) */}
+          {videoUrl && (
             <video
               ref={videoRef}
-              src={URL.createObjectURL(videoFile)}
+              src={videoUrl}
+              onLoadedData={() => setReady(true)}
               style={{ width:'100%', maxHeight: running ? 140 : 180, borderRadius:8, background:'#000' }}
               muted={running}
+              playsInline
             />
           )}
 
@@ -240,9 +275,9 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
               </div>
 
               {/* Bouton publier */}
-              <button onClick={publish} disabled={running || !videoFile}
-                style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', gap:8, padding:'11px 18px', background:'var(--orion-accent)', border:'none', borderRadius:9, fontSize:14, fontWeight:700, color:'#fff', cursor: running ? 'wait' : 'pointer', opacity: (running || !videoFile) ? 0.7 : 1 }}>
-                {running ? <><Loader size={15} /> Publication…</> : <><UploadCloud size={15} /> Publier et obtenir le lien</>}
+              <button onClick={publish} disabled={running || !videoFile || !ready}
+                style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', gap:8, padding:'11px 18px', background:'var(--orion-accent)', border:'none', borderRadius:9, fontSize:14, fontWeight:700, color:'#fff', cursor: (running || !ready) ? 'wait' : 'pointer', opacity: (running || !videoFile || !ready) ? 0.7 : 1 }}>
+                {running ? <><Loader size={15} /> Publication…</> : !ready ? <><Loader size={15} /> Chargement vidéo…</> : <><UploadCloud size={15} /> Publier et obtenir le lien</>}
               </button>
 
               {/* Progression */}
