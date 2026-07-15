@@ -65,8 +65,10 @@ export default async function handler(req, res) {
       ffmpeg(inputPath)
         .outputOptions([
           '-c:v libx264',
-          '-preset veryfast',
-          '-crf 23',
+          '-preset medium',
+          '-crf 22',
+          '-vf scale=-2:720',   // downscale à 720p (largeur auto, hauteur 720)
+          '-r 30',              // framerate fixe 30fps -> supprime les saccades
           '-c:a aac',
           '-b:a 128k',
           '-movflags +faststart',

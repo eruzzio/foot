@@ -45,12 +45,13 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
     new Promise((resolve, reject) => {
       const video = videoRef.current;
       if (!video) { reject(new Error('Lecteur indisponible')); return; }
-      const stream = (video as any).captureStream?.() || (video as any).mozCaptureStream?.();
+      const stream = (video as any).captureStream?.(30) || (video as any).mozCaptureStream?.(30);
       if (!stream) { reject(new Error('Navigateur non supporté (utilisez Chrome)')); return; }
 
-      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
-        ? 'video/webm;codecs=vp9,opus' : 'video/webm';
-      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 5_000_000 });
+      // 720p équilibré : ~4 Mbps suffit et reste fluide. VP8 est plus stable que VP9 pour la capture temps réel.
+      const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')
+        ? 'video/webm;codecs=vp8,opus' : 'video/webm';
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: 4_500_000 });
       const chunks: BlobPart[] = [];
       recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
       const dur = Math.max(0.1, end - start);
@@ -129,41 +130,45 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setError('Vous devez être connecté.'); setRunning(false); return; }
 
-      const items: any[] = [];
-
+      // ── PHASE 1 : capturer toutes les séquences (séquentiel, un seul lecteur) ──
+      setStep('capture');
+      const segments: { webm: Blob; item: any; s: number; e: number }[] = [];
       for (let i = 0; i < playlist.length; i++) {
-        setCurrentIdx(i);
+        setCurrentIdx(i); setProgress(0);
         const item = playlist[i];
         const vTs = item.timestamp;
         const s = Math.max(0, vTs - before);
         const e = Math.min(videoRef.current?.duration || vTs + after, vTs + after);
-
-        // 1. Capture
-        setStep('capture'); setProgress(0);
         const webm = await captureSegment(s, e);
+        segments.push({ webm, item, s, e });
+      }
 
-        // 2. Conversion MP4
-        setStep('convert');
-        const { blob, ext } = await toMp4(webm);
-
-        // 3. Upload Supabase Storage
-        setStep('upload');
+      // ── PHASE 2 : convertir + uploader EN PARALLÈLE (bien plus rapide) ──
+      setStep('convert');
+      let doneCount = 0;
+      const results = await Promise.all(segments.map(async (seg, i) => {
+        const { blob, ext } = await toMp4(seg.webm);
         const path = `${user.id}/${match.id}/${Date.now()}_${i}.${ext}`;
         const { error: upErr } = await supabase.storage
           .from('clips')
           .upload(path, blob, { contentType: ext === 'mp4' ? 'video/mp4' : 'video/webm', upsert: true });
         if (upErr) throw new Error('Upload échoué : ' + upErr.message);
-
         const { data: pub } = supabase.storage.from('clips').getPublicUrl(path);
-
-        items.push({
-          label: item.label,
-          team: item.team,
-          minute: fmt(item.matchSeconds ?? (item.timestamp - videoOffset)),
-          duration: Math.round(e - s),
+        doneCount++;
+        setCurrentIdx(doneCount - 1);
+        setProgress(Math.round((doneCount / segments.length) * 100));
+        return {
+          idx: i,
+          label: seg.item.label,
+          team: seg.item.team,
+          minute: fmt(seg.item.matchSeconds ?? (seg.item.timestamp - videoOffset)),
+          duration: Math.round(seg.e - seg.s),
           url: pub.publicUrl,
-        });
-      }
+        };
+      }));
+
+      // Remettre dans l'ordre d'origine
+      const items = results.sort((a, b) => a.idx - b.idx).map(({ idx, ...rest }) => rest);
 
       // 4. Créer la playlist partageable
       setStep('finalize');

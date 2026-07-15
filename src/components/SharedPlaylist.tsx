@@ -84,7 +84,7 @@ export default function SharedPlaylist() {
         </div>
 
         <div style={{ borderRadius:12, overflow:'hidden', background:'#000', boxShadow:'0 8px 30px -8px rgba(0,0,0,0.3)' }}>
-          <video ref={videoRef} key={active.url} src={active.url} controls playsInline
+          <video ref={videoRef} key={active.url} src={active.url} controls playsInline preload="auto"
             style={{ width:'100%', display:'block', maxHeight:'56vh', background:'#000' }}
             onEnded={() => { if (activeIdx < data.items.length - 1) setActiveIdx(activeIdx + 1); }} />
         </div>
