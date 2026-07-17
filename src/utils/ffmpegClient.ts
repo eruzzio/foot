@@ -10,17 +10,25 @@ export async function getFFmpeg(): Promise<FFmpeg> {
 
   loadingPromise = (async () => {
     try {
+      console.log('[ffmpeg] 1. création instance');
       const instance = new FFmpeg();
-      // Core + worker servis depuis NOTRE domaine (public/ffmpeg)
-      // classWorkerURL est LA clé : sans lui, ffmpeg résout mal son worker après le bundling Vite
+      instance.on('log', ({ message }) => console.log('[ffmpeg-core]', message));
+      console.log('[ffmpeg] 2. fetch core.js');
       const coreURL = await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript');
+      console.log('[ffmpeg] 3. fetch core.wasm');
       const wasmURL = await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm');
+      console.log('[ffmpeg] 4. fetch worker 814');
       const classWorkerURL = await toBlobURL('/ffmpeg/814.ffmpeg.js', 'text/javascript');
+      console.log('[ffmpeg] 5. instance.load()…');
       await instance.load({ coreURL, wasmURL, classWorkerURL });
+      console.log('[ffmpeg] 6. chargé OK');
       ffmpeg = instance;
       return instance;
     } catch (e: any) {
       loadingPromise = null;
+      console.error('[ffmpeg] Échec du chargement — détail complet :', e);
+      console.error('[ffmpeg] message:', e?.message);
+      console.error('[ffmpeg] stack:', e?.stack);
       throw new Error('Chargement du moteur vidéo impossible : ' + (e?.message || e));
     }
   })();
