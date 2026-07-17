@@ -11,10 +11,12 @@ export async function getFFmpeg(): Promise<FFmpeg> {
   loadingPromise = (async () => {
     try {
       const instance = new FFmpeg();
-      // Core servi depuis NOTRE domaine (public/ffmpeg) -> aucun blocage CSP/CORS
+      // Core + worker servis depuis NOTRE domaine (public/ffmpeg)
+      // classWorkerURL est LA clé : sans lui, ffmpeg résout mal son worker après le bundling Vite
       const coreURL = await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript');
       const wasmURL = await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm');
-      await instance.load({ coreURL, wasmURL });
+      const classWorkerURL = await toBlobURL('/ffmpeg/814.ffmpeg.js', 'text/javascript');
+      await instance.load({ coreURL, wasmURL, classWorkerURL });
       ffmpeg = instance;
       return instance;
     } catch (e: any) {
