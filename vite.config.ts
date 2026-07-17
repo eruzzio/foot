@@ -24,7 +24,13 @@ function safeCopyPublicPlugin() {
         const src = path.join(publicDir, file);
         const dest = path.join(distDir, file);
         try {
-          fs.copyFileSync(src, dest);
+          const stat = fs.statSync(src);
+          if (stat.isDirectory()) {
+            // Copie récursive des sous-dossiers (ex: ffmpeg/)
+            fs.cpSync(src, dest, { recursive: true });
+          } else {
+            fs.copyFileSync(src, dest);
+          }
         } catch {
           // skip locked files silently
         }

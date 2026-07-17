@@ -4,33 +4,23 @@ import { fetchFile, toBlobURL } from '@ffmpeg/util';
 let ffmpeg: FFmpeg | null = null;
 let loadingPromise: Promise<FFmpeg> | null = null;
 
-// Plusieurs sources de core en fallback (single-thread, pas besoin de COOP/COEP)
-const CORE_SOURCES = [
-  'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd',
-  'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd',
-];
-
 export async function getFFmpeg(): Promise<FFmpeg> {
   if (ffmpeg) return ffmpeg;
   if (loadingPromise) return loadingPromise;
 
   loadingPromise = (async () => {
-    let lastErr: any = null;
-    for (const base of CORE_SOURCES) {
-      try {
-        const instance = new FFmpeg();
-        const coreURL = await toBlobURL(`${base}/ffmpeg-core.js`, 'text/javascript');
-        const wasmURL = await toBlobURL(`${base}/ffmpeg-core.wasm`, 'application/wasm');
-        await instance.load({ coreURL, wasmURL });
-        ffmpeg = instance;
-        return instance;
-      } catch (e) {
-        lastErr = e;
-        // essaie la source suivante
-      }
+    try {
+      const instance = new FFmpeg();
+      // Core servi depuis NOTRE domaine (public/ffmpeg) -> aucun blocage CSP/CORS
+      const coreURL = await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript');
+      const wasmURL = await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm');
+      await instance.load({ coreURL, wasmURL });
+      ffmpeg = instance;
+      return instance;
+    } catch (e: any) {
+      loadingPromise = null;
+      throw new Error('Chargement du moteur vidéo impossible : ' + (e?.message || e));
     }
-    loadingPromise = null;
-    throw new Error('Chargement du moteur vidéo impossible : ' + (lastErr?.message || lastErr));
   })();
 
   return loadingPromise;
