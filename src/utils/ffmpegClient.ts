@@ -1,5 +1,5 @@
 import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { fetchFile } from '@ffmpeg/util';
 
 let ffmpeg: FFmpeg | null = null;
 let loadingPromise: Promise<FFmpeg> | null = null;
@@ -13,12 +13,12 @@ export async function getFFmpeg(): Promise<FFmpeg> {
       console.log('[ffmpeg] 1. création instance');
       const instance = new FFmpeg();
       instance.on('log', ({ message }) => console.log('[ffmpeg-core]', message));
-      console.log('[ffmpeg] 2. fetch core.js');
-      const coreURL = await toBlobURL('/ffmpeg/ffmpeg-core.js', 'text/javascript');
-      console.log('[ffmpeg] 3. fetch core.wasm');
-      const wasmURL = await toBlobURL('/ffmpeg/ffmpeg-core.wasm', 'application/wasm');
-      console.log('[ffmpeg] 4. fetch worker 814');
-      const classWorkerURL = await toBlobURL('/ffmpeg/814.ffmpeg.js', 'text/javascript');
+      console.log('[ffmpeg] 2. URLs directes same-origin');
+      const coreURL = new URL('/ffmpeg/ffmpeg-core.js', window.location.origin).href;
+      const wasmURL = new URL('/ffmpeg/ffmpeg-core.wasm', window.location.origin).href;
+      console.log('[ffmpeg] 4. worker 814 en URL directe (same-origin)');
+      // Tout en URL directe same-origin : le worker peut importScripts(core) sans blocage CSP blob.
+      const classWorkerURL = new URL('/ffmpeg/814.ffmpeg.js', window.location.origin).href;
       console.log('[ffmpeg] 5. instance.load()…');
       await instance.load({ coreURL, wasmURL, classWorkerURL });
       console.log('[ffmpeg] 6. chargé OK');
