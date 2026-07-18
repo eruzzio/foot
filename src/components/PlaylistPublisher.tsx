@@ -1,7 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo } from 'lucide-react';
-import { getFFmpeg, createClipSession } from '../utils/ffmpegClient';
 
 interface PlaylistItem {
   id: string;
@@ -41,10 +40,7 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
   const videoUrl = useMemo(() => (videoFile ? URL.createObjectURL(videoFile) : ''), [videoFile]);
   useEffect(() => () => { if (videoUrl) URL.revokeObjectURL(videoUrl); }, [videoUrl]);
 
-  // Étape courante détaillée pour chaque séquence (découpe locale ffmpeg.wasm)
-  const [loadingFfmpeg, setLoadingFfmpeg] = useState(false);
-
-  // ── Pipeline : découpe locale (ffmpeg.wasm) -> upload clips ────────────────
+  // ── Pipeline : upload vidéo sur Supabase -> découpe serveur par clip ────────
   const publish = async () => {
     if (!videoFile || playlist.length === 0) return;
     setRunning(true); setError(''); setShareUrl('');
@@ -55,49 +51,65 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
       const duration = videoRef.current?.duration || 0;
 
-      // 0. Charger ffmpeg.wasm (une seule fois, ~30 Mo au premier usage)
-      setStep('loading'); setLoadingFfmpeg(true);
-      await getFFmpeg();
-      const session = await createClipSession(videoFile);
-      setLoadingFfmpeg(false);
+      // 1. Upload de la vidéo source sur Supabase Storage (bucket privé)
+      setStep('upload-video'); setProgress(0);
+      const ext = videoFile.name.split('.').pop() || 'mp4';
+      const videoPath = `${user.id}/${match.id}/source_${Date.now()}.${ext}`;
+      const { error: upVidErr } = await supabase.storage
+        .from('match-videos')
+        .upload(videoPath, videoFile, { contentType: videoFile.type || 'video/mp4', upsert: true });
+      if (upVidErr) throw new Error('Upload vidéo : ' + upVidErr.message);
 
-      // 1. Découper chaque séquence EN LOCAL (aucune capture écran -> zéro saccade)
+      // URL signée temporaire (2h) pour que le serveur puisse lire la vidéo
+      const { data: signed, error: signErr } = await supabase.storage
+        .from('match-videos')
+        .createSignedUrl(videoPath, 7200);
+      if (signErr || !signed?.signedUrl) throw new Error('URL signée : ' + (signErr?.message || 'échec'));
+      const videoSignedUrl = signed.signedUrl;
+
+      // 2. Découper chaque séquence CÔTÉ SERVEUR (seek FFmpeg, pas de limite de taille)
       setStep('cut');
-      const clips: { blob: Blob; item: any; s: number; e: number }[] = [];
+      const items: any[] = [];
       for (let i = 0; i < playlist.length; i++) {
-        setCurrentIdx(i); setProgress(0);
+        setCurrentIdx(i); setProgress(Math.round((i / playlist.length) * 100));
         const item = playlist[i];
         const vTs = item.timestamp;
         const s = Math.max(0, vTs - before);
         const e = Math.min(duration || vTs + after, vTs + after);
-        const blob = await session.clip(s, e, r => setProgress(Math.round(r * 100)));
-        clips.push({ blob, item, s, e });
-      }
-      await session.cleanup();
 
-      // 2. Upload des clips EN PARALLÈLE
-      setStep('upload');
-      let done = 0;
-      const results = await Promise.all(clips.map(async (c, i) => {
-        const path = `${user.id}/${match.id}/${Date.now()}_${i}.mp4`;
+        const resp = await fetch('/api/clip-from-storage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl: videoSignedUrl, start: s, duration: e - s }),
+        });
+        if (!resp.ok) {
+          const msg = await resp.json().catch(() => ({}));
+          throw new Error(`Découpe séquence ${i + 1} : ${msg.error || resp.status}`);
+        }
+        const clipBlob = await resp.blob();
+
+        // Upload du clip généré dans le bucket public
+        const clipPath = `${user.id}/${match.id}/${Date.now()}_${i}.mp4`;
         const { error: upErr } = await supabase.storage
           .from('clips')
-          .upload(path, c.blob, { contentType: 'video/mp4', upsert: true });
-        if (upErr) throw new Error('Upload échoué : ' + upErr.message);
-        const { data: pub } = supabase.storage.from('clips').getPublicUrl(path);
-        done++; setCurrentIdx(done - 1); setProgress(Math.round((done / clips.length) * 100));
-        return {
-          idx: i,
-          label: c.item.label,
-          team: c.item.team,
-          minute: fmt(c.item.matchSeconds ?? (c.item.timestamp - videoOffset)),
-          duration: Math.round(c.e - c.s),
-          url: pub.publicUrl,
-        };
-      }));
-      const items = results.sort((a, b) => a.idx - b.idx).map(({ idx, ...rest }) => rest);
+          .upload(clipPath, clipBlob, { contentType: 'video/mp4', upsert: true });
+        if (upErr) throw new Error('Upload clip : ' + upErr.message);
+        const { data: pub } = supabase.storage.from('clips').getPublicUrl(clipPath);
 
-      // 3. Créer la playlist partageable
+        items.push({
+          label: item.label,
+          team: item.team,
+          minute: fmt(item.matchSeconds ?? (item.timestamp - videoOffset)),
+          duration: Math.round(e - s),
+          url: pub.publicUrl,
+        });
+      }
+
+      // 3. Supprimer la vidéo source (on n'en a plus besoin, économise le stockage)
+      setStep('cleanup');
+      await supabase.storage.from('match-videos').remove([videoPath]).catch(() => {});
+
+      // 4. Créer la playlist partageable
       setStep('finalize');
       const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
       const payload = {
@@ -127,14 +139,13 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       setError(e?.message || String(e));
     }
     setRunning(false);
-    setLoadingFfmpeg(false);
   };
 
   const stepLabel = () => {
-    if (step === 'loading')  return 'Chargement du moteur vidéo (1re fois, ~30 Mo)…';
-    if (step === 'cut')      return `Découpe de la séquence ${currentIdx + 1}/${playlist.length} (${progress}%)`;
-    if (step === 'upload')   return `Mise en ligne ${currentIdx + 1}/${playlist.length}…`;
-    if (step === 'finalize') return 'Création du lien de partage…';
+    if (step === 'upload-video') return 'Envoi de la vidéo sur le serveur…';
+    if (step === 'cut')          return `Découpe de la séquence ${currentIdx + 1}/${playlist.length}…`;
+    if (step === 'cleanup')      return 'Nettoyage…';
+    if (step === 'finalize')     return 'Création du lien de partage…';
     return '';
   };
 
