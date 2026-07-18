@@ -56,7 +56,8 @@ class FFmpegClient {
   }
 
   async writeFile(name: string, data: Uint8Array): Promise<void> {
-    await this.send(T.WRITE_FILE, { path: name, data }, [data.buffer]);
+    // Pas de transfert du buffer (peut détacher/corrompre) : on laisse le clone structuré faire la copie
+    await this.send(T.WRITE_FILE, { path: name, data });
   }
   async readFile(name: string): Promise<Uint8Array> {
     return this.send(T.READ_FILE, { path: name, encoding: 'binary' });
@@ -97,14 +98,19 @@ export async function getFFmpeg(): Promise<FFmpegClient> {
 export async function createClipSession(videoFile: File) {
   const ff = await getFFmpeg();
   const inName = 'src_' + Math.random().toString(36).slice(2) + '.mp4';
-  await ff.writeFile(inName, await fetchFile(videoFile) as Uint8Array);
+  const fileData = await fetchFile(videoFile) as Uint8Array;
+  console.log('[ffmpeg] fichier source:', fileData.length, 'octets');
+  if (!fileData.length) throw new Error('Fichier vidéo vide ou illisible');
+  await ff.writeFile(inName, fileData);
 
   return {
     async clip(start: number, end: number, onProgress?: (r: number) => void): Promise<Blob> {
       const outName = 'clip_' + Math.random().toString(36).slice(2) + '.mp4';
       const dur = Math.max(0.5, end - start);
+      // -ss APRÈS -i : seek précis, plus robuste sur les conteneurs variés
       await ff.exec([
-        '-ss', String(start), '-i', inName, '-t', String(dur),
+        '-i', inName,
+        '-ss', String(start), '-t', String(dur),
         '-vf', 'scale=-2:720', '-r', '30',
         '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '23',
         '-c:a', 'aac', '-b:a', '128k',
