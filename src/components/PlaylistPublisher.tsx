@@ -1,5 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { uploadResumable } from '../utils/resumableUpload';
 import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo } from 'lucide-react';
 
 interface PlaylistItem {
@@ -51,14 +52,11 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
       const duration = videoRef.current?.duration || 0;
 
-      // 1. Upload de la vidéo source sur Supabase Storage (bucket privé)
+      // 1. Upload de la vidéo source sur Supabase Storage (resumable, contourne la limite 50Mo)
       setStep('upload-video'); setProgress(0);
       const ext = videoFile.name.split('.').pop() || 'mp4';
       const videoPath = `${user.id}/${match.id}/source_${Date.now()}.${ext}`;
-      const { error: upVidErr } = await supabase.storage
-        .from('match-videos')
-        .upload(videoPath, videoFile, { contentType: videoFile.type || 'video/mp4', upsert: true });
-      if (upVidErr) throw new Error('Upload vidéo : ' + upVidErr.message);
+      await uploadResumable('match-videos', videoPath, videoFile, p => setProgress(p));
 
       // URL signée temporaire (2h) pour que le serveur puisse lire la vidéo
       const { data: signed, error: signErr } = await supabase.storage
@@ -142,7 +140,7 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
   };
 
   const stepLabel = () => {
-    if (step === 'upload-video') return 'Envoi de la vidéo sur le serveur…';
+    if (step === 'upload-video') return `Envoi de la vidéo sur le serveur… ${progress}%`;
     if (step === 'cut')          return `Découpe de la séquence ${currentIdx + 1}/${playlist.length}…`;
     if (step === 'cleanup')      return 'Nettoyage…';
     if (step === 'finalize')     return 'Création du lien de partage…';
