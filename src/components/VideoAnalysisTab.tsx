@@ -52,6 +52,25 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [savingUrl, setSavingUrl] = useState(false);
   const [localVideoUrl, setLocalVideoUrl] = useState<string>(match.video_url || '');
 
+  // Retire la vidéo : vide l'affichage ET efface le lien en base (sinon il revient au rechargement)
+  const removeVideo = async () => {
+    setVideoSource(null);
+    setLocalFile(null);
+    setUrlInput('');
+    setOffset(0);
+    setPlaylist([]);
+    if (localVideoUrl || match.video_url) {
+      setSavingUrl(true);
+      await supabase
+        .from('matches')
+        .update({ video_url: null, video_provider: null })
+        .eq('id', match.id);
+      setLocalVideoUrl('');
+      (match as any).video_url = null;
+      setSavingUrl(false);
+    }
+  };
+
   const saveVideoUrl = async (url: string) => {
     setSavingUrl(true);
     const clean = url.trim();
@@ -397,8 +416,8 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
             <Link size={12} /> {localVideoUrl ? 'Modifier le lien VEO' : 'Lien VEO'}
           </button>
           {videoSource && (
-            <button onClick={() => setVideoSource(null)} className="o-btn o-btn--ghost o-btn--sm" style={{ color: 'var(--orion-red)' }}>
-              <X size={12} /> Retirer
+            <button onClick={removeVideo} disabled={savingUrl} className="o-btn o-btn--ghost o-btn--sm" style={{ color: 'var(--orion-red)' }}>
+              <X size={12} /> {savingUrl ? '...' : 'Retirer'}
             </button>
           )}
 
