@@ -36,6 +36,7 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
   const [shareCopied, setShareCopied] = useState(false);
 
   const handleShare = async () => {
+    // Si un lien a déjà été copié dans cette session, on le réutilise
     if (shareUrl) {
       navigator.clipboard.writeText(shareUrl);
       setShareCopied(true);
@@ -43,16 +44,22 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
       return;
     }
     setSharing(true);
-    // Générer un token unique
-    const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-    const { error } = await supabase.from('matches').update({ share_token: token }).eq('id', matchId);
-    if (!error) {
-      const url = `${window.location.origin}/share/${token}`;
-      setShareUrl(url);
-      navigator.clipboard.writeText(url);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
+
+    // Réutiliser le token déjà en base s'il existe (lien STABLE : ne casse jamais les liens déjà envoyés)
+    let token = match?.share_token;
+
+    if (!token) {
+      // Aucun lien encore : on en génère un une seule fois
+      token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      const { error } = await supabase.from('matches').update({ share_token: token }).eq('id', matchId);
+      if (error) { setSharing(false); return; }
     }
+
+    const url = `${window.location.origin}/share/${token}`;
+    setShareUrl(url);
+    navigator.clipboard.writeText(url);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
     setSharing(false);
   };
 
