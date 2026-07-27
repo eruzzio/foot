@@ -99,7 +99,7 @@ export default function PlayerForm({ player, onSave, onCancel }: PlayerFormProps
   const age = formData.birth_date ? Math.floor((Date.now() - new Date(formData.birth_date).getTime()) / (365.25 * 24 * 3600 * 1000)) : null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4">
+    <div className="orion fixed inset-0 bg-black/60 flex items-center justify-center z-[9999] p-4">
       <div className="bg-dark-secondary border border-orion-line shadow-2xl w-full max-w-lg rounded-lg flex flex-col" style={{ maxHeight: 'calc(100svh - 2rem)' }}>
 
         {/* Header */}
