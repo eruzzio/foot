@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { uploadResumable } from '../utils/resumableUpload';
+import { uploadToR2 } from '../utils/r2Upload';
 import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo } from 'lucide-react';
 
 interface PlaylistItem {
@@ -52,18 +52,22 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
       const duration = videoRef.current?.duration || 0;
 
-      // 1. Upload de la vidéo source sur Supabase Storage (resumable, contourne la limite 50Mo)
+      // 1. Upload de la vidéo source sur Cloudflare R2 (pas de plafond 50Mo, egress gratuit)
       setStep('upload-video'); setProgress(0);
       const ext = videoFile.name.split('.').pop() || 'mp4';
       const videoPath = `${user.id}/${match.id}/source_${Date.now()}.${ext}`;
-      await uploadResumable('match-videos', videoPath, videoFile, p => setProgress(p));
+      await uploadToR2(videoPath, videoFile, p => setProgress(p));
 
-      // URL signée temporaire (2h) pour que le serveur puisse lire la vidéo
-      const { data: signed, error: signErr } = await supabase.storage
-        .from('match-videos')
-        .createSignedUrl(videoPath, 7200);
-      if (signErr || !signed?.signedUrl) throw new Error('URL signée : ' + (signErr?.message || 'échec'));
-      const videoSignedUrl = signed.signedUrl;
+      // URL signée temporaire (2h) pour que le serveur puisse lire la vidéo depuis R2
+      const { data: { session } } = await supabase.auth.getSession();
+      const signResp = await fetch('/api/r2-get-signed-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ key: videoPath }),
+      });
+      const signed = await signResp.json();
+      if (!signResp.ok || !signed?.url) throw new Error('URL signée : ' + (signed?.error || 'échec'));
+      const videoSignedUrl = signed.url;
 
       // 2. Découper chaque séquence CÔTÉ SERVEUR (seek FFmpeg, pas de limite de taille)
       setStep('cut');
@@ -103,9 +107,13 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
         });
       }
 
-      // 3. Supprimer la vidéo source (on n'en a plus besoin, économise le stockage)
+      // 3. Supprimer la vidéo source sur R2 (on n'en a plus besoin, économise le stockage)
       setStep('cleanup');
-      await supabase.storage.from('match-videos').remove([videoPath]).catch(() => {});
+      await fetch('/api/r2-get-signed-url', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({ key: videoPath, action: 'delete' }),
+      }).catch(() => {});
 
       // 4. Créer la playlist partageable
       setStep('finalize');
