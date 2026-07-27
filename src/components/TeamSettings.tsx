@@ -191,7 +191,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: FC Marseille"
               />
             </div>
@@ -204,7 +204,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                 type="text"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="Ex: U13, U15, Senior, Féminine"
               />
             </div>
@@ -218,7 +218,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="Description de votre équipe..."
             />
           </div>
@@ -271,7 +271,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
               <div>
                 <label
                   htmlFor="logo-upload"
-                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-700  hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-700 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer"
                 >
                   <Upload size={20} className="text-gray-400" />
                   <span className="text-sm text-gray-300">
@@ -308,7 +308,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
                     setPreviewUrl(e.target.value);
                     setSelectedFile(null);
                   }}
-                  className="w-full px-3 py-2 border border-gray-700  text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  className="w-full px-3 py-2 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://example.com/logo.png"
                 />
                 <p className="text-xs text-gray-500 mt-1">
@@ -330,7 +330,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
             <button
               type="submit"
               disabled={uploading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white  hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {uploading ? (
                 <>

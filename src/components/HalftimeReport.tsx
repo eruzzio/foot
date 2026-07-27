@@ -98,7 +98,7 @@ export default function HalftimeReport({
               <p className="text-xs text-white/50">{formatTime(currentTime)} · {events.length} actions codées</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-dark-tertiary  transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-dark-tertiary rounded-lg transition-colors">
             <X size={18} className="text-white/50" />
           </button>
         </div>
@@ -106,7 +106,7 @@ export default function HalftimeReport({
         <div className="p-5 space-y-5">
 
           {/* Score */}
-          <div className="bg-dark-tertiary  p-4">
+          <div className="bg-dark-tertiary rounded-lg p-4">
             <div className="grid grid-cols-3 items-center gap-3">
               <div className="text-center">
                 <div className="text-3xl font-black" style={{ color: teamAColor }}>{teamAScore}</div>
@@ -127,7 +127,7 @@ export default function HalftimeReport({
 
           {/* xG */}
           {(xgA + xgB) > 0 && (
-            <div className="bg-dark-tertiary  p-4">
+            <div className="bg-dark-tertiary rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
                 <Target size={14} className="text-orange-primary" />
                 <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Expected Goals</span>
@@ -153,7 +153,7 @@ export default function HalftimeReport({
           )}
 
           {/* Stats comparatives */}
-          <div className="bg-dark-tertiary  p-4">
+          <div className="bg-dark-tertiary rounded-lg p-4">
             <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">Comparatif</div>
             <div className="space-y-2.5">
               <StatBar a={teamAEvents.length} b={teamBEvents.length} label="Total actions" color={teamAColor} />
@@ -165,7 +165,7 @@ export default function HalftimeReport({
 
           {/* Zones si données disponibles */}
           {fieldEvents.length > 0 && (
-            <div className="bg-dark-tertiary  p-4">
+            <div className="bg-dark-tertiary rounded-lg p-4">
               <div className="text-xs font-bold text-white/50 uppercase tracking-wider mb-3">Répartition par zone</div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 {[
@@ -208,7 +208,7 @@ export default function HalftimeReport({
         <div className="px-5 pb-5">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white  font-semibold transition-colors"
+            className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white rounded-lg font-semibold transition-colors"
           >
             Retour au match
           </button>

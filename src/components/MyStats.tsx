@@ -142,7 +142,7 @@ export default function MyStats({ onBack, initialMatchId }: MyStatsProps) {
         )}
 
         {matches.length === 0 ? (
-          <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-12 text-center">
+          <div className="bg-dark-secondary border border-orion-line rounded-lg shadow-2xl p-12 text-center">
             <BarChart3 size={80} className="text-orange-primary mx-auto mb-4" />
             <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--orion-text)' }}>
               Aucun match terminé

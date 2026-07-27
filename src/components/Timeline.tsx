@@ -34,7 +34,7 @@ export default function Timeline({ events, match, onDeleteEvent, teamAName = 'É
   };
 
   return (
-    <div className="bg-dark-secondary border border-orion-line  shadow-2xl p-6 text-white">
+    <div className="bg-dark-secondary border border-orion-line rounded-lg shadow-2xl p-6 text-white">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white">Timeline des événements</h3>
         {veoUrl && (
@@ -52,7 +52,7 @@ export default function Timeline({ events, match, onDeleteEvent, teamAName = 'É
             .map((event) => (
               <div
                 key={event.id}
-                className="p-3 bg-dark-tertiary  hover:bg-dark-tertiary transition-colors"
+                className="p-3 bg-dark-tertiary rounded-lg hover:bg-dark-tertiary transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1 min-w-0">

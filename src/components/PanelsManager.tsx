@@ -744,14 +744,14 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Description du panneau..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500 resize-none"
+                  className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-white placeholder-gray-500 resize-none"
                 />
               </div>
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={savePanel}
                   disabled={saving}
-                  className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white  transition-colors font-medium disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors font-medium disabled:opacity-50"
                 >
                   <Check size={16} />
                   {saving ? 'Enregistrement...' : 'Enregistrer'}
@@ -1014,7 +1014,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                       <select
                         value={selectedEventTypeId}
                         onChange={(e) => handleEventTypeSelect(e.target.value)}
-                        className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                       >
                         <option value="">-- Non assigné --</option>
                         {Object.entries(groupedEventTypes).map(([category, types]) => (
@@ -1107,7 +1107,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                           onChange={(e) => setButtonShortcut(e.target.value.slice(-1))}
                           maxLength={1}
                           placeholder="Ex: s, p, t..."
-                          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line  text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 text-center font-mono uppercase"
+                          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 text-center font-mono uppercase"
                         />
                       </div>
                     </div>
@@ -1198,7 +1198,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                 {activeTab === 'layout' && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center justify-between flex-1 p-4  border border-orion-line bg-dark-tertiary/40">
+                      <div className="flex items-center justify-between flex-1 p-4 rounded-lg border border-orion-line bg-dark-tertiary/40">
                         <div>
                           <h3 className="text-sm font-semibold text-white mb-0.5">Mode layout libre</h3>
                           <p className="text-xs text-gray-500">
@@ -1220,7 +1220,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                       </div>
                       <button
                         onClick={() => { setShowCreateForm(true); resetButtonForm(); setActiveTab('list'); }}
-                        className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white  transition-colors text-sm font-medium flex-shrink-0"
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-primary hover-orange text-white rounded-lg transition-colors text-sm font-medium flex-shrink-0"
                       >
                         <Plus size={15} />
                         Bouton

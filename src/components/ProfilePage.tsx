@@ -302,7 +302,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
                   style={{ flex:1, padding:"8px 12px", background:"var(--orion-surface)", border:"1.5px solid var(--orion-line-strong)", borderRadius:6, color:"var(--orion-text)", fontSize:13, outline:"none" }} />
                 <button onClick={handleUpdateEmail} disabled={newEmail === email || saving}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white  text-sm font-semibold transition-colors">
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white rounded-lg text-sm font-semibold transition-colors">
                   Modifier
                 </button>
               </div>
@@ -336,7 +336,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
                 {newPassword.length >= 8 && newPassword === confirmPassword && <p className="text-xs text-green-400">✓ Mot de passe valide</p>}
               </div>
               <button onClick={handleUpdatePassword} disabled={!newPassword || !confirmPassword || saving}
-                className="w-full mt-4 py-2.5 bg-orange-primary hover:bg-orange-600 disabled:opacity-40 text-white  font-semibold text-sm transition-colors">
+                className="w-full mt-4 py-2.5 bg-orange-primary hover:bg-orange-600 disabled:opacity-40 text-white rounded-lg font-semibold text-sm transition-colors">
                 Mettre à jour le mot de passe
               </button>
             </div>
@@ -409,7 +409,7 @@ export default function ProfilePage({ onBack }: ProfilePageProps) {
             </div>
 
             <button onClick={handleSavePreferences} disabled={saving}
-              className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white  font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+              className="w-full py-3 bg-orange-primary hover:bg-orange-600 text-white rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
               <Save size={15} /> Sauvegarder les préférences
             </button>
           </div>

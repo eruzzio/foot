@@ -148,7 +148,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
 
   if (!hasFieldData && !hasGoalData) {
     return (
-      <div className="bg-dark-secondary border border-orion-line  p-8 text-center">
+      <div className="bg-dark-secondary border border-orion-line rounded-lg p-8 text-center">
         <MapPin size={32} className="mx-auto mb-3 text-gray-600" />
         <p className="text-gray-400 font-medium mb-1">Heatmap indisponible</p>
         <p className="text-gray-600 text-sm">
@@ -160,7 +160,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
   }
 
   return (
-    <div className="bg-dark-secondary border border-orion-line  shadow-2xl overflow-hidden">
+    <div className="bg-dark-secondary border border-orion-line rounded-lg shadow-2xl overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-orion-line flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
@@ -177,7 +177,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
 
         <div className="flex flex-wrap gap-2 items-center">
           {/* Vue toggle */}
-          <div className="flex bg-dark-tertiary  border border-orion-line overflow-hidden mr-2">
+          <div className="flex bg-dark-tertiary rounded-lg border border-orion-line overflow-hidden mr-2">
             <button
               onClick={() => setView('field')}
               className={`px-3 py-1 text-xs font-medium transition-colors ${
@@ -222,7 +222,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
             </button>
           ))}
           {/* Filtre mi-temps */}
-          <div className="flex bg-dark-tertiary border border-orion-line  overflow-hidden">
+          <div className="flex bg-dark-tertiary border border-orion-line rounded-lg overflow-hidden">
             {(['all', '1', '2'] as const).map(h => (
               <button
                 key={h}
@@ -318,7 +318,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
                       }}
                     />
                     {hoveredEvent === e.id && (
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-dark-secondary border border-orion-line  px-3 py-2 text-[11px] whitespace-nowrap z-30 shadow-xl">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-dark-secondary border border-orion-line rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-30 shadow-xl">
                         <p className="text-white font-medium">{e.event_type?.name || e.label}</p>
                         <p className="text-gray-400">{formatTime(e.timestamp)} · {e.team === 'A' ? teamAName : teamBName}</p>
                       </div>
@@ -468,7 +468,7 @@ export default function Heatmap({ events, teamAName, teamBName, halftimes = [] }
                         />
                         {hoveredEvent === e.id && (
                           <div
-                            className="absolute left-1/2 -translate-x-1/2 bg-dark-secondary border border-gray-600  px-3 py-2 text-[11px] whitespace-nowrap z-50 shadow-xl pointer-events-none"
+                            className="absolute left-1/2 -translate-x-1/2 bg-dark-secondary border border-gray-600 rounded-lg px-3 py-2 text-[11px] whitespace-nowrap z-50 shadow-xl pointer-events-none"
                             style={{ [isTop ? 'top' : 'bottom']: '100%', marginTop: isTop ? '6px' : 0, marginBottom: isTop ? 0 : '6px' }}
                           >
                             <p className="text-white font-semibold">{e.event_type?.name || e.label}</p>

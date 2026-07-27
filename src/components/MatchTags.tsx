@@ -73,7 +73,7 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
   );
 
   return (
-    <div className="bg-dark-secondary border border-orion-line  p-6 space-y-6">
+    <div className="bg-dark-secondary border border-orion-line rounded-lg p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Tag size={18} className="text-orange-primary" />
@@ -113,7 +113,7 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
           value={tags.tag_competition}
           onChange={e => setTags(t => ({ ...t, tag_competition: e.target.value }))}
           placeholder="Ou saisir manuellement..."
-          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600"
+          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600"
         />
       </div>
 
@@ -187,13 +187,13 @@ export default function MatchTags({ matchId, match, onUpdate }: MatchTagsProps) 
           onChange={e => setTags(t => ({ ...t, tag_notes: e.target.value }))}
           rows={3}
           placeholder="Contexte particulier, adversaire clé, conditions particulières, observations..."
-          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white  text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600 resize-none"
+          className="w-full px-3 py-2 bg-dark-tertiary border border-orion-line text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-primary placeholder-gray-600 resize-none"
         />
       </div>
 
       {/* Résumé des tags actifs */}
       {(tags.tag_competition || tags.tag_venue || tags.tag_stake || tags.tag_surface || tags.tag_weather) && (
-        <div className="bg-dark-tertiary  p-3">
+        <div className="bg-dark-tertiary rounded-lg p-3">
           <div className="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Tags actifs</div>
           <div className="flex flex-wrap gap-2">
             {tags.tag_competition && (
