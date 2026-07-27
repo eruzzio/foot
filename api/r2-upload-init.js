@@ -23,6 +23,14 @@ async function checkAuth(req) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // Diagnostic : liste les variables d'environnement manquantes
+  const missing = ['R2_ENDPOINT', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME', 'SUPABASE_SERVICE_KEY']
+    .filter(k => !process.env[k]);
+  if (!process.env.SUPABASE_URL && !process.env.VITE_SUPABASE_URL) missing.push('SUPABASE_URL');
+  if (missing.length) {
+    return res.status(500).json({ error: 'Variables env manquantes: ' + missing.join(', ') });
+  }
+
   if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
 
   const { key, contentType } = req.body || {};
