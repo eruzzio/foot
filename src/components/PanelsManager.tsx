@@ -458,7 +458,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
               )}
             </div>
           </div>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-center gap-1 opacity-70 hover:opacity-100 transition-opacity">
             {button.button_type === 'event' && (
               <button
                 onClick={() => startAddSubButton(button)}
@@ -596,7 +596,7 @@ style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', borde
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-70 hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => startEditButton(sub)}
                     className="p-1 text-blue-500 hover:bg-blue-900/20 rounded transition-colors"
