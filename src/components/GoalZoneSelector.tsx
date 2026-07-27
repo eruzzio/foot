@@ -23,7 +23,7 @@ export default function GoalZoneSelector({ onPositionSelected, onSkip }: GoalZon
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[1100] p-2 sm:p-4">
+    <div className="orion fixed inset-0 bg-black/80 flex items-center justify-center z-[1100] p-2 sm:p-4">
       <div className="bg-dark-secondary border-2 border-orange-primary rounded-xl shadow-2xl w-full max-w-lg max-h-[95vh] overflow-auto">
         <div className="flex items-center justify-between px-5 py-3 border-b border-gray-700">
           <div>

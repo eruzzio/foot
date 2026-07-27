@@ -157,7 +157,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+      <div className="orion fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
         <div style={{ background:"var(--orion-surface)", padding:24 }}>
           <div className="text-gray-400">Chargement...</div>
         </div>
@@ -166,7 +166,7 @@ export default function TeamSettings({ onClose, onSave, teamId: propTeamId }: Te
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4 overflow-y-auto">
+    <div className="orion fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000] p-4 overflow-y-auto">
       <div style={{ background:"var(--orion-surface)", border:"1px solid var(--orion-line)", maxWidth:640, width:"100%", padding:24, margin:"32px auto" }}>
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-2xl font-bold text-white">

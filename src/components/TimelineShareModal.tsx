@@ -55,7 +55,7 @@ export default function TimelineShareModal({ event, match, onClose }: TimelineSh
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4">
+    <div className="orion fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4">
       <div className="bg-dark-secondary border border-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-800">
           <div className="flex items-center gap-3">

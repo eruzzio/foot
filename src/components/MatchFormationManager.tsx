@@ -345,7 +345,7 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
     return inline ? (
       <div style={{ padding: 24, color: 'var(--orion-text)' }}>Chargement...</div>
     ) : (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
+      <div className="orion fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
         <div style={{ background:"var(--orion-surface)", padding:24, color:"var(--orion-text)" }}>
           <div className="text-gray-400">Chargement...</div>
         </div>
@@ -355,7 +355,7 @@ export default function MatchFormationManager({ matchId, team, onClose, inline =
 
   return (
     <div
-      className={inline ? '' : 'fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center z-[1000] p-4 overflow-y-auto'}
+      className={inline ? '' : 'orion fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center z-[1000] p-4 overflow-y-auto'}
       onClick={inline ? undefined : onClose}
     >
       <div
