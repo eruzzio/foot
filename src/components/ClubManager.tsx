@@ -162,7 +162,9 @@ export default function ClubManager({ onClubSelected, currentClubId }: ClubManag
     if (!joinCode.trim()) { setError('Entrez le code'); return; }
     setSaving(true); setError('');
     try {
-      const { data: clubData } = await supabase.from('clubs').select('*').eq('join_code', joinCode.trim().toUpperCase()).single();
+      const { data: clubMatches } = await supabase
+        .rpc('find_club_by_join_code', { p_code: joinCode.trim().toUpperCase() });
+      const clubData = Array.isArray(clubMatches) ? clubMatches[0] : clubMatches;
       if (!clubData) { setError('Code invalide — club introuvable'); setSaving(false); return; }
 
       // Récupérer le profil utilisateur
