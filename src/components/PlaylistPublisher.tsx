@@ -81,7 +81,7 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
         const resp = await fetch('/api/clip-from-storage', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
           body: JSON.stringify({ videoUrl: videoSignedUrl, start: s, duration: e - s }),
         });
         if (!resp.ok) {

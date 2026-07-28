@@ -1,22 +1,32 @@
 import { createClient } from '@supabase/supabase-js';
 
-async function checkAuth(req) {
+// Retourne l'utilisateur authentifié (ou null), pour pouvoir vérifier
+// qu'il n'accède qu'à ses propres fichiers.
+async function getAuthUser(req) {
   const auth = req.headers.authorization || '';
   const token = auth.replace('Bearer ', '');
-  if (!token) return false;
+  if (!token) return null;
   const supabase = createClient(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data?.user;
+  if (error || !data?.user) return null;
+  return data.user;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
+    const user = await getAuthUser(req);
+    if (!user) return res.status(401).json({ error: 'Non authentifié' });
 
     const { key, action } = req.body || {};
     if (!key) return res.status(400).json({ error: 'Paramètre "key" manquant' });
+
+    // Sécurité : la clé doit appartenir à l'utilisateur (préfixe {user.id}/).
+    // Empêche un utilisateur connecté d'accéder aux fichiers d'un autre.
+    if (!key.startsWith(`${user.id}/`)) {
+      return res.status(403).json({ error: 'Accès refusé à cette ressource' });
+    }
 
     const { S3Client, GetObjectCommand, DeleteObjectCommand } = await import('@aws-sdk/client-s3');
     const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');

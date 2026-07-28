@@ -4,6 +4,7 @@ import { readFileSync, existsSync, unlinkSync, chmodSync } from 'fs';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 
 let FFMPEG_PATH = ffmpegInstaller.path;
 try { chmodSync(FFMPEG_PATH, 0o755); } catch (e) { console.error('chmod:', e?.message); }
@@ -14,12 +15,38 @@ export const config = {
   maxDuration: 60,
 };
 
+async function isAuthenticated(req) {
+  const auth = req.headers.authorization || '';
+  const token = auth.replace('Bearer ', '');
+  if (!token) return false;
+  const supabase = createClient(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  const { data, error } = await supabase.auth.getUser(token);
+  return !error && !!data?.user;
+}
+
+// Anti-SSRF : n'autorise que les URLs pointant vers le stockage R2 (ou Supabase, au cas où).
+function isAllowedVideoUrl(u) {
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol !== 'https:') return false;
+    const host = parsed.hostname;
+    return host.endsWith('.r2.cloudflarestorage.com') || host.endsWith('.supabase.co');
+  } catch {
+    return false;
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  if (!(await isAuthenticated(req))) return res.status(401).json({ error: 'Non authentifié' });
 
   const { videoUrl, start, duration } = req.body || {};
   if (!videoUrl || start == null || !duration) {
     return res.status(400).json({ error: 'Paramètres manquants (videoUrl, start, duration)' });
+  }
+  if (!isAllowedVideoUrl(videoUrl)) {
+    return res.status(400).json({ error: 'URL vidéo non autorisée' });
   }
 
   const id = randomUUID();

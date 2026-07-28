@@ -1,23 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
 
-async function checkAuth(req) {
+async function getAuthUser(req) {
   const auth = req.headers.authorization || '';
   const token = auth.replace('Bearer ', '');
-  if (!token) return false;
+  if (!token) return null;
   const supabase = createClient(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data?.user;
+  if (error || !data?.user) return null;
+  return data.user;
 }
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
+    const user = await getAuthUser(req);
+    if (!user) return res.status(401).json({ error: 'Non authentifié' });
 
     const { key, uploadId, partNumber } = req.body || {};
     if (!key || !uploadId || !partNumber) {
       return res.status(400).json({ error: 'Paramètres manquants (key, uploadId, partNumber)' });
+    }
+    if (!key.startsWith(`${user.id}/`)) {
+      return res.status(403).json({ error: 'Accès refusé à cette ressource' });
     }
 
     const { S3Client, UploadPartCommand } = await import('@aws-sdk/client-s3');
@@ -25,15 +30,13 @@ export default async function handler(req, res) {
 
     const s3 = new S3Client({
       region: 'auto',
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
       endpoint: process.env.R2_ENDPOINT,
       credentials: {
         accessKeyId: process.env.R2_ACCESS_KEY_ID,
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
       },
-      // R2 ne supporte pas les checksums CRC32 que le SDK AWS v3 ajoute par défaut.
-      // Ces deux options restaurent le comportement compatible (pas de checksum auto).
-      requestChecksumCalculation: 'WHEN_REQUIRED',
-      responseChecksumValidation: 'WHEN_REQUIRED',
     });
 
     const url = await getSignedUrl(

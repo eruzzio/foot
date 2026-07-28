@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-async function checkAuth(req) {
+async function getAuthUser(req) {
   const auth = req.headers.authorization || '';
   const token = auth.replace('Bearer ', '');
-  if (!token) return false;
+  if (!token) return null;
   const supabase = createClient(process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data?.user;
+  if (error || !data?.user) return null;
+  return data.user;
 }
 
 export default async function handler(req, res) {
@@ -20,12 +21,15 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Variables env manquantes: ' + missing.join(', ') });
     }
 
-    if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
+    const user = await getAuthUser(req);
+    if (!user) return res.status(401).json({ error: 'Non authentifié' });
 
     const { key, contentType } = req.body || {};
     if (!key) return res.status(400).json({ error: 'Paramètre "key" manquant' });
+    if (!key.startsWith(`${user.id}/`)) {
+      return res.status(403).json({ error: 'Accès refusé à cette ressource' });
+    }
 
-    // Import + instanciation lazy pour capturer toute erreur du SDK dans ce try/catch
     const { S3Client, CreateMultipartUploadCommand } = await import('@aws-sdk/client-s3');
     const s3 = new S3Client({
       region: 'auto',
