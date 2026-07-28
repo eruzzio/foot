@@ -73,9 +73,18 @@ export default function MatchReport({ matchId, onBack, readOnly = false }: Match
   }, [matchId]);
 
   const loadMatchData = async () => {
+    // Liste explicite des colonnes : on exclut volontairement video_url,
+    // video_provider et video_share_id pour ne jamais les exposer dans un
+    // rapport partagé public (ce composant sert aussi la vue /share/).
     const { data: matchData, error: matchError } = await supabase
       .from('matches')
-      .select('*')
+      .select(`
+        id, team_a_id, team_b_id, team_a_name, team_b_name,
+        team_a_score, team_b_score,
+        match_date, match_time, status, tag_competition, tag_venue,
+        tag_stake, tag_surface, tag_weather, tag_notes, share_token,
+        possession_a_seconds, possession_b_seconds
+      `)
       .eq('id', matchId)
       .maybeSingle();
 
