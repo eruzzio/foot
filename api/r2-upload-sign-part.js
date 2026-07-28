@@ -1,15 +1,4 @@
-import { S3Client, UploadPartCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createClient } from '@supabase/supabase-js';
-
-const s3 = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-  },
-});
 
 async function checkAuth(req) {
   const auth = req.headers.authorization || '';
@@ -22,25 +11,44 @@ async function checkAuth(req) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
-
-  const { key, uploadId, partNumber } = req.body || {};
-  if (!key || !uploadId || !partNumber) {
-    return res.status(400).json({ error: 'Paramètres manquants (key, uploadId, partNumber)' });
-  }
 
   try {
-    const cmd = new UploadPartCommand({
-      Bucket: process.env.R2_BUCKET_NAME,
-      Key: key,
-      UploadId: uploadId,
-      PartNumber: partNumber,
+    if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
+
+    const { key, uploadId, partNumber } = req.body || {};
+    if (!key || !uploadId || !partNumber) {
+      return res.status(400).json({ error: 'Paramètres manquants (key, uploadId, partNumber)' });
+    }
+
+    const { S3Client, UploadPartCommand } = await import('@aws-sdk/client-s3');
+    const { getSignedUrl } = await import('@aws-sdk/s3-request-presigner');
+
+    const s3 = new S3Client({
+      region: 'auto',
+      endpoint: process.env.R2_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+      },
+      // R2 ne supporte pas les checksums CRC32 que le SDK AWS v3 ajoute par défaut.
+      // Ces deux options restaurent le comportement compatible (pas de checksum auto).
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
     });
-    // URL valable 15 min, largement suffisant pour envoyer un morceau de 8 Mo
-    const url = await getSignedUrl(s3, cmd, { expiresIn: 900 });
+
+    const url = await getSignedUrl(
+      s3,
+      new UploadPartCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: key,
+        UploadId: uploadId,
+        PartNumber: partNumber,
+      }),
+      { expiresIn: 900 }
+    );
     return res.status(200).json({ url });
   } catch (err) {
-    console.error('[r2-upload-sign-part]', err?.message);
-    return res.status(500).json({ error: err?.message || 'Erreur signature' });
+    console.error('[r2-upload-sign-part]', err?.message, err?.stack);
+    return res.status(500).json({ error: 'sign: ' + (err?.message || 'erreur inconnue') });
   }
 }

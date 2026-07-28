@@ -1,14 +1,4 @@
-import { S3Client, CompleteMultipartUploadCommand, AbortMultipartUploadCommand } from '@aws-sdk/client-s3';
 import { createClient } from '@supabase/supabase-js';
-
-const s3 = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-  },
-});
 
 async function checkAuth(req) {
   const auth = req.headers.authorization || '';
@@ -21,17 +11,28 @@ async function checkAuth(req) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
-
-  const { key, uploadId, parts, abort } = req.body || {};
-  if (!key || !uploadId) return res.status(400).json({ error: 'Paramètres manquants (key, uploadId)' });
 
   try {
+    if (!(await checkAuth(req))) return res.status(401).json({ error: 'Non authentifié' });
+
+    const { key, uploadId, parts, abort } = req.body || {};
+    if (!key || !uploadId) return res.status(400).json({ error: 'Paramètres manquants (key, uploadId)' });
+
+    const { S3Client, CompleteMultipartUploadCommand, AbortMultipartUploadCommand } = await import('@aws-sdk/client-s3');
+    const s3 = new S3Client({
+      region: 'auto',
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
+      endpoint: process.env.R2_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+      },
+    });
+
     if (abort) {
       await s3.send(new AbortMultipartUploadCommand({
-        Bucket: process.env.R2_BUCKET_NAME,
-        Key: key,
-        UploadId: uploadId,
+        Bucket: process.env.R2_BUCKET_NAME, Key: key, UploadId: uploadId,
       }));
       return res.status(200).json({ aborted: true });
     }
@@ -44,13 +45,11 @@ export default async function handler(req, res) {
       Bucket: process.env.R2_BUCKET_NAME,
       Key: key,
       UploadId: uploadId,
-      MultipartUpload: {
-        Parts: parts.map(p => ({ ETag: p.etag, PartNumber: p.partNumber })),
-      },
+      MultipartUpload: { Parts: parts.map(p => ({ ETag: p.etag, PartNumber: p.partNumber })) },
     }));
     return res.status(200).json({ done: true, key });
   } catch (err) {
-    console.error('[r2-upload-complete]', err?.message);
-    return res.status(500).json({ error: err?.message || 'Erreur finalisation' });
+    console.error('[r2-upload-complete]', err?.message, err?.stack);
+    return res.status(500).json({ error: 'complete: ' + (err?.message || 'erreur inconnue') });
   }
 }
