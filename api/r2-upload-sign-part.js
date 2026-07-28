@@ -47,7 +47,7 @@ export default async function handler(req, res) {
         UploadId: uploadId,
         PartNumber: partNumber,
       }),
-      { expiresIn: 900 }
+      { expiresIn: 3600 }
     );
     return res.status(200).json({ url });
   } catch (err) {
