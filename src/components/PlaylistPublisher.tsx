@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { uploadToR2 } from '../utils/r2Upload';
-import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo } from 'lucide-react';
+import { X, Loader, Check, Share2, UploadCloud, Copy, ExternalLink, ListVideo, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface PlaylistItem {
   id: string;
@@ -29,22 +29,45 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
   const [name, setName] = useState(`${match.team_a_name} vs ${match.team_b_name}`);
   const [sortBy, setSortBy] = useState<'manual' | 'name' | 'time' | 'team'>('manual');
 
-  // Playlist réordonnée selon le critère choisi. 'manual' = ordre d'origine.
-  const sortedPlaylist = useMemo(() => {
-    const arr = [...playlist];
-    if (sortBy === 'name') {
-      arr.sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }));
-    } else if (sortBy === 'time') {
-      arr.sort((a, b) => (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp));
-    } else if (sortBy === 'team') {
-      // Tri par équipe, puis par temps à l'intérieur de chaque équipe
-      arr.sort((a, b) =>
-        (a.team || '').localeCompare(b.team || '', 'fr', { sensitivity: 'base' })
-        || (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp)
-      );
-    }
-    return arr;
-  }, [playlist, sortBy]);
+  // Ordre courant des séquences (modifiable : tri auto OU flèches manuelles)
+  const [orderedList, setOrderedList] = useState<PlaylistItem[]>(playlist);
+
+  // Resynchronise si la playlist d'entrée change
+  useEffect(() => { setOrderedList(playlist); setSortBy('manual'); }, [playlist]);
+
+  // Applique un tri automatique et réordonne la liste
+  const applySort = (criteria: 'manual' | 'name' | 'time' | 'team') => {
+    setSortBy(criteria);
+    if (criteria === 'manual') { setOrderedList(playlist); return; }
+    setOrderedList(prev => {
+      const arr = [...prev];
+      if (criteria === 'name') {
+        arr.sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }));
+      } else if (criteria === 'time') {
+        arr.sort((a, b) => (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp));
+      } else if (criteria === 'team') {
+        arr.sort((a, b) =>
+          (a.team || '').localeCompare(b.team || '', 'fr', { sensitivity: 'base' })
+          || (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp)
+        );
+      }
+      return arr;
+    });
+  };
+
+  // Déplace une séquence vers le haut/bas et bascule en mode manuel
+  const moveItem = (index: number, dir: -1 | 1) => {
+    setOrderedList(prev => {
+      const target = index + dir;
+      if (target < 0 || target >= prev.length) return prev;
+      const arr = [...prev];
+      [arr[index], arr[target]] = [arr[target], arr[index]];
+      return arr;
+    });
+    setSortBy('manual');
+  };
+
+  const sortedPlaylist = orderedList;
 
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState('');
@@ -241,7 +264,7 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
                     ['name', 'Nom'],
                     ['team', 'Équipe'],
                   ] as const).map(([val, lbl]) => (
-                    <button key={val} type="button" disabled={running} onClick={() => setSortBy(val)}
+                    <button key={val} type="button" disabled={running} onClick={() => applySort(val)}
                       style={{
                         padding:'4px 10px', borderRadius:6, fontSize:11, fontWeight:600, cursor: running ? 'default' : 'pointer',
                         background: sortBy === val ? 'var(--orion-accent)' : 'var(--orion-surface-2)',
@@ -265,6 +288,20 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
                     <span style={{ color:'var(--orion-text-mute)' }}>{fmt(p.matchSeconds ?? p.timestamp)}</span>
                     {running && currentIdx > i && <Check size={12} style={{ color:'var(--orion-green)' }} />}
                     {running && currentIdx === i && <Loader size={12} style={{ color:'var(--orion-accent)' }} />}
+                    {!running && (
+                      <span style={{ display:'flex', flexDirection:'column', gap:1 }}>
+                        <button type="button" onClick={() => moveItem(i, -1)} disabled={i === 0}
+                          title="Monter"
+                          style={{ display:'flex', padding:0, background:'none', border:'none', cursor: i === 0 ? 'default' : 'pointer', color: i === 0 ? 'var(--orion-line-strong)' : 'var(--orion-text-mute)', lineHeight:0 }}>
+                          <ChevronUp size={14} />
+                        </button>
+                        <button type="button" onClick={() => moveItem(i, 1)} disabled={i === sortedPlaylist.length - 1}
+                          title="Descendre"
+                          style={{ display:'flex', padding:0, background:'none', border:'none', cursor: i === sortedPlaylist.length - 1 ? 'default' : 'pointer', color: i === sortedPlaylist.length - 1 ? 'var(--orion-line-strong)' : 'var(--orion-text-mute)', lineHeight:0 }}>
+                          <ChevronDown size={14} />
+                        </button>
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>
