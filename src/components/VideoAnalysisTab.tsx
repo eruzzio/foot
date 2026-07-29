@@ -443,15 +443,23 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
               {/* Séparateur */}
               <div style={{ width: 1, height: 16, background: 'var(--orion-line)' }} />
 
-              {/* Décalage sync */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {/* Décalage sync : marque le coup d'envoi à la position courante de la vidéo */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontSize: 11, color: 'var(--orion-text-mute)', fontFamily: 'var(--orion-font-mono)' }}>SYNC</span>
-                <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>−</button>
-                <span style={{ fontSize: 11, fontWeight: 700, color: offset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 36, textAlign: 'center' }}>
+                <button
+                  onClick={() => setOffset(Math.round(currentTime))}
+                  className="o-btn o-btn--ghost o-btn--sm"
+                  title="Place la vidéo sur le coup d'envoi puis clique ici : toutes les actions seront calées sur ce repère"
+                  style={{ fontSize: 11, fontWeight: 700, padding: '4px 10px' }}
+                >
+                  ⚑ Coup d'envoi ici
+                </button>
+                <span style={{ fontSize: 11, fontWeight: 700, color: offset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 44, textAlign: 'center' }}>
                   {offset >= 0 ? '+' : ''}{offset}s
                 </span>
-                <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '3px 7px' }}>+</button>
-                <button onClick={() => setOffset(0)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize: 10, padding: '3px 7px' }}>Reset</button>
+                {offset !== 0 && (
+                  <button onClick={() => setOffset(0)} className="o-btn o-btn--ghost o-btn--sm" style={{ fontSize: 10, padding: '4px 8px' }}>Reset</button>
+                )}
               </div>
             </div>
           )}
