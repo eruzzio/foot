@@ -27,6 +27,24 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
   const [before, setBefore] = useState(5);
   const [after, setAfter] = useState(5);
   const [name, setName] = useState(`${match.team_a_name} vs ${match.team_b_name}`);
+  const [sortBy, setSortBy] = useState<'manual' | 'name' | 'time' | 'team'>('manual');
+
+  // Playlist réordonnée selon le critère choisi. 'manual' = ordre d'origine.
+  const sortedPlaylist = useMemo(() => {
+    const arr = [...playlist];
+    if (sortBy === 'name') {
+      arr.sort((a, b) => a.label.localeCompare(b.label, 'fr', { sensitivity: 'base' }));
+    } else if (sortBy === 'time') {
+      arr.sort((a, b) => (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp));
+    } else if (sortBy === 'team') {
+      // Tri par équipe, puis par temps à l'intérieur de chaque équipe
+      arr.sort((a, b) =>
+        (a.team || '').localeCompare(b.team || '', 'fr', { sensitivity: 'base' })
+        || (a.matchSeconds ?? a.timestamp) - (b.matchSeconds ?? b.timestamp)
+      );
+    }
+    return arr;
+  }, [playlist, sortBy]);
 
   const [running, setRunning] = useState(false);
   const [step, setStep] = useState('');
@@ -72,9 +90,9 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       // 2. Découper chaque séquence CÔTÉ SERVEUR (seek FFmpeg, pas de limite de taille)
       setStep('cut');
       const items: any[] = [];
-      for (let i = 0; i < playlist.length; i++) {
-        setCurrentIdx(i); setProgress(Math.round((i / playlist.length) * 100));
-        const item = playlist[i];
+      for (let i = 0; i < sortedPlaylist.length; i++) {
+        setCurrentIdx(i); setProgress(Math.round((i / sortedPlaylist.length) * 100));
+        const item = sortedPlaylist[i];
         const vTs = item.timestamp;
         const s = Math.max(0, vTs - before);
         const e = Math.min(duration || vTs + after, vTs + after);
@@ -213,12 +231,37 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
                 </div>
               </div>
 
+              {/* Sélecteur de tri */}
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:2 }}>
+                <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600 }}>Trier par</span>
+                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                  {([
+                    ['manual', 'Ordre manuel'],
+                    ['time', 'Temps de match'],
+                    ['name', 'Nom'],
+                    ['team', 'Équipe'],
+                  ] as const).map(([val, lbl]) => (
+                    <button key={val} type="button" disabled={running} onClick={() => setSortBy(val)}
+                      style={{
+                        padding:'4px 10px', borderRadius:6, fontSize:11, fontWeight:600, cursor: running ? 'default' : 'pointer',
+                        background: sortBy === val ? 'var(--orion-accent)' : 'var(--orion-surface-2)',
+                        color: sortBy === val ? '#fff' : 'var(--orion-text-mute)',
+                        border: '1px solid ' + (sortBy === val ? 'var(--orion-accent)' : 'var(--orion-line)'),
+                        opacity: running ? 0.6 : 1,
+                      }}>
+                      {lbl}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {/* Liste des séquences */}
               <div style={{ maxHeight:120, overflowY:'auto', border:'1.5px solid var(--orion-line)', borderRadius:8, padding:8, display:'flex', flexDirection:'column', gap:4 }}>
-                {playlist.map((p, i) => (
+                {sortedPlaylist.map((p, i) => (
                   <div key={p.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 8px', background: running && currentIdx === i ? 'rgba(61,128,224,0.1)' : 'var(--orion-surface-2)', borderRadius:5, fontSize:12 }}>
                     <span style={{ color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', minWidth:20 }}>{i+1}.</span>
                     <span style={{ color:'var(--orion-text)', fontWeight:600, flex:1 }}>{p.label}</span>
+                    {p.team && <span style={{ color:'var(--orion-text-mute)', fontSize:11, maxWidth:90, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.team}</span>}
                     <span style={{ color:'var(--orion-text-mute)' }}>{fmt(p.matchSeconds ?? p.timestamp)}</span>
                     {running && currentIdx > i && <Check size={12} style={{ color:'var(--orion-green)' }} />}
                     {running && currentIdx === i && <Loader size={12} style={{ color:'var(--orion-accent)' }} />}
