@@ -187,13 +187,15 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
     if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
   }, []);
 
-  // Mettre en surbrillance l'événement le plus proche du currentTime
+  // Mettre en surbrillance l'événement le plus proche du currentTime.
+  // Fenêtre = celle du clip (clipBefore avant / clipAfter après), pour rester
+  // cohérent avec seekToEvent qui positionne à (action - clipBefore).
   useEffect(() => {
     if (!videoRef.current) return;
     const closest = match.events
       .filter(e => {
         const ts = (e.video_timestamp ?? e.timestamp) + offset;
-        return ts >= currentTime - 2 && ts <= currentTime + 2;
+        return ts >= currentTime - clipAfter && ts <= currentTime + clipBefore + 0.5;
       })
       .sort((a, b) => {
         const ta = Math.abs((a.video_timestamp ?? a.timestamp) + offset - currentTime);
@@ -201,7 +203,8 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         return ta - tb;
       })[0];
     if (closest) setActiveEventId(closest.id);
-  }, [currentTime, match.events, offset]);
+    else setActiveEventId(null);
+  }, [currentTime, match.events, offset, clipBefore, clipAfter]);
 
   const eventTypes = Array.from(new Set(
     match.events.map(e => e.event_type?.name || e.label).filter(Boolean)
@@ -286,8 +289,18 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                     </div>
                   </div>
                 ) : (
-                  <div style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:10 }}>
-                    <div style={{ height:'100%', width:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, background:'var(--orion-accent)', borderRadius:3 }} />
+                  <div
+                    style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:10, cursor:'pointer', position:'relative' }}
+                    onClick={e => {
+                      if (!videoRef.current) return;
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const ratio = (e.clientX - rect.left) / rect.width;
+                      const dur = videoRef.current.duration || 0;
+                      videoRef.current.currentTime = Math.max(0, Math.min(dur, ratio * dur));
+                    }}
+                  >
+                    <div style={{ position:'absolute', left:0, top:0, height:'100%', width:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, background:'var(--orion-accent)', borderRadius:3 }} />
+                    <div style={{ position:'absolute', top:'50%', left:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, transform:'translate(-50%,-50%)', width:12, height:12, borderRadius:'50%', background:'white', boxShadow:'0 0 4px rgba(0,0,0,0.5)' }} />
                   </div>
                 )}
 
