@@ -27,6 +27,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [freeNavigation, setFreeNavigation] = useState(false);
   const [clipBefore, setClipBefore] = useState(3);
   const [clipAfter, setClipAfter] = useState(5);
   const [clipOffsets, setClipOffsets] = useState<Record<string, number>>({});
@@ -171,6 +172,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const seekToEvent = (event: MatchEventWithDetails) => {
     const ts = event.video_timestamp ?? event.timestamp;
     const videoTs = ts + offset;
+    setFreeNavigation(false);
     setActiveEventId(event.id);
 
     if (videoSource?.type === 'local' && videoRef.current) {
@@ -193,6 +195,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   // cohérent avec seekToEvent qui positionne à (action - clipBefore).
   useEffect(() => {
     if (!videoRef.current) return;
+    if (freeNavigation) { setActiveEventId(null); return; }
     const closest = match.events
       .filter(e => {
         const ts = (e.video_timestamp ?? e.timestamp) + offset;
@@ -205,7 +208,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
       })[0];
     if (closest) setActiveEventId(closest.id);
     else setActiveEventId(null);
-  }, [currentTime, match.events, offset, clipBefore, clipAfter]);
+  }, [currentTime, match.events, offset, clipBefore, clipAfter, freeNavigation]);
 
   const eventTypes = Array.from(new Set(
     match.events.map(e => e.event_type?.name || e.label).filter(Boolean)
@@ -328,6 +331,18 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                       title="Rejouer le clip"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.85"/></svg>
+                    </button>
+                  )}
+
+                  {/* Revenir au match entier (sortir du mode clip) */}
+                  {activeEvent && (
+                    <button
+                      onClick={() => { setFreeNavigation(true); setActiveEventId(null); }}
+                      className="o-btn o-btn--ghost o-btn--sm"
+                      title="Revenir à la navigation libre dans tout le match"
+                      style={{ fontSize:11, fontWeight:700, padding:'3px 9px' }}
+                    >
+                      ↩ Match entier
                     </button>
                   )}
 
@@ -470,6 +485,11 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 >
                   ⚑ Coup d'envoi ici
                 </button>
+                {/* Ajustement fin */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Reculer le coup d'envoi d'1s">−1s</button>
+                  <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Avancer le coup d'envoi d'1s">+1s</button>
+                </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: offset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 44, textAlign: 'center' }}>
                   {offset >= 0 ? '+' : ''}{offset}s
                 </span>
