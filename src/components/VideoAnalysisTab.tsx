@@ -26,6 +26,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [clipBefore, setClipBefore] = useState(3);
   const [clipAfter, setClipAfter] = useState(5);
   const [clipOffsets, setClipOffsets] = useState<Record<string, number>>({});
@@ -239,6 +240,7 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 src={videoSource.url}
                 style={{ width: '100%', maxHeight: 380, display: 'block' }}
                 onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={() => { if (videoRef.current) setVideoDuration(videoRef.current.duration || 0); }}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
               />
@@ -289,19 +291,20 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                     </div>
                   </div>
                 ) : (
-                  <div
-                    style={{ height:6, background:'rgba(255,255,255,0.1)', borderRadius:3, marginBottom:10, cursor:'pointer', position:'relative' }}
-                    onClick={e => {
-                      if (!videoRef.current) return;
-                      const rect = e.currentTarget.getBoundingClientRect();
-                      const ratio = (e.clientX - rect.left) / rect.width;
-                      const dur = videoRef.current.duration || 0;
-                      videoRef.current.currentTime = Math.max(0, Math.min(dur, ratio * dur));
+                  <input
+                    type="range"
+                    min={0}
+                    max={videoDuration || 0}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={e => {
+                      if (videoRef.current) videoRef.current.currentTime = Number(e.target.value);
                     }}
-                  >
-                    <div style={{ position:'absolute', left:0, top:0, height:'100%', width:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, background:'var(--orion-accent)', borderRadius:3 }} />
-                    <div style={{ position:'absolute', top:'50%', left:`${videoRef.current ? (currentTime / (videoRef.current.duration || 1)) * 100 : 0}%`, transform:'translate(-50%,-50%)', width:12, height:12, borderRadius:'50%', background:'white', boxShadow:'0 0 4px rgba(0,0,0,0.5)' }} />
-                  </div>
+                    style={{
+                      width:'100%', marginBottom:10, cursor:'pointer', accentColor:'var(--orion-accent)',
+                      height:6,
+                    }}
+                  />
                 )}
 
                 {/* Boutons de contrôle */}
