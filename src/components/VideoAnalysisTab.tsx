@@ -485,10 +485,10 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
                 >
                   ⚑ Coup d'envoi ici
                 </button>
-                {/* Ajustement fin */}
+                {/* Ajustement fin : déplace aussi la vidéo pour voir le repère bouger */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                  <button onClick={() => setOffset(o => o - 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Reculer le coup d'envoi d'1s">−1s</button>
-                  <button onClick={() => setOffset(o => o + 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Avancer le coup d'envoi d'1s">+1s</button>
+                  <button onClick={() => setOffset(o => { const n = o - 1; if (videoRef.current) videoRef.current.currentTime = Math.max(0, n); return n; })} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Reculer le coup d'envoi d'1s (la vidéo recule aussi)">−1s</button>
+                  <button onClick={() => setOffset(o => { const n = o + 1; if (videoRef.current) videoRef.current.currentTime = Math.max(0, n); return n; })} className="o-btn o-btn--ghost o-btn--sm" style={{ padding: '4px 7px' }} title="Avancer le coup d'envoi d'1s (la vidéo avance aussi)">+1s</button>
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: offset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily: 'var(--orion-font-mono)', minWidth: 44, textAlign: 'center' }}>
                   {offset >= 0 ? '+' : ''}{offset}s
