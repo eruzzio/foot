@@ -110,11 +110,13 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       if (!signResp.ok || !signed?.url) throw new Error('URL signée : ' + (signed?.error || 'échec'));
       const videoSignedUrl = signed.url;
 
-      // 2. Découper chaque séquence CÔTÉ SERVEUR (seek FFmpeg, pas de limite de taille)
+      // 2. Découper chaque séquence CÔTÉ SERVEUR (seek FFmpeg), par lots parallèles
       setStep('cut');
-      const items: any[] = [];
-      for (let i = 0; i < sortedPlaylist.length; i++) {
-        setCurrentIdx(i); setProgress(Math.round((i / sortedPlaylist.length) * 100));
+      const CONCURRENCY = 3; // nb de découpes simultanées (compromis vitesse / charge Vercel)
+      const items: any[] = new Array(sortedPlaylist.length);
+      let done = 0;
+
+      const processClip = async (i: number) => {
         const item = sortedPlaylist[i];
         const vTs = item.timestamp;
         const s = Math.max(0, vTs - before);
@@ -139,14 +141,29 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
         if (upErr) throw new Error('Upload clip : ' + upErr.message);
         const { data: pub } = supabase.storage.from('clips').getPublicUrl(clipPath);
 
-        items.push({
+        // On range le résultat à sa position d'origine pour préserver l'ordre de la playlist
+        items[i] = {
           label: item.label,
           team: item.team,
           minute: fmt(item.matchSeconds ?? (item.timestamp - videoOffset)),
           duration: Math.round(e - s),
           url: pub.publicUrl,
-        });
-      }
+        };
+        done++;
+        setCurrentIdx(done - 1);
+        setProgress(Math.round((done / sortedPlaylist.length) * 100));
+      };
+
+      // File d'attente consommée par CONCURRENCY workers en parallèle
+      let nextIndex = 0;
+      const worker = async () => {
+        while (true) {
+          const i = nextIndex++;
+          if (i >= sortedPlaylist.length) return;
+          await processClip(i);
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(CONCURRENCY, sortedPlaylist.length) }, worker));
 
       // 3. Supprimer la vidéo source sur R2 (on n'en a plus besoin, économise le stockage)
       setStep('cleanup');
