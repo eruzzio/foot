@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import OnboardingWizard from './components/OnboardingWizard';
 import Toast from './components/Toast';
 import { useToast } from './hooks/useToast';
@@ -6,25 +6,33 @@ import { ToastProvider } from './contexts/ToastContext';
 import { supabase } from './lib/supabase';
 import Auth from './components/Auth';
 import HomePage from './components/HomePage';
-import CodingInterface from './components/CodingInterface';
-import MyStats from './components/MyStats';
-import MyTeam from './components/MyTeam';
-import PanelsManager from './components/PanelsManager';
-import EvolutionDashboard from './components/EvolutionDashboard';
-import ProfilePage from './components/ProfilePage';
 import AppLayout from './components/AppLayout';
-import AdminPanel from './components/AdminPanel';
-import ConfirmEmail from './components/ConfirmEmail';
-import SharedReport from './components/SharedReport';
-import SharedPlaylist from './components/SharedPlaylist';
-import PricingPage from './components/PricingPage';
-import MentionsLegales from './components/MentionsLegales';
-import CGU from './components/CGU';
-import PolitiqueConfidentialite from './components/PolitiqueConfidentialite';
 import { usePlan } from './hooks/usePlan';
 import { I18nProvider } from './i18n/I18nContext';
 
+// Composants chargés à la demande (code-splitting) : allège le bundle initial
+const CodingInterface = lazy(() => import('./components/CodingInterface'));
+const MyStats = lazy(() => import('./components/MyStats'));
+const MyTeam = lazy(() => import('./components/MyTeam'));
+const PanelsManager = lazy(() => import('./components/PanelsManager'));
+const EvolutionDashboard = lazy(() => import('./components/EvolutionDashboard'));
+const ProfilePage = lazy(() => import('./components/ProfilePage'));
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const ConfirmEmail = lazy(() => import('./components/ConfirmEmail'));
+const SharedReport = lazy(() => import('./components/SharedReport'));
+const SharedPlaylist = lazy(() => import('./components/SharedPlaylist'));
+const PricingPage = lazy(() => import('./components/PricingPage'));
+const MentionsLegales = lazy(() => import('./components/MentionsLegales'));
+const CGU = lazy(() => import('./components/CGU'));
+const PolitiqueConfidentialite = lazy(() => import('./components/PolitiqueConfidentialite'));
+
 type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing' | 'mentions-legales' | 'cgu' | 'confidentialite';
+
+const PageLoader = () => (
+  <div style={{ minHeight:'100vh', background:'var(--orion-bg)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+    <div style={{ color:'var(--orion-text-mute)', fontSize:13 }}>Chargement…</div>
+  </div>
+);
 
 function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home');
@@ -103,16 +111,16 @@ function App() {
 
   // Rapport partagé public
   if (window.location.pathname.startsWith('/playlist/')) {
-    return <SharedPlaylist />;
+    return <Suspense fallback={<PageLoader />}><SharedPlaylist /></Suspense>;
   }
 
   if (window.location.pathname.startsWith('/share/')) {
-    return <SharedReport />;
+    return <Suspense fallback={<PageLoader />}><SharedReport /></Suspense>;
   }
 
   // Détecter la page de confirmation email
   if (window.location.pathname === '/confirm' || window.location.hash.includes('type=signup')) {
-    return <ConfirmEmail />;
+    return <Suspense fallback={<PageLoader />}><ConfirmEmail /></Suspense>;
   }
 
   if (isAuthenticated === null) {
@@ -131,7 +139,9 @@ function App() {
   if (currentPage === 'live') {
     return (
       <I18nProvider>
-        <CodingInterface onBack={handleBackToHome} />
+        <Suspense fallback={<PageLoader />}>
+          <CodingInterface onBack={handleBackToHome} />
+        </Suspense>
       </I18nProvider>
     );
   }
@@ -166,7 +176,9 @@ function App() {
     <I18nProvider>
       <ToastProvider addToast={addToast}>
         <AppLayout onNavigate={handleNavigate} currentPage={currentPage} userName={userName} isAdmin={isAdmin} trialDaysLeft={trialDaysLeft} trialExpired={trialExpired} isPro={isPro}>
-          {renderContent()}
+          <Suspense fallback={<PageLoader />}>
+            {renderContent()}
+          </Suspense>
         </AppLayout>
         <Toast toasts={toasts} onRemove={removeToast} />
       </ToastProvider>
