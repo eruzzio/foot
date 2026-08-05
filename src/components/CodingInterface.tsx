@@ -379,7 +379,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const handleVideoTimeUpdate = () => {
     const v = videoElRef.current;
     if (!v) return;
-    const matchSeconds = Math.max(0, v.currentTime - videoOffset);
+    const matchSeconds = Math.max(0, Math.round(v.currentTime - videoOffset));
     setCurrentTime(matchSeconds);
   };
 
@@ -464,9 +464,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     parentButtonId?: string,
     buttonLabel?: string
   ) => {
-    if (isVideoMode) console.log('[VIDEO CODAGE] clic bouton — matchId:', matchId, '| buttonType:', buttonType, '| currentTime:', currentTime);
     if (!matchId) {
-      if (isVideoMode) console.warn('[VIDEO CODAGE] matchId absent → clic ignoré');
       const { data } = await supabase.from('matches').select('id').eq('status', 'in_progress').maybeSingle();
       if (data?.id) {
         setMatchId(data.id);
@@ -503,7 +501,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
         event_type_id: eventType?.id ?? null,
         label: buttonLabel ?? null,
         team: selectedTeam,
-        timestamp: currentTime,
+        timestamp: Math.round(currentTime),
         outcome: outcome || 'neutral',
         keywords: [] as string[],
         parent_event_id: null,
@@ -833,7 +831,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
             event_type_id: eventTypeData.id,
             label: 'But',
             team: team,
-            timestamp: currentTime,
+            timestamp: Math.round(currentTime),
             outcome: 'success',
           });
       }
