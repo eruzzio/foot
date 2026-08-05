@@ -161,7 +161,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     }
     await initializeMatch();
     await loadAllPanels();
-    setIsMatchSheetOpen(true);
+    if (!isVideoMode) setIsMatchSheetOpen(true);
   };
 
   // Vérifier si un backup existe après la création du match
@@ -464,6 +464,31 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     buttonLabel?: string
   ) => {
     if (!matchId) {
+      // En mode vidéo, si le match n'est pas encore créé, on le crée à la volée
+      if (isVideoMode) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: newMatch } = await supabase
+          .from('matches')
+          .insert({
+            user_id: user.id,
+            status: 'in_progress',
+            match_time: 0,
+            match_date: new Date().toISOString(),
+            team_a_name: teamAName || 'Équipe A',
+            team_b_name: teamBName || 'Équipe B',
+            team_a_score: 0,
+            team_b_score: 0,
+          })
+          .select()
+          .single();
+        if (newMatch?.id) {
+          setMatchId(newMatch.id);
+          // On relance le clic une fois le match créé
+          setTimeout(() => handleActionClick(eventType, outcome, buttonType, keywordLabel, parentButtonId, buttonLabel), 50);
+        }
+        return;
+      }
       const { data } = await supabase.from('matches').select('id').eq('status', 'in_progress').maybeSingle();
       if (data?.id) {
         setMatchId(data.id);
