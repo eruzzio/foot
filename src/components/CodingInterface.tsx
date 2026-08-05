@@ -464,7 +464,9 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     parentButtonId?: string,
     buttonLabel?: string
   ) => {
+    if (isVideoMode) console.log('[VIDEO CODAGE] clic bouton — matchId:', matchId, '| buttonType:', buttonType, '| currentTime:', currentTime);
     if (!matchId) {
+      if (isVideoMode) console.warn('[VIDEO CODAGE] matchId absent → clic ignoré');
       const { data } = await supabase.from('matches').select('id').eq('status', 'in_progress').maybeSingle();
       if (data?.id) {
         setMatchId(data.id);
