@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Activity, AlertTriangle, CheckCircle, Menu, X, ChevronRight, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Shield } from 'lucide-react';
+import { Activity, AlertTriangle, CheckCircle, Menu, X, ChevronRight, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Shield, Film } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createDefaultFootballPanel } from '../utils/createDefaultPanel';
 import { calculateTeamXG } from '../utils/xg';
@@ -15,6 +15,7 @@ interface MatchSummary {
 
 const NAV_ITEMS = [
   { id: 'live',      label: 'Codage Live',    icon: Radio },
+  { id: 'video',     label: 'Codage Vidéo',   icon: Film },
   { id: 'panels',    label: 'Mes Panneaux',   icon: PanelLeft },
   { id: 'stats',     label: 'Mes Stats',      icon: BarChart2 },
   { id: 'evolution', label: 'Évolution',      icon: TrendingUp },
