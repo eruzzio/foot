@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Zap } from 'lucide-react';
+import { Shield, Menu, X, Radio, PanelLeft, BarChart2, TrendingUp, Users, User, Home, Zap, Film } from 'lucide-react';
 import { OrionLogo } from './orion/Orion';
 import { supabase } from '../lib/supabase';
 
@@ -17,6 +17,7 @@ interface AppLayoutProps {
 const NAV_ITEMS = [
   { id: 'home',      label: 'Accueil',        icon: Home },
   { id: 'live',      label: 'Codage Live',     icon: Radio },
+  { id: 'video',     label: 'Codage Vidéo',    icon: Film },
   { id: 'panels',    label: 'Mes Panneaux',    icon: PanelLeft },
   { id: 'stats',     label: 'Mes Stats',       icon: BarChart2 },
   { id: 'evolution', label: 'Évolution',       icon: TrendingUp },

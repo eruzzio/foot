@@ -8,7 +8,7 @@ import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
 import LocationSelector from './LocationSelector';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Upload, Play, Pause } from 'lucide-react';
 import ExportButton from './ExportButton';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
@@ -17,9 +17,16 @@ import HalftimeReport from './HalftimeReport';
 
 interface CodingInterfaceProps {
   onBack?: () => void;
+  mode?: 'live' | 'video';
 }
 
-export default function CodingInterface({ onBack }: CodingInterfaceProps) {
+export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfaceProps) {
+  const isVideoMode = mode === 'video';
+  const videoElRef = useRef<HTMLVideoElement | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string>('');
+  const [videoOffset, setVideoOffset] = useState(0); // secondes vidéo avant le coup d'envoi
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -365,6 +372,39 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
         .update({ match_time: 0, status: 'setup' })
         .eq('id', matchId);
     }
+  };
+
+  // --- Mode vidéo : le "temps de match" suit le timecode de la vidéo (moins l'offset du coup d'envoi) ---
+  const handleVideoTimeUpdate = () => {
+    const v = videoElRef.current;
+    if (!v) return;
+    const matchSeconds = Math.max(0, v.currentTime - videoOffset);
+    setCurrentTime(matchSeconds);
+  };
+
+  const handleVideoFileSelected = (file: File) => {
+    setVideoFile(file);
+    const url = URL.createObjectURL(file);
+    setVideoUrl(url);
+  };
+
+  const markVideoKickoff = () => {
+    const v = videoElRef.current;
+    if (!v) return;
+    setVideoOffset(Math.round(v.currentTime));
+  };
+
+  const videoSeek = (delta: number) => {
+    const v = videoElRef.current;
+    if (!v) return;
+    v.currentTime = Math.max(0, Math.min(v.duration || 0, v.currentTime + delta));
+  };
+
+  const toggleVideoPlay = () => {
+    const v = videoElRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setVideoPlaying(true); }
+    else { v.pause(); setVideoPlaying(false); }
   };
 
   const handleHalftime = () => {
@@ -891,6 +931,63 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 </div>
               </div>
             )}
+            {isVideoMode ? (
+              <div style={{ background:'var(--orion-surface)', border:'1px solid var(--orion-line)', borderRadius:8, overflow:'hidden' }}>
+                {!videoUrl ? (
+                  <label style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:10, padding:'48px 20px', cursor:'pointer', color:'var(--orion-text-mute)' }}>
+                    <Upload size={28} />
+                    <span style={{ fontWeight:700 }}>Charger la vidéo du match</span>
+                    <span style={{ fontSize:12 }}>Fichier local (MP4, MOV, WebM…)</span>
+                    <input type="file" accept="video/*" style={{ display:'none' }}
+                      onChange={e => { const f = e.target.files?.[0]; if (f) handleVideoFileSelected(f); }} />
+                  </label>
+                ) : (
+                  <div>
+                    <video
+                      ref={videoElRef}
+                      src={videoUrl}
+                      style={{ width:'100%', maxHeight:420, background:'#000', display:'block' }}
+                      onTimeUpdate={handleVideoTimeUpdate}
+                      onPlay={() => setVideoPlaying(true)}
+                      onPause={() => setVideoPlaying(false)}
+                      controls
+                    />
+                    {/* Barre de contrôle codage vidéo */}
+                    <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap', padding:'10px 12px', borderTop:'1px solid var(--orion-line)' }}>
+                      <button onClick={toggleVideoPlay} className="o-btn o-btn--sm">
+                        {videoPlaying ? <Pause size={14} /> : <Play size={14} />}
+                      </button>
+                      <button onClick={() => videoSeek(-5)} className="o-btn o-btn--ghost o-btn--sm">−5s</button>
+                      <button onClick={() => videoSeek(-1)} className="o-btn o-btn--ghost o-btn--sm">−1s</button>
+                      <button onClick={() => videoSeek(1)} className="o-btn o-btn--ghost o-btn--sm">+1s</button>
+                      <button onClick={() => videoSeek(5)} className="o-btn o-btn--ghost o-btn--sm">+5s</button>
+                      <div style={{ width:1, alignSelf:'stretch', background:'var(--orion-line)' }} />
+                      <span style={{ fontSize:11, color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)' }}>SYNC</span>
+                      <button onClick={markVideoKickoff} className="o-btn o-btn--ghost o-btn--sm" style={{ fontWeight:700 }}
+                        title="Place la vidéo sur le coup d'envoi puis clique ici">⚑ Coup d'envoi ici</button>
+                      <span style={{ fontSize:11, fontWeight:700, color: videoOffset !== 0 ? 'var(--orion-accent)' : 'var(--orion-text-dim)', fontFamily:'var(--orion-font-mono)' }}>
+                        {videoOffset >= 0 ? '+' : ''}{videoOffset}s
+                      </span>
+                      <div style={{ flex:1 }} />
+                      <span style={{ fontSize:12, fontWeight:800, color:'var(--orion-accent)', fontFamily:'var(--orion-font-mono)' }}>
+                        Match : {Math.floor(currentTime/60)}:{String(Math.floor(currentTime%60)).padStart(2,'0')}
+                      </span>
+                    </div>
+                    {/* Sélection d'équipe (réutilise selectedTeam) */}
+                    <div style={{ display:'flex', gap:8, padding:'0 12px 12px' }}>
+                      <button onClick={() => setSelectedTeam('A')} className="o-btn o-btn--sm"
+                        style={selectedTeam === 'A' ? { borderColor:'var(--orion-accent)', color:'var(--orion-accent)', flex:1 } : { flex:1 }}>
+                        {teamAName}
+                      </button>
+                      <button onClick={() => setSelectedTeam('B')} className="o-btn o-btn--sm"
+                        style={selectedTeam === 'B' ? { borderColor:'var(--orion-accent)', color:'var(--orion-accent)', flex:1 } : { flex:1 }}>
+                        {teamBName}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
             <MatchTimer
               currentTime={currentTime}
               isRunning={isRunning}
@@ -918,6 +1015,7 @@ export default function CodingInterface({ onBack }: CodingInterfaceProps) {
                 setShowFormationManager(true);
               }}
             />
+            )}
 
             {/* Barre Undo */}
             {showUndoBar && undoEvent && (

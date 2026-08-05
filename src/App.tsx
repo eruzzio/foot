@@ -26,7 +26,7 @@ const MentionsLegales = lazy(() => import('./components/MentionsLegales'));
 const CGU = lazy(() => import('./components/CGU'));
 const PolitiqueConfidentialite = lazy(() => import('./components/PolitiqueConfidentialite'));
 
-type PageType = 'home' | 'live' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing' | 'mentions-legales' | 'cgu' | 'confidentialite';
+type PageType = 'home' | 'live' | 'video' | 'stats' | 'team' | 'panels' | 'evolution' | 'profile' | 'admin' | 'pricing' | 'mentions-legales' | 'cgu' | 'confidentialite';
 
 const PageLoader = () => (
   <div style={{ minHeight:'100vh', background:'var(--orion-bg)', display:'flex', alignItems:'center', justifyContent:'center' }}>
@@ -141,6 +141,17 @@ function App() {
       <I18nProvider>
         <Suspense fallback={<PageLoader />}>
           <CodingInterface onBack={handleBackToHome} />
+        </Suspense>
+      </I18nProvider>
+    );
+  }
+
+  // Codage vidéo (post-match) plein écran
+  if (currentPage === 'video') {
+    return (
+      <I18nProvider>
+        <Suspense fallback={<PageLoader />}>
+          <CodingInterface onBack={handleBackToHome} mode="video" />
         </Suspense>
       </I18nProvider>
     );
