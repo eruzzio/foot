@@ -133,7 +133,8 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     const handleKey = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
-      if (e.code === 'Space') {
+      // En mode vidéo, la barre Espace ne pilote pas le chrono live (le play/pause se fait sur la vidéo)
+      if (e.code === 'Space' && !isVideoMode) {
         e.preventDefault();
         setIsRunning(prev => !prev);
       }
@@ -151,7 +152,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [isRunning, undoEvent]);
+  }, [isRunning, undoEvent, isVideoMode]);
 
   const [backupToRestore, setBackupToRestore] = useState<any>(null);
 
@@ -464,31 +465,6 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     buttonLabel?: string
   ) => {
     if (!matchId) {
-      // En mode vidéo, si le match n'est pas encore créé, on le crée à la volée
-      if (isVideoMode) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data: newMatch } = await supabase
-          .from('matches')
-          .insert({
-            user_id: user.id,
-            status: 'in_progress',
-            match_time: 0,
-            match_date: new Date().toISOString(),
-            team_a_name: teamAName || 'Équipe A',
-            team_b_name: teamBName || 'Équipe B',
-            team_a_score: 0,
-            team_b_score: 0,
-          })
-          .select()
-          .single();
-        if (newMatch?.id) {
-          setMatchId(newMatch.id);
-          // On relance le clic une fois le match créé
-          setTimeout(() => handleActionClick(eventType, outcome, buttonType, keywordLabel, parentButtonId, buttonLabel), 50);
-        }
-        return;
-      }
       const { data } = await supabase.from('matches').select('id').eq('status', 'in_progress').maybeSingle();
       if (data?.id) {
         setMatchId(data.id);
@@ -560,10 +536,12 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
         const locMode = clickedButton?.location_mode ?? 'none';
 
         if (locMode === 'field' || locMode === 'field_and_goal') {
+          if (isVideoMode && videoElRef.current) { videoElRef.current.pause(); setVideoPlaying(false); }
           setFieldSelectorEventId(data[0].id);
           setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
           setShowFieldSelector(true);
         } else if (locMode === 'zones') {
+          if (isVideoMode && videoElRef.current) { videoElRef.current.pause(); setVideoPlaying(false); }
           setFieldSelectorEventId(data[0].id);
           setFieldSelectorEventName(buttonLabel ?? eventType?.name ?? 'Action');
           setShowZoneSelector(true);
