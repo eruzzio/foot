@@ -1138,9 +1138,21 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
       {isVideoMode && activeClipId && (
         <div style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.85)', display:'grid', placeItems:'center', zIndex:250 }}
           onClick={() => setActiveClipId(null)}>
-          <div style={{ background:'var(--orion-surface)', padding:20, borderRadius:12 }} onClick={e => e.stopPropagation()}>
-            <p style={{ color:'#fff' }}>Modale test — action {activeClipId}</p>
-            <button onClick={() => setActiveClipId(null)} className="o-btn o-btn--primary o-btn--sm">Fermer</button>
+          <div style={{ background:'var(--orion-surface)', padding:20, borderRadius:12, minWidth:340 }} onClick={e => e.stopPropagation()}>
+            <p style={{ color:'#fff', marginBottom:12 }}>Ajuster la séquence</p>
+            <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
+              <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44 }}>Début</span>
+              <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost o-btn--sm">+1s</button>
+              <span style={{ fontSize:13, fontWeight:700, minWidth:32, textAlign:'center' }}>{getClipBefore(activeClipId)}s</span>
+              <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost o-btn--sm">−1s</button>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:12 }}>
+              <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44 }}>Fin</span>
+              <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost o-btn--sm">−1s</button>
+              <span style={{ fontSize:13, fontWeight:700, minWidth:32, textAlign:'center' }}>{getClipAfter(activeClipId)}s</span>
+              <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost o-btn--sm">+1s</button>
+            </div>
+            <button onClick={() => setActiveClipId(null)} className="o-btn o-btn--primary o-btn--sm">Valider</button>
           </div>
         </div>
       )}
