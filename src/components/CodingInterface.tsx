@@ -4,11 +4,12 @@ import { EventType, MatchEventWithDetails, PanelButtonWithEventType, Panel } fro
 import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
 import Timeline from './Timeline';
+import PlaylistPublisher from './PlaylistPublisher';
 import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
 import LocationSelector from './LocationSelector';
-import { ArrowLeft, Upload, Play, Pause } from 'lucide-react';
+import { ArrowLeft, Upload, Play, Pause, ListVideo } from 'lucide-react';
 import ExportButton from './ExportButton';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
@@ -27,6 +28,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [videoOffset, setVideoOffset] = useState(0); // secondes vidéo avant le coup d'envoi
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [showPlaylistPublisher, setShowPlaylistPublisher] = useState(false);
   const [matchId, setMatchId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -1067,6 +1069,17 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
           </div>
 
           <div className="lg:col-span-1 order-first lg:order-last">
+            {isVideoMode && (
+              <button
+                onClick={() => setShowPlaylistPublisher(true)}
+                disabled={events.length === 0 || !videoFile}
+                className="o-btn o-btn--primary"
+                style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: (events.length === 0 || !videoFile) ? 0.5 : 1 }}
+                title={!videoFile ? 'Charge une vidéo' : events.length === 0 ? 'Code au moins une action' : 'Créer une playlist à partir de tes actions'}
+              >
+                <ListVideo size={15} /> Créer une playlist ({events.length})
+              </button>
+            )}
             <Timeline
               events={events}
               onDeleteEvent={handleDeleteEvent}
@@ -1078,6 +1091,22 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
           </div>
         </div>
       </div>
+
+      {showPlaylistPublisher && isVideoMode && (
+        <PlaylistPublisher
+          playlist={events.map(e => ({
+            id: e.id,
+            timestamp: (e.timestamp ?? 0) + videoOffset,  // timecode réel dans la vidéo
+            matchSeconds: e.timestamp ?? 0,               // temps de match (affichage)
+            label: e.event_type?.name || e.label || 'Action',
+            team: e.team === 'A' ? teamAName : e.team === 'B' ? teamBName : '',
+          }))}
+          videoFile={videoFile}
+          videoOffset={videoOffset}
+          match={{ id: matchId, team_a_name: teamAName, team_b_name: teamBName }}
+          onClose={() => setShowPlaylistPublisher(false)}
+        />
+      )}
 
       <MatchSheet
         isOpen={isMatchSheetOpen}
