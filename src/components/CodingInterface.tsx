@@ -31,16 +31,6 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const [showPlaylistPublisher, setShowPlaylistPublisher] = useState(false);
   const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(new Set());
 
-  // En mode vidéo : par défaut toute nouvelle action est incluse (cochée)
-  useEffect(() => {
-    if (!isVideoMode) return;
-    setSelectedClipIds(prev => {
-      const next = new Set(prev);
-      events.forEach(e => { if (!prev.has(e.id)) next.add(e.id); });
-      return next;
-    });
-  }, [events, isVideoMode]);
-
   // Revoir une action : la vidéo saute quelques secondes avant et rejoue
   const seekVideoToEvent = (ev: { timestamp?: number }) => {
     const v = videoElRef.current;
@@ -66,6 +56,16 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const [currentPanel, setCurrentPanel] = useState<Panel | null>(null);
   const [allPanels, setAllPanels] = useState<Panel[]>([]);
   const [events, setEvents] = useState<MatchEventWithDetails[]>([]);
+
+  // En mode vidéo : par défaut toute nouvelle action est incluse (cochée)
+  useEffect(() => {
+    if (!isVideoMode) return;
+    setSelectedClipIds(prev => {
+      const next = new Set(prev);
+      events.forEach(e => { if (!prev.has(e.id)) next.add(e.id); });
+      return next;
+    });
+  }, [events, isVideoMode]);
   const [loading, setLoading] = useState(true);
   const [isMatchSheetOpen, setIsMatchSheetOpen] = useState(false);
   const [teamAName, setTeamAName] = useState('Équipe A');
