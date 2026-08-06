@@ -5,6 +5,7 @@ import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
 import Timeline from './Timeline';
 import PlaylistPublisher from './PlaylistPublisher';
+import ClipAdjuster from './ClipAdjuster';
 import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
@@ -46,15 +47,9 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
     });
   };
 
-  // Revoir une action : la vidéo se cale au début du clip et devient l'action active à ajuster
+  // Clic sur une action → ouvre la modale d'ajustement de CETTE séquence
   const seekVideoToEvent = (ev: { id: string; timestamp?: number }) => {
-    const v = videoElRef.current;
-    if (!v) return;
     setActiveClipId(ev.id);
-    const videoTs = (ev.timestamp ?? 0) + videoOffset;
-    v.currentTime = Math.max(0, videoTs - getClipBefore(ev.id));
-    v.play();
-    setVideoPlaying(true);
   };
 
   const toggleClipSelect = (id: string) => {
@@ -1034,39 +1029,6 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
                         {teamBName}
                       </button>
                     </div>
-
-                    {/* Ajustement de la séquence sélectionnée */}
-                    {activeClipId && (() => {
-                      const ev = events.find(e => e.id === activeClipId);
-                      if (!ev) return null;
-                      const bef = getClipBefore(activeClipId);
-                      const aft = getClipAfter(activeClipId);
-                      return (
-                        <div style={{ margin:'0 12px 12px', padding:'10px 12px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-accent)', borderRadius:8 }}>
-                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-accent)', marginBottom:8, display:'flex', alignItems:'center', gap:6 }}>
-                            <ListVideo size={13} /> Ajuster : {ev.event_type?.name || ev.label || 'Action'}
-                            <span style={{ marginLeft:'auto', fontSize:11, color:'var(--orion-text-mute)', fontWeight:600 }}>durée totale : {bef + aft}s</span>
-                          </div>
-                          <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
-                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                              <span style={{ fontSize:11, color:'var(--orion-text-mute)', minWidth:40 }}>Début</span>
-                              <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Commencer 1s plus tôt">+1s</button>
-                              <span style={{ fontSize:12, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:30, textAlign:'center' }}>{bef}s</span>
-                              <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Commencer 1s plus tard">−1s</button>
-                            </div>
-                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                              <span style={{ fontSize:11, color:'var(--orion-text-mute)', minWidth:40 }}>Fin</span>
-                              <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Finir 1s plus tôt">−1s</button>
-                              <span style={{ fontSize:12, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:30, textAlign:'center' }}>{aft}s</span>
-                              <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Finir 1s plus tard">+1s</button>
-                            </div>
-                            <button onClick={() => seekVideoToEvent({ id: ev.id, timestamp: ev.timestamp })} className="o-btn o-btn--sm" style={{ marginLeft:'auto' }} title="Revoir la séquence">
-                              <Play size={13} /> Revoir
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })()}
                   </div>
                 )}
               </div>
@@ -1172,6 +1134,59 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
           </div>
         </div>
       </div>
+
+      {/* Modale d'ajustement d'une séquence (mode vidéo) */}
+      {isVideoMode && activeClipId && videoUrl && (() => {
+        const ev = events.find(e => e.id === activeClipId);
+        if (!ev) return null;
+        const bef = getClipBefore(activeClipId);
+        const aft = getClipAfter(activeClipId);
+        const videoTs = (ev.timestamp ?? 0) + videoOffset;
+        const clipStart = Math.max(0, videoTs - bef);
+        const clipEnd = videoTs + aft;
+        return (
+          <div style={{ position:'fixed', inset:0, background:'rgba(5,7,10,0.85)', backdropFilter:'blur(4px)', display:'grid', placeItems:'center', zIndex:250, padding:16 }}
+            onClick={() => setActiveClipId(null)}>
+            <div style={{ background:'var(--orion-surface)', border:'1px solid var(--orion-line)', borderRadius:12, width:'min(760px,96vw)', overflow:'hidden' }}
+              onClick={e => e.stopPropagation()}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', borderBottom:'1px solid var(--orion-line)' }}>
+                <span style={{ fontWeight:800, fontSize:15, display:'flex', alignItems:'center', gap:8 }}>
+                  <ListVideo size={16} /> Ajuster la séquence · {ev.event_type?.name || ev.label || 'Action'}
+                </span>
+                <button onClick={() => setActiveClipId(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)' }}><X size={18} /></button>
+              </div>
+
+              <ClipAdjuster
+                key={activeClipId}
+                videoUrl={videoUrl}
+                clipStart={clipStart}
+                clipEnd={clipEnd}
+              />
+
+              <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)' }}>
+                <div style={{ display:'flex', gap:20, flexWrap:'wrap', alignItems:'center' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44, fontWeight:600 }}>Début</span>
+                    <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'4px 9px' }} title="Commencer 1s plus tôt">+1s</button>
+                    <span style={{ fontSize:13, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:32, textAlign:'center' }}>{bef}s</span>
+                    <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'4px 9px' }} title="Commencer 1s plus tard">−1s</button>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44, fontWeight:600 }}>Fin</span>
+                    <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'4px 9px' }} title="Finir 1s plus tôt">−1s</button>
+                    <span style={{ fontSize:13, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:32, textAlign:'center' }}>{aft}s</span>
+                    <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'4px 9px' }} title="Finir 1s plus tard">+1s</button>
+                  </div>
+                  <span style={{ fontSize:12, color:'var(--orion-text-mute)', fontWeight:600 }}>durée totale : {bef + aft}s</span>
+                  <button onClick={() => setActiveClipId(null)} className="o-btn o-btn--primary o-btn--sm" style={{ marginLeft:'auto' }}>
+                    <Check size={14} /> Valider
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {showPlaylistPublisher && isVideoMode && (
         <PlaylistPublisher
