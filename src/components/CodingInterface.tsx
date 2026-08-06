@@ -5,7 +5,6 @@ import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
 import Timeline from './Timeline';
 import PlaylistPublisher from './PlaylistPublisher';
-import ClipAdjuster from './ClipAdjuster';
 import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
@@ -1156,11 +1155,18 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
                 <button onClick={() => setActiveClipId(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)' }}><X size={18} /></button>
               </div>
 
-              <ClipAdjuster
+              <video
                 key={activeClipId}
-                videoUrl={videoUrl}
-                clipStart={clipStart}
-                clipEnd={clipEnd}
+                src={videoUrl}
+                style={{ width:'100%', maxHeight:400, display:'block', background:'#000' }}
+                controls
+                autoPlay
+                muted
+                onLoadedMetadata={e => { (e.target as HTMLVideoElement).currentTime = clipStart; }}
+                onTimeUpdate={e => {
+                  const v = e.target as HTMLVideoElement;
+                  if (v.currentTime >= clipEnd || v.currentTime < clipStart - 0.3) { v.currentTime = clipStart; v.play().catch(() => {}); }
+                }}
               />
 
               <div style={{ padding:'12px 16px', borderTop:'1px solid var(--orion-line)' }}>
