@@ -30,13 +30,29 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [showPlaylistPublisher, setShowPlaylistPublisher] = useState(false);
   const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(new Set());
+  // Action actuellement sélectionnée pour ajustement dans le lecteur
+  const [activeClipId, setActiveClipId] = useState<string | null>(null);
+  // Durées personnalisées par séquence (id -> {before, after}) — partagées avec le PlaylistPublisher
+  const [clipDurations, setClipDurations] = useState<Record<string, { before: number; after: number }>>({});
+  const DEFAULT_BEFORE = 5;
+  const DEFAULT_AFTER = 5;
+  const getClipBefore = (id: string) => clipDurations[id]?.before ?? DEFAULT_BEFORE;
+  const getClipAfter = (id: string) => clipDurations[id]?.after ?? DEFAULT_AFTER;
+  const adjustClip = (id: string, field: 'before' | 'after', delta: number) => {
+    setClipDurations(prev => {
+      const cur = prev[id] ?? { before: DEFAULT_BEFORE, after: DEFAULT_AFTER };
+      const val = Math.max(0, Math.min(60, (field === 'before' ? cur.before : cur.after) + delta));
+      return { ...prev, [id]: { ...cur, [field]: val } };
+    });
+  };
 
-  // Revoir une action : la vidéo saute quelques secondes avant et rejoue
-  const seekVideoToEvent = (ev: { timestamp?: number }) => {
+  // Revoir une action : la vidéo se cale au début du clip et devient l'action active à ajuster
+  const seekVideoToEvent = (ev: { id: string; timestamp?: number }) => {
     const v = videoElRef.current;
     if (!v) return;
+    setActiveClipId(ev.id);
     const videoTs = (ev.timestamp ?? 0) + videoOffset;
-    v.currentTime = Math.max(0, videoTs - 3);
+    v.currentTime = Math.max(0, videoTs - getClipBefore(ev.id));
     v.play();
     setVideoPlaying(true);
   };
@@ -1018,6 +1034,39 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
                         {teamBName}
                       </button>
                     </div>
+
+                    {/* Ajustement de la séquence sélectionnée */}
+                    {activeClipId && (() => {
+                      const ev = events.find(e => e.id === activeClipId);
+                      if (!ev) return null;
+                      const bef = getClipBefore(activeClipId);
+                      const aft = getClipAfter(activeClipId);
+                      return (
+                        <div style={{ margin:'0 12px 12px', padding:'10px 12px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-accent)', borderRadius:8 }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:'var(--orion-accent)', marginBottom:8, display:'flex', alignItems:'center', gap:6 }}>
+                            <ListVideo size={13} /> Ajuster : {ev.event_type?.name || ev.label || 'Action'}
+                            <span style={{ marginLeft:'auto', fontSize:11, color:'var(--orion-text-mute)', fontWeight:600 }}>durée totale : {bef + aft}s</span>
+                          </div>
+                          <div style={{ display:'flex', gap:16, flexWrap:'wrap' }}>
+                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                              <span style={{ fontSize:11, color:'var(--orion-text-mute)', minWidth:40 }}>Début</span>
+                              <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Commencer 1s plus tôt">+1s</button>
+                              <span style={{ fontSize:12, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:30, textAlign:'center' }}>{bef}s</span>
+                              <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Commencer 1s plus tard">−1s</button>
+                            </div>
+                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                              <span style={{ fontSize:11, color:'var(--orion-text-mute)', minWidth:40 }}>Fin</span>
+                              <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Finir 1s plus tôt">−1s</button>
+                              <span style={{ fontSize:12, fontWeight:700, fontFamily:'var(--orion-font-mono)', minWidth:30, textAlign:'center' }}>{aft}s</span>
+                              <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost o-btn--sm" style={{ padding:'3px 8px' }} title="Finir 1s plus tard">+1s</button>
+                            </div>
+                            <button onClick={() => seekVideoToEvent({ id: ev.id, timestamp: ev.timestamp })} className="o-btn o-btn--sm" style={{ marginLeft:'auto' }} title="Revoir la séquence">
+                              <Play size={13} /> Revoir
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -1135,6 +1184,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
           }))}
           videoFile={videoFile}
           videoOffset={videoOffset}
+          initialClipDurations={clipDurations}
           match={{ id: matchId, team_a_name: teamAName, team_b_name: teamBName }}
           onClose={() => setShowPlaylistPublisher(false)}
         />

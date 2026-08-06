@@ -17,17 +17,19 @@ interface Props {
   videoOffset: number;
   match: any;
   onClose: () => void;
+  initialClipDurations?: Record<string, { before: number; after: number }>;
 }
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
 
-export default function PlaylistPublisher({ playlist, videoFile, videoOffset, match, onClose }: Props) {
+export default function PlaylistPublisher({ playlist, videoFile, videoOffset, match, onClose, initialClipDurations }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const [before, setBefore] = useState(5);
   const [after, setAfter] = useState(5);
-  // Durées personnalisées par séquence (id -> {before, after}) ; repli sur les valeurs globales
-  const [perClip, setPerClip] = useState<Record<string, { before: number; after: number }>>({});
+  // Durées personnalisées par séquence (id -> {before, after}) ; repli sur les valeurs globales.
+  // Initialisé avec les durées déjà ajustées dans le lecteur (mode codage vidéo).
+  const [perClip, setPerClip] = useState<Record<string, { before: number; after: number }>>(initialClipDurations ?? {});
   const clipBefore = (id: string) => perClip[id]?.before ?? before;
   const clipAfter = (id: string) => perClip[id]?.after ?? after;
   const setClipDuration = (id: string, field: 'before' | 'after', val: number) => {
