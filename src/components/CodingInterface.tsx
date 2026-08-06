@@ -29,6 +29,35 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const [videoOffset, setVideoOffset] = useState(0); // secondes vidéo avant le coup d'envoi
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [showPlaylistPublisher, setShowPlaylistPublisher] = useState(false);
+  const [selectedClipIds, setSelectedClipIds] = useState<Set<string>>(new Set());
+
+  // En mode vidéo : par défaut toute nouvelle action est incluse (cochée)
+  useEffect(() => {
+    if (!isVideoMode) return;
+    setSelectedClipIds(prev => {
+      const next = new Set(prev);
+      events.forEach(e => { if (!prev.has(e.id)) next.add(e.id); });
+      return next;
+    });
+  }, [events, isVideoMode]);
+
+  // Revoir une action : la vidéo saute quelques secondes avant et rejoue
+  const seekVideoToEvent = (ev: { timestamp?: number }) => {
+    const v = videoElRef.current;
+    if (!v) return;
+    const videoTs = (ev.timestamp ?? 0) + videoOffset;
+    v.currentTime = Math.max(0, videoTs - 3);
+    v.play();
+    setVideoPlaying(true);
+  };
+
+  const toggleClipSelect = (id: string) => {
+    setSelectedClipIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
   const [matchId, setMatchId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -1072,12 +1101,12 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
             {isVideoMode && (
               <button
                 onClick={() => setShowPlaylistPublisher(true)}
-                disabled={events.length === 0 || !videoFile}
+                disabled={selectedClipIds.size === 0 || !videoFile}
                 className="o-btn o-btn--primary"
-                style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: (events.length === 0 || !videoFile) ? 0.5 : 1 }}
-                title={!videoFile ? 'Charge une vidéo' : events.length === 0 ? 'Code au moins une action' : 'Créer une playlist à partir de tes actions'}
+                style={{ width:'100%', justifyContent:'center', marginBottom:10, opacity: (selectedClipIds.size === 0 || !videoFile) ? 0.5 : 1 }}
+                title={!videoFile ? 'Charge une vidéo' : selectedClipIds.size === 0 ? 'Coche au moins une action' : 'Créer une playlist à partir des actions cochées'}
               >
-                <ListVideo size={15} /> Créer une playlist ({events.length})
+                <ListVideo size={15} /> Créer la playlist ({selectedClipIds.size})
               </button>
             )}
             <Timeline
@@ -1087,6 +1116,9 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
               teamBName={teamBName}
               veoUrl={veoUrl}
               buildVeoLink={buildVeoLink}
+              onSeekToEvent={isVideoMode ? seekVideoToEvent : undefined}
+              selectedIds={isVideoMode ? selectedClipIds : undefined}
+              onToggleSelect={isVideoMode ? toggleClipSelect : undefined}
             />
           </div>
         </div>
@@ -1094,7 +1126,7 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
 
       {showPlaylistPublisher && isVideoMode && (
         <PlaylistPublisher
-          playlist={events.map(e => ({
+          playlist={events.filter(e => selectedClipIds.has(e.id)).map(e => ({
             id: e.id,
             timestamp: (e.timestamp ?? 0) + videoOffset,  // timecode réel dans la vidéo
             matchSeconds: e.timestamp ?? 0,               // temps de match (affichage)

@@ -11,9 +11,13 @@ interface TimelineProps {
   teamBName?: string;
   veoUrl?: string;
   buildVeoLink?: (videoTimestamp: number) => string;
+  // Mode vidéo (post-match) : revoir une action + sélection pour la playlist
+  onSeekToEvent?: (event: MatchEventWithDetails) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (eventId: string) => void;
 }
 
-export default function Timeline({ events, match, onDeleteEvent, teamAName = 'Éq. A', teamBName = 'Éq. B', veoUrl, buildVeoLink }: TimelineProps) {
+export default function Timeline({ events, match, onDeleteEvent, teamAName = 'Éq. A', teamBName = 'Éq. B', veoUrl, buildVeoLink, onSeekToEvent, selectedIds, onToggleSelect }: TimelineProps) {
   const [shareEvent, setShareEvent] = useState<MatchEventWithDetails | null>(null);
 
   const formatTime = (seconds: number): string => {
@@ -56,14 +60,32 @@ export default function Timeline({ events, match, onDeleteEvent, teamAName = 'É
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="font-mono text-sm font-semibold text-gray-400 w-12 flex-shrink-0">
+                    {onToggleSelect && (
+                      <input
+                        type="checkbox"
+                        checked={selectedIds ? selectedIds.has(event.id) : true}
+                        onChange={() => onToggleSelect(event.id)}
+                        style={{ width:16, height:16, flexShrink:0, cursor:'pointer', accentColor:'var(--orion-accent)' }}
+                        title="Inclure dans la playlist"
+                      />
+                    )}
+                    <span
+                      className="font-mono text-sm font-semibold text-gray-400 w-12 flex-shrink-0"
+                      style={onSeekToEvent ? { cursor:'pointer', textDecoration:'underline dotted' } : undefined}
+                      onClick={onSeekToEvent ? () => onSeekToEvent(event) : undefined}
+                      title={onSeekToEvent ? 'Revoir cette action dans la vidéo' : undefined}
+                    >
                       {formatTime(event.timestamp)}
                     </span>
                     <span
                       className="w-2 h-2 rounded-full flex-shrink-0"
                       style={{ backgroundColor: event.event_type?.color || '#6B7280' }}
                     />
-                    <span className="font-medium text-white truncate">
+                    <span
+                      className="font-medium text-white truncate"
+                      style={onSeekToEvent ? { cursor:'pointer' } : undefined}
+                      onClick={onSeekToEvent ? () => onSeekToEvent(event) : undefined}
+                    >
                       {event.event_type?.name
                         ? event.label && event.label !== event.event_type.name
                           ? `${event.event_type.name} › ${event.label}`
