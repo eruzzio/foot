@@ -26,6 +26,19 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
 
   const [before, setBefore] = useState(5);
   const [after, setAfter] = useState(5);
+  // Durées personnalisées par séquence (id -> {before, after}) ; repli sur les valeurs globales
+  const [perClip, setPerClip] = useState<Record<string, { before: number; after: number }>>({});
+  const clipBefore = (id: string) => perClip[id]?.before ?? before;
+  const clipAfter = (id: string) => perClip[id]?.after ?? after;
+  const setClipDuration = (id: string, field: 'before' | 'after', val: number) => {
+    setPerClip(prev => ({
+      ...prev,
+      [id]: {
+        before: field === 'before' ? val : (prev[id]?.before ?? before),
+        after: field === 'after' ? val : (prev[id]?.after ?? after),
+      },
+    }));
+  };
   const [name, setName] = useState(`${match.team_a_name} vs ${match.team_b_name}`);
   const [sortBy, setSortBy] = useState<'manual' | 'name' | 'time' | 'team'>('manual');
 
@@ -119,8 +132,10 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
       const processClip = async (i: number) => {
         const item = sortedPlaylist[i];
         const vTs = item.timestamp;
-        const s = Math.max(0, vTs - before);
-        const e = Math.min(duration || vTs + after, vTs + after);
+        const bef = clipBefore(item.id);
+        const aft = clipAfter(item.id);
+        const s = Math.max(0, vTs - bef);
+        const e = Math.min(duration || vTs + aft, vTs + aft);
 
         const resp = await fetch('/api/clip-from-storage', {
           method: 'POST',
@@ -260,12 +275,12 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
               {/* Réglages avant/après */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 <div>
-                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes avant l'action</div>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes avant (défaut)</div>
                   <input type="number" value={before} min={0} step={1} disabled={running} onChange={e => setBefore(Number(e.target.value))}
                     style={{ width:'100%', padding:'7px 10px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, color:'var(--orion-text)', fontSize:13, textAlign:'center', outline:'none', boxSizing:'border-box' }} />
                 </div>
                 <div>
-                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes après l'action</div>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', marginBottom:4, fontWeight:600 }}>Secondes après (défaut)</div>
                   <input type="number" value={after} min={0} step={1} disabled={running} onChange={e => setAfter(Number(e.target.value))}
                     style={{ width:'100%', padding:'7px 10px', background:'var(--orion-surface)', border:'1.5px solid var(--orion-line-strong)', borderRadius:6, color:'var(--orion-text)', fontSize:13, textAlign:'center', outline:'none', boxSizing:'border-box' }} />
                 </div>
@@ -296,13 +311,24 @@ export default function PlaylistPublisher({ playlist, videoFile, videoOffset, ma
               </div>
 
               {/* Liste des séquences */}
-              <div style={{ maxHeight:120, overflowY:'auto', border:'1.5px solid var(--orion-line)', borderRadius:8, padding:8, display:'flex', flexDirection:'column', gap:4 }}>
+              <div style={{ maxHeight:180, overflowY:'auto', border:'1.5px solid var(--orion-line)', borderRadius:8, padding:8, display:'flex', flexDirection:'column', gap:4 }}>
                 {sortedPlaylist.map((p, i) => (
                   <div key={p.id} style={{ display:'flex', alignItems:'center', gap:8, padding:'5px 8px', background: running && currentIdx === i ? 'rgba(61,128,224,0.1)' : 'var(--orion-surface-2)', borderRadius:5, fontSize:12 }}>
                     <span style={{ color:'var(--orion-text-mute)', fontFamily:'var(--orion-font-mono)', minWidth:20 }}>{i+1}.</span>
-                    <span style={{ color:'var(--orion-text)', fontWeight:600, flex:1 }}>{p.label}</span>
-                    {p.team && <span style={{ color:'var(--orion-text-mute)', fontSize:11, maxWidth:90, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.team}</span>}
+                    <span style={{ color:'var(--orion-text)', fontWeight:600, flex:1, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{p.label}</span>
                     <span style={{ color:'var(--orion-text-mute)' }}>{fmt(p.matchSeconds ?? p.timestamp)}</span>
+                    {/* Durée par séquence */}
+                    {!running && (
+                      <span style={{ display:'flex', alignItems:'center', gap:2, fontSize:10, color:'var(--orion-text-mute)' }} title="Secondes avant / après l'action pour cette séquence">
+                        <input type="number" min={0} max={60} value={clipBefore(p.id)}
+                          onChange={e => setClipDuration(p.id, 'before', Math.max(0, parseInt(e.target.value) || 0))}
+                          style={{ width:34, padding:'2px 3px', textAlign:'center', background:'var(--orion-surface)', border:'1px solid var(--orion-line)', borderRadius:4, color:'var(--orion-text)', fontSize:10 }} />
+                        <span>‹●›</span>
+                        <input type="number" min={0} max={60} value={clipAfter(p.id)}
+                          onChange={e => setClipDuration(p.id, 'after', Math.max(0, parseInt(e.target.value) || 0))}
+                          style={{ width:34, padding:'2px 3px', textAlign:'center', background:'var(--orion-surface)', border:'1px solid var(--orion-line)', borderRadius:4, color:'var(--orion-text)', fontSize:10 }} />
+                      </span>
+                    )}
                     {running && currentIdx > i && <Check size={12} style={{ color:'var(--orion-green)' }} />}
                     {running && currentIdx === i && <Loader size={12} style={{ color:'var(--orion-accent)' }} />}
                     {!running && (
