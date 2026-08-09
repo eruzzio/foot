@@ -8,46 +8,56 @@ interface Props {
 
 /**
  * Lecteur de prévisualisation : joue en boucle uniquement la portion
- * [clipStart, clipEnd] de la vidéo, pour ajuster une séquence.
- * Ne touche pas au lecteur principal (sa propre balise vidéo).
+ * [clipStart, clipEnd] de la vidéo. Sa propre balise vidéo, n'impacte pas le lecteur principal.
  */
 export default function ClipAdjuster({ videoUrl, clipStart, clipEnd }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
+  // Les bornes courantes, lues par le handler de boucle sans le recréer
+  const startRef = useRef(clipStart);
+  const endRef = useRef(clipEnd);
+  startRef.current = clipStart;
+  endRef.current = clipEnd;
 
-  // Au montage / changement de bornes : se placer au début et lancer la lecture
+  // Placer la vidéo au début du clip dès que possible (et à chaque changement de bornes)
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    const onReady = () => {
-      v.currentTime = clipStart;
-      v.play().catch(() => {});
+    const place = () => {
+      try { v.currentTime = clipStart; v.play().catch(() => {}); } catch { /* noop */ }
     };
-    if (v.readyState >= 1) onReady();
-    else v.addEventListener('loadedmetadata', onReady, { once: true });
-    return () => v.removeEventListener('loadedmetadata', onReady);
-  }, [clipStart, clipEnd]);
+    if (v.readyState >= 1) {
+      place();
+    } else {
+      v.addEventListener('loadedmetadata', place, { once: true });
+      return () => v.removeEventListener('loadedmetadata', place);
+    }
+  }, [clipStart, clipEnd, videoUrl]);
 
-  // Boucle : dès qu'on dépasse la fin, on repart au début
+  // Boucle sur la portion
   const handleTimeUpdate = () => {
     const v = ref.current;
     if (!v) return;
-    if (v.currentTime >= clipEnd || v.currentTime < clipStart - 0.3) {
-      v.currentTime = clipStart;
+    if (v.currentTime >= endRef.current || v.currentTime < startRef.current - 0.3) {
+      v.currentTime = startRef.current;
       v.play().catch(() => {});
     }
   };
 
   return (
-    <div style={{ background:'#000' }}>
+    <div style={{ background: '#000', textAlign: 'center' }}>
       <video
         ref={ref}
         src={videoUrl}
-        style={{ width:'100%', maxHeight:400, display:'block', background:'#000' }}
+        style={{ width: '100%', maxHeight: 400, display: 'block', background: '#000' }}
         onTimeUpdate={handleTimeUpdate}
         controls
         autoPlay
         muted
+        playsInline
       />
+      <div style={{ fontSize: 11, color: 'var(--orion-text-mute)', padding: '4px 0' }}>
+        Aperçu en boucle · {Math.round(clipEnd - clipStart)}s
+      </div>
     </div>
   );
 }

@@ -5,6 +5,7 @@ import MatchTimer from './MatchTimer';
 import ActionButtons from './ActionButtons';
 import Timeline from './Timeline';
 import PlaylistPublisher from './PlaylistPublisher';
+import ClipAdjuster from './ClipAdjuster';
 import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
@@ -1144,27 +1145,11 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
               <button onClick={() => setActiveClipId(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--orion-text-mute)' }}><X size={18} /></button>
             </div>
 
-            <video
+            <ClipAdjuster
               key={activeClipId}
-              src={videoUrl}
-              style={{ width:'100%', maxHeight:400, display:'block', background:'#000' }}
-              controls
-              autoPlay
-              muted
-              onLoadedMetadata={e => {
-                const ev = events.find(x => x.id === activeClipId);
-                if (!ev) return;
-                const start = Math.max(0, (ev.timestamp ?? 0) + videoOffset - getClipBefore(activeClipId));
-                (e.target as HTMLVideoElement).currentTime = start;
-              }}
-              onTimeUpdate={e => {
-                const ev = events.find(x => x.id === activeClipId);
-                if (!ev) return;
-                const start = Math.max(0, (ev.timestamp ?? 0) + videoOffset - getClipBefore(activeClipId));
-                const end = (ev.timestamp ?? 0) + videoOffset + getClipAfter(activeClipId);
-                const v = e.target as HTMLVideoElement;
-                if (v.currentTime >= end || v.currentTime < start - 0.3) { v.currentTime = start; v.play().catch(() => {}); }
-              }}
+              videoUrl={videoUrl}
+              clipStart={Math.max(0, ((events.find(x => x.id === activeClipId)?.timestamp ?? 0) + videoOffset) - getClipBefore(activeClipId))}
+              clipEnd={((events.find(x => x.id === activeClipId)?.timestamp ?? 0) + videoOffset) + getClipAfter(activeClipId)}
             />
 
             <div style={{ padding:'12px 16px' }}>
