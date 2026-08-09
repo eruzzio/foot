@@ -9,7 +9,7 @@ import Statistics from './Statistics';
 import MatchSheet from './MatchSheet';
 import MatchFormationManager from './MatchFormationManager';
 import LocationSelector from './LocationSelector';
-import { ArrowLeft, Upload, Play, Pause, ListVideo } from 'lucide-react';
+import { ArrowLeft, Upload, Play, Pause, ListVideo, X } from 'lucide-react';
 import ExportButton from './ExportButton';
 import FieldPositionSelector from './FieldPositionSelector';
 import GoalZoneSelector from './GoalZoneSelector';
