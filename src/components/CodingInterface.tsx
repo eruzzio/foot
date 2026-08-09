@@ -40,11 +40,9 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const getClipBefore = (id: string) => clipDurations[id]?.before ?? DEFAULT_BEFORE;
   const getClipAfter = (id: string) => clipDurations[id]?.after ?? DEFAULT_AFTER;
   const adjustClip = (id: string, field: 'before' | 'after', delta: number) => {
-    console.log('[adjustClip]', { id, field, delta, current: clipDurations[id] });
     setClipDurations(prev => {
       const cur = prev[id] ?? { before: DEFAULT_BEFORE, after: DEFAULT_AFTER };
       const val = Math.max(0, Math.min(60, (field === 'before' ? cur.before : cur.after) + delta));
-      console.log('[adjustClip] nouvelle valeur', field, '=', val);
       return { ...prev, [id]: { ...cur, [field]: val } };
     });
   };
@@ -1160,18 +1158,18 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
                 <div style={{ flex:'1 1 200px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:8, padding:'10px 12px' }}>
                   <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>Secondes avant l'action</div>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                    <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir le début">−</button>
+                    <button type="button" onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir le début">−</button>
                     <span style={{ fontSize:20, fontWeight:800, fontFamily:'var(--orion-font-mono)', color:'var(--orion-accent)' }}>{getClipBefore(activeClipId)}s</span>
-                    <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger le début">+</button>
+                    <button type="button" onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger le début">+</button>
                   </div>
                 </div>
                 {/* Fin */}
                 <div style={{ flex:'1 1 200px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:8, padding:'10px 12px' }}>
                   <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>Secondes après l'action</div>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
-                    <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir la fin">−</button>
+                    <button type="button" onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir la fin">−</button>
                     <span style={{ fontSize:20, fontWeight:800, fontFamily:'var(--orion-font-mono)', color:'var(--orion-accent)' }}>{getClipAfter(activeClipId)}s</span>
-                    <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger la fin">+</button>
+                    <button type="button" onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger la fin">+</button>
                   </div>
                 </div>
               </div>
