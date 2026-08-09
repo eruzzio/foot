@@ -40,9 +40,11 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
   const getClipBefore = (id: string) => clipDurations[id]?.before ?? DEFAULT_BEFORE;
   const getClipAfter = (id: string) => clipDurations[id]?.after ?? DEFAULT_AFTER;
   const adjustClip = (id: string, field: 'before' | 'after', delta: number) => {
+    console.log('[adjustClip]', { id, field, delta, current: clipDurations[id] });
     setClipDurations(prev => {
       const cur = prev[id] ?? { before: DEFAULT_BEFORE, after: DEFAULT_AFTER };
       const val = Math.max(0, Math.min(60, (field === 'before' ? cur.before : cur.after) + delta));
+      console.log('[adjustClip] nouvelle valeur', field, '=', val);
       return { ...prev, [id]: { ...cur, [field]: val } };
     });
   };
