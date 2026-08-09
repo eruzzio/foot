@@ -1152,20 +1152,33 @@ export default function CodingInterface({ onBack, mode = 'live' }: CodingInterfa
               clipEnd={((events.find(x => x.id === activeClipId)?.timestamp ?? 0) + videoOffset) + getClipAfter(activeClipId)}
             />
 
-            <div style={{ padding:'12px 16px' }}>
-              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}>
-                <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44 }}>Début</span>
-                <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost o-btn--sm">+1s</button>
-                <span style={{ fontSize:13, fontWeight:700, minWidth:32, textAlign:'center' }}>{getClipBefore(activeClipId)}s</span>
-                <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost o-btn--sm">−1s</button>
+            <div style={{ padding:'14px 16px' }}>
+              <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
+                {/* Début */}
+                <div style={{ flex:'1 1 200px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:8, padding:'10px 12px' }}>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>Secondes avant l'action</div>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+                    <button onClick={() => adjustClip(activeClipId, 'before', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir le début">−</button>
+                    <span style={{ fontSize:20, fontWeight:800, fontFamily:'var(--orion-font-mono)', color:'var(--orion-accent)' }}>{getClipBefore(activeClipId)}s</span>
+                    <button onClick={() => adjustClip(activeClipId, 'before', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger le début">+</button>
+                  </div>
+                </div>
+                {/* Fin */}
+                <div style={{ flex:'1 1 200px', background:'var(--orion-surface-2)', border:'1px solid var(--orion-line)', borderRadius:8, padding:'10px 12px' }}>
+                  <div style={{ fontSize:11, color:'var(--orion-text-mute)', fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:0.5 }}>Secondes après l'action</div>
+                  <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+                    <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Raccourcir la fin">−</button>
+                    <span style={{ fontSize:20, fontWeight:800, fontFamily:'var(--orion-font-mono)', color:'var(--orion-accent)' }}>{getClipAfter(activeClipId)}s</span>
+                    <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost" style={{ width:36, height:36, padding:0, justifyContent:'center', fontSize:16 }} title="Allonger la fin">+</button>
+                  </div>
+                </div>
               </div>
-              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:12 }}>
-                <span style={{ fontSize:12, color:'var(--orion-text-mute)', minWidth:44 }}>Fin</span>
-                <button onClick={() => adjustClip(activeClipId, 'after', -1)} className="o-btn o-btn--ghost o-btn--sm">−1s</button>
-                <span style={{ fontSize:13, fontWeight:700, minWidth:32, textAlign:'center' }}>{getClipAfter(activeClipId)}s</span>
-                <button onClick={() => adjustClip(activeClipId, 'after', 1)} className="o-btn o-btn--ghost o-btn--sm">+1s</button>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:14 }}>
+                <span style={{ fontSize:12, color:'var(--orion-text-mute)', fontWeight:600 }}>
+                  Durée totale du clip : <strong style={{ color:'var(--orion-text)' }}>{getClipBefore(activeClipId) + getClipAfter(activeClipId)}s</strong>
+                </span>
+                <button onClick={() => setActiveClipId(null)} className="o-btn o-btn--primary">Valider</button>
               </div>
-              <button onClick={() => setActiveClipId(null)} className="o-btn o-btn--primary o-btn--sm">Valider</button>
             </div>
           </div>
         </div>
