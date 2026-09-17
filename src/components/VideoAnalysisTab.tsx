@@ -3,7 +3,7 @@ import { Upload, Video, Play, Pause, Filter, ExternalLink, Clock, ChevronRight, 
 import { supabase } from '../lib/supabase';
 import { Match, MatchEventWithDetails } from '../types/database';
 import { buildVeoTimestampUrl } from '../utils/veoParser';
-import VideoClipper from './VideoClipper';
+import ClipExporter from './ClipExporter';
 import PlaylistPublisher from './PlaylistPublisher';
 
 interface VideoAnalysisTabProps {
@@ -710,13 +710,13 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         </div>
       )}
 
-      {/* VideoClipper modale (export unitaire) */}
-      {showClipper && (
-        <VideoClipper
-          matchDuration={match.match_time || 5400}
-          pendingClip={pendingClip}
-          initialVideoFile={localFile}
-          initialVideoOffset={offset}
+      {/* Export unitaire d'un clip */}
+      {showClipper && pendingClip && localFile && (
+        <ClipExporter
+          playlist={[{ timestamp: pendingClip.timestamp, label: pendingClip.label }]}
+          videoFile={localFile}
+          videoOffset={offset}
+          match={match}
           onClose={() => { setShowClipper(false); setPendingClip(null); }}
         />
       )}
@@ -732,13 +732,13 @@ export default function VideoAnalysisTab({ match, teamAName, teamBName }: VideoA
         />
       )}
 
-      {/* VideoClipper modale (export playlist) */}
-      {showPlaylistExport && (
-        <VideoClipper
-          matchDuration={match.match_time || 5400}
+      {/* Export playlist en fichier(s) */}
+      {showPlaylistExport && localFile && (
+        <ClipExporter
           playlist={playlist}
-          initialVideoFile={localFile}
-          initialVideoOffset={offset}
+          videoFile={localFile}
+          videoOffset={offset}
+          match={match}
           onClose={() => setShowPlaylistExport(false)}
         />
       )}
